@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 import { Section, SectionHeader, Card } from '@/components/ui';
 import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
