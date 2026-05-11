@@ -2,7 +2,7 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import * as path from 'path';
 import * as fs from 'fs';
 import sharp from 'sharp';
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class StorageService {
@@ -15,7 +15,7 @@ export class StorageService {
   }
 
   async saveImage(file: Express.Multer.File): Promise<string> {
-    const filename = `${uuidv4()}.webp`;
+    const filename = `${randomUUID()}.webp`;
     const filePath = path.join(this.uploadPath, filename);
 
     try {
@@ -32,7 +32,7 @@ export class StorageService {
 
   async saveVideo(file: Express.Multer.File): Promise<string> {
     const ext = path.extname(file.originalname);
-    const filename = `${uuidv4()}${ext}`;
+    const filename = `${randomUUID()}${ext}`;
     const filePath = path.join(this.uploadPath, filename);
 
     try {
