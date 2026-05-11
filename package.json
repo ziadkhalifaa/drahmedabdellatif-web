@@ -18,22 +18,20 @@
     "deploy:web": "npx turbo build --filter=@dr-ahmed/web --force",
     "clean": "npx turbo clean && rm -rf node_modules"
   },
-  "devDependencies": {
+  "dependencies": {
     "prettier": "^3.8.3",
     "turbo": "^2.9.10",
     "typescript": "^5.9.0",
     "@nestjs/cli": "^11.0.21",
-    "prisma": "^6.6.0"
-  },
-  "packageManager": "npm@10.0.0",
-  "engines": {
-    "node": ">=20.0.0"
-  },
-  "dependencies": {
+    "prisma": "^6.6.0",
     "@types/sharp": "^0.32.0",
     "@types/uuid": "^11.0.0",
     "axios": "^1.16.0",
     "sharp": "^0.34.5",
     "uuid": "^14.0.0"
+  },
+  "packageManager": "npm@10.0.0",
+  "engines": {
+    "node": ">=20.0.0"
   }
 }
