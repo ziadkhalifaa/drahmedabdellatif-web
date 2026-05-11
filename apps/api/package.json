@@ -21,8 +21,8 @@
     "seed": "ts-node prisma/seed.ts"
   },
   "dependencies": {
-    "@dr-ahmed/shared": "*",
-    "@dr-ahmed/typescript-config": "*",
+    "@dr-ahmed/shared": "file:../../packages/shared",
+    "@dr-ahmed/typescript-config": "file:../../packages/config-typescript",
     "@nestjs/common": "^11.1.19",
     "@nestjs/config": "^4.0.4",
     "@nestjs/core": "^11.1.19",
