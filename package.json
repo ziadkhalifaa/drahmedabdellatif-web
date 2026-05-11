@@ -38,7 +38,7 @@
     "@types/jest": "^29.5.14",
     "@types/supertest": "^6.0.3"
   },
-  "packageManager": "npm@10.0.0",
+  "packageManager": "pnpm@9.12.3",
   "engines": {
     "node": ">=20.0.0"
   }
