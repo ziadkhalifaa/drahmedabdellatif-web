@@ -83,7 +83,7 @@ export default function LoginPage() {
                   <label className="text-xs font-bold uppercase tracking-widest text-[var(--muted)]">
                     {t('password') || 'Password'}
                   </label>
-                  <Link href="/auth/forgot-password" size="sm" className="text-xs font-bold text-[var(--primary)] hover:underline">
+                  <Link href="/auth/forgot-password" className="text-xs font-bold text-[var(--primary)] hover:underline">
                     {t('forgotPassword')}
                   </Link>
                 </div>
