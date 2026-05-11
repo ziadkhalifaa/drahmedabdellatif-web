@@ -8,7 +8,7 @@
   ],
   "scripts": {
     "dev": "npx turbo dev",
-    "build": "npx turbo build",
+    "build": "npx turbo build && mkdir -p public",
     "lint": "npx turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,js,json}\"",
     "db:generate": "npx prisma generate --schema=apps/api/prisma/schema.prisma",
