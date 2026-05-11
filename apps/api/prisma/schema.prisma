@@ -1,0 +1,200 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  admin
+  editor
+  patient
+}
+
+enum AppointmentType {
+  ONLINE
+  IN_CLINIC
+}
+
+enum AppointmentStatus {
+  pending
+  approved
+  rejected
+  completed
+  cancelled
+}
+
+enum BlogPostStatus {
+  draft
+  published
+}
+
+model User {
+  id                    String         @id @default(cuid())
+  email                 String         @unique
+  password              String
+  name                  String
+  phone                 String?
+  isPhoneVerified       Boolean        @default(false)
+  phoneVerificationCode String?
+  isEmailVerified       Boolean        @default(false)
+  emailVerificationCode String?
+  role                  UserRole       @default(patient)
+  appointments          Appointment[]
+  medicalReports        MedicalReport[]
+  createdAt             DateTime       @default(now())
+  updatedAt             DateTime       @updatedAt
+}
+
+model Appointment {
+  id             String            @id @default(cuid())
+  type           AppointmentType   @default(IN_CLINIC)
+  patientId      String?
+  patient        User?             @relation(fields: [patientId], references: [id])
+  // Guest info (fallback)
+  guestName      String?
+  guestPhone     String?
+  guestEmail     String?
+  
+  date           DateTime
+  timeSlot       String
+  status         AppointmentStatus @default(pending)
+  notes          String?           @db.Text
+  
+  // Video Meeting Info
+  meetingId      String?           @unique
+  meetingUrl     String?           @db.Text
+  
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+}
+
+model MedicalReport {
+  id          String   @id @default(cuid())
+  patientId   String
+  patient     User     @relation(fields: [patientId], references: [id])
+  title       String
+  description String?  @db.Text
+  fileUrl     String?  @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model BlogPost {
+  id                String         @id @default(cuid())
+  titleAr           String
+  titleEn           String
+  slugAr            String         @unique
+  slugEn            String         @unique
+  contentAr         String         @db.LongText
+  contentEn         String         @db.LongText
+  excerptAr         String?        @db.Text
+  excerptEn         String?        @db.Text
+  metaTitleAr       String?
+  metaTitleEn       String?
+  metaDescriptionAr String?        @db.Text
+  metaDescriptionEn String?        @db.Text
+  keywords          String?        @db.Text
+  categoryId        String?
+  category          Category?      @relation(fields: [categoryId], references: [id])
+  tags              BlogTag[]
+  status            BlogPostStatus @default(draft)
+  featuredImage     String?        @db.Text
+  createdAt         DateTime       @default(now())
+
+  updatedAt         DateTime       @updatedAt
+}
+
+model Category {
+  id     String     @id @default(cuid())
+  nameAr String
+  nameEn String
+  slugAr String     @unique
+  slugEn String     @unique
+  posts  BlogPost[]
+}
+
+model Tag {
+  id     String    @id @default(cuid())
+  nameAr String
+  nameEn String
+  slugAr String    @unique
+  slugEn String    @unique
+  posts  BlogTag[]
+}
+
+model BlogTag {
+  blogId String
+  tagId  String
+  blog   BlogPost @relation(fields: [blogId], references: [id], onDelete: Cascade)
+  tag    Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([blogId, tagId])
+}
+
+model Service {
+  id            String   @id @default(cuid())
+  titleAr       String
+  titleEn       String
+  descriptionAr String   @db.Text
+  descriptionEn String   @db.Text
+  icon          String
+  image         String?  @db.Text
+  order         Int      @default(0)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+
+model Testimonial {
+  id           String   @id @default(cuid())
+  patientName  String
+  patientAvatar String?  @db.Text
+  content      String   @db.Text
+  rating       Int
+  isApproved   Boolean  @default(false)
+  isVisible    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String
+  message   String   @db.Text
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model Media {
+  id        String   @id @default(cuid())
+  type      String   // "image" or "video"
+  url       String   @db.Text
+  titleAr   String?
+  titleEn   String?
+  categoryAr String?
+  categoryEn String?
+  order     Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SiteSettings {
+  key   String @id
+  value Json
+}
+
+model AnalyticsEvent {
+  id        String   @id @default(cuid())
+  type      String
+  payload   Json
+  createdAt DateTime @default(now())
+}
+
+

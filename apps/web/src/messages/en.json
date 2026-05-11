@@ -1,0 +1,414 @@
+{
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "aboutUs": "About Us",
+    "services": "Services",
+    "blog": "Blog",
+    "successStories": "Success Stories",
+    "patientGuide": "Patient Guide",
+    "media": "Media",
+    "contact": "Contact",
+    "bookAppointment": "Book Now",
+    "bookNow": "Book Now",
+    "admin": "Admin",
+    "login": "Patient Login",
+    "register": "Create Account",
+    "dashboard": "My Dashboard",
+    "appearance": "Appearance & Language",
+    "megamenu": {
+      "services": {
+        "title": "Medical Specialties",
+        "items": [
+          { "title": "Kidney Surgery", "desc": "Advanced endoscopic and laser surgeries for kidney stones and tumors.", "slug": "kidney" },
+          { "title": "Prostate Laser Treatment", "desc": "HOLEP and advanced laser solutions for prostate enlargement.", "slug": "prostate" },
+          { "title": "Infertility & Andrology", "desc": "Scientific solutions for male infertility and sexual health.", "slug": "andrology" },
+          { "title": "Bladder & Urology", "desc": "Comprehensive diagnosis and treatment for bladder disorders.", "slug": "bladder" },
+          { "title": "Urinary Incontinence", "desc": "Modern surgical and non-surgical treatments for incontinence.", "slug": "incontinence" },
+          { "title": "Pediatric Urology", "desc": "Delicate specialized surgeries for children's urological issues.", "slug": "pediatric" }
+        ]
+      }
+    }
+  },
+  "hero": {
+    "title": "Prof. Dr. Ahmed Abdellatif",
+    "subtitle": "Professor & Consultant of Urology, Kidney Surgery, Endoscopy, and Andrology",
+    "description": "Specialized medical care under the supervision of top academic expertise, utilizing the latest global technologies in urology and endoscopy.",
+    "cta": "Book an Appointment",
+    "learnMore": "Learn More"
+  },
+  "about": {
+    "title": "About Prof. Dr. Ahmed Abdellatif",
+    "description": "Professor and Consultant of Urology and Venereology at the University Hospital, holding a PhD in Urology from top Egyptian and American universities. Dr. Ahmed possesses extensive experience in delicate surgeries and endoscopy, with a sub-specialization in andrology, infertility, and sexual health, committed to delivering the highest standards of medical care.",
+    "experience": "Years Experience",
+    "patients": "Happy Patients",
+    "surgeries": "Surgeries Performed",
+    "awards": "Awards & Recognition",
+    "mission": {
+      "title": "Our Mission",
+      "content": "To provide outstanding medical care in urological surgery using the latest global technologies to ensure the health and comfort of our patients."
+    },
+    "vision": {
+      "title": "Our Vision",
+      "content": "To be the leading and preferred center for urological surgery and andrology in Egypt and the Middle East."
+    },
+    "values": {
+      "title": "Our Values",
+      "items": ["Professional Integrity", "Surgical Precision", "Patient Compassion", "Continuous Medical Innovation"]
+    }
+  },
+  "faqs": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "Answers to the most common questions about urological health",
+    "items": [
+      { "q": "What are the symptoms of prostate enlargement?", "a": "Symptoms include difficulty urinating, weak urine flow, and frequent need to urinate, especially at night." },
+      { "q": "Can kidney stones be treated without surgery?", "a": "Yes, we use laser techniques and flexible endoscopes to fragment stones without any surgical incision." },
+      { "q": "What are the latest treatments for male infertility?", "a": "We adopt the latest global protocols and microscopic surgeries to treat varicocele and improve sperm quality." }
+    ]
+  },
+  "patientGuide": {
+    "title": "Patient Guide",
+    "subtitle": "Important information before and after medical procedures",
+    "prep": "Pre-operative Preparation",
+    "postOp": "Post-operative Tips",
+    "prevention": "Tips for Stone Prevention",
+    "downloadPdf": "Download Guide as PDF",
+    "emergency": {
+      "title": "Emergency Cases",
+      "description": "In case of severe bleeding, unbearable pain, or complete urinary retention after surgery, please immediately head to the nearest emergency hospital or contact us directly on the 24-hour emergency number.",
+      "button": "Emergency Number: +201002621743"
+    },
+    "items": {
+      "prep": [
+        "Fast for 6-8 hours before surgical procedures.",
+        "Bring all previous medical reports and X-rays.",
+        "Inform the doctor about all regular medications.",
+        "Shower thoroughly on the morning of the procedure."
+      ],
+      "postOp": [
+        "Drink plenty of fluids (3-4 liters daily).",
+        "Avoid lifting heavy weights for two weeks.",
+        "Strictly adhere to prescribed medication schedules.",
+        "Light walking at home to stimulate circulation."
+      ],
+      "prevention": [
+        "Reduce salt and sodium intake.",
+        "Maintain regular water intake throughout the day.",
+        "Minimize carbonated drinks and caffeine.",
+        "Regular check-ups every 6 months."
+      ]
+    }
+  },
+  "media": {
+    "title": "Media Center",
+    "news": "News",
+    "videos": "Videos",
+    "images": "Images",
+    "all": "All",
+    "videosSubtitle": "Watch Dr. Ahmed Abdellatif's media appearances and health awareness video series.",
+    "gallerySubtitle": "A photo tour inside our medical centers and highlights from our scientific and media journey.",
+    "gallery": "Gallery"
+  },
+  "services": {
+    "title": "Our Services",
+    "subtitle": "Providing comprehensive and specialized medical care with the highest standards",
+    "viewAll": "View All Services",
+    "details": "View Details",
+    "badge": "Urology Specialist",
+    "learnMore": "Learn More",
+    "cta": {
+
+      "title": "Do you suffer from any health problems?",
+      "subtitle": "Don't hesitate to consult an expert. We are here to provide the care you deserve using the best technologies.",
+      "book": "Book an Appointment Now",
+      "whatsapp": "Contact via WhatsApp"
+    }
+  },
+  "whyUs": {
+    "title": "Why Choose Us",
+    "reasons": [
+      { "title": "Academic & Clinical Excellence", "description": "University Professor and specialized consultant combining modern science with long-standing experience." },
+      { "title": "Advanced Endoscopy", "description": "Utilizing the latest endoscopic and microscopic surgical techniques for faster recovery." },
+      { "title": "Infertility & Andrology", "description": "Comprehensive advanced solutions for infertility and sexual health using international protocols." },
+      { "title": "Integrated Care", "description": "Careful monitoring for every case with personalized treatment plans tailored to patient needs." }
+    ]
+  },
+  "testimonials": {
+    "title": "Patient Success Stories",
+    "subtitle": "We are proud to be part of the recovery journey for thousands of patients, and we cherish their kind words that drive us forward.",
+    "shareTitle": "Share Your Experience",
+    "shareDesc": "Your words mean a lot to us and help other patients make the right decision.",
+    "addReview": "Add a Review Now",
+    "verified": "Verified Review",
+    "thankYou": "Thank You!",
+    "reviewSubmitted": "Your review has been submitted for approval. It will appear on the site soon.",
+    "shareExperience": "Share Your Experience",
+    "yourName": "Your Full Name",
+    "namePlaceholder": "e.g. John Doe",
+    "ratingLabel": "Rating",
+    "reviewContent": "Review Content",
+    "reviewPlaceholder": "Tell us about your experience with Dr. Ahmed...",
+    "submitting": "Submitting...",
+    "postReview": "Post Review",
+    "noReviews": "No reviews yet. Be the first to share your experience!"
+  },
+  "blog": {
+    "title": "Latest Articles",
+    "subtitle": "Discover the latest medical tips and scientific articles in urology.",
+    "searchPlaceholder": "Search for an article...",
+    "viewAll": "View All Articles",
+    "readMore": "Read More",
+    "backToBlog": "Back to Blog",
+    "noPosts": "No articles yet."
+  },
+  "booking": {
+    "title": "Book an Appointment",
+    "subtitle": "Schedule your consultation with Dr. Ahmed Abdellatif easily online.",
+    "steps": {
+      "one": "Clinic & Service",
+      "two": "Patient Info",
+      "three": "Confirmation"
+    },
+    "form": {
+      "clinic": "Clinic",
+      "service": "Requested Service",
+      "name": "Full Name",
+      "phone": "Phone Number",
+      "email": "Email Address",
+      "date": "Birth Date",
+      "time": "Preferred Time",
+      "notes": "Additional Notes",
+      "next": "Next: Patient Details",
+      "prev": "Previous",
+      "confirm": "Confirm Booking",
+      "submit": "Book Appointment",
+      "error": "Something went wrong. Please try again.",
+      "conflict": "This time slot is already booked. Please choose another.",
+      "success": "Booking Successful!",
+      "successSub": "Our team will contact you soon to confirm the final appointment.",
+      "backHome": "Back to Home",
+      "placeholders": {
+        "name": "Enter your full name",
+        "phone": "Enter your phone number",
+        "email": "Enter your email"
+      }
+    },
+    "sidebar": {
+      "why": "Why book online?",
+      "reasons": [
+        "Save time and avoid waiting",
+        "Choose the most suitable time",
+        "Priority in examination"
+      ],
+      "immediate": "Call for immediate booking",
+      "available": "Available daily from 10 AM to 10 PM",
+      "whatsapp": "Booking via WhatsApp",
+      "chat": "Start Chat Now"
+    },
+    "wizard": {
+      "clinicVisit": "Clinic Visit",
+      "clinicVisitDesc": "Meet Prof. Dr. Ahmed at Beni Suef or 6th of October branches.",
+      "onlineConsultation": "Online Consultation",
+      "onlineConsultationDesc": "Professional video conference consultation from your home.",
+      "selectOption": "Select this option",
+      "selectDate": "Select Appointment Date",
+      "selectSlot": "Select Available Slot",
+      "doctorAvailable": "Doctor available for the selected dates.",
+      "continueToDetails": "Continue to Details",
+      "patientInfo": "Patient Information",
+      "fullName": "Full Name",
+      "phoneNumber": "Phone Number",
+      "emailAddress": "Email Address",
+      "notesPlaceholder": "Notes for the doctor...",
+      "back": "Back",
+      "confirmAppointment": "Confirm Appointment",
+      "booking": "Booking...",
+      "successTitle": "Success!",
+      "successOnline": "Your Online Consultation has been scheduled.",
+      "successClinic": "Your Clinic Visit has been scheduled.",
+      "meetingLinkSent": "Meeting link sent to your email.",
+      "returnHome": "Return to Homepage"
+    }
+  },
+  "contact": {
+    "title": "Contact Us",
+    "subtitle": "We are here to answer your inquiries and provide necessary medical care.",
+    "address": "Beni Suef: Boursaid St. - Al Nada Tower | 6th of October: Magda Sq. - Prima Vista Mall",
+    "phone": "+201002621743",
+    "email": "info@drahmed.com",
+    "form": {
+      "title": "Send us a message",
+      "name": "Full Name",
+      "namePlaceholder": "Enter your name",
+      "email": "Email Address",
+      "emailPlaceholder": "Enter your email",
+      "phone": "Phone Number",
+      "phonePlaceholder": "Enter your phone number",
+      "message": "Message",
+      "messagePlaceholder": "How can we help you?",
+      "submit": "Send Message",
+      "success": "Your message has been sent. We will get back to you soon.",
+      "successMessage": "Message sent successfully!"
+    },
+    "info": {
+      "phone": "Phone Number",
+      "email": "Email",
+      "beniSuef": "Beni Suef Branch",
+      "october": "6th of October Branch",
+      "beniSuefAddress": "Boursaid St. - Al Nada Tower",
+      "octoberAddress": "Magda Sq. - Prima Vista Mall"
+    },
+    "hours": {
+      "title": "Working Hours",
+      "beniSuef": "Beni Suef Branch",
+      "october": "6th of October Branch",
+      "beniSuefHours": "Sun - Thu (4 PM - 10 PM)",
+      "octoberHours": "Sat (2 PM - 8 PM)"
+    },
+    "map": "Interactive map will be added here"
+  },
+  "footer": {
+    "rights": "All rights reserved.",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "contact": "Contact",
+    "quickLinks": "Quick Links",
+    "facebook": "Follow us on Facebook"
+  },
+  "faqs": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "Answers to the most common questions about urology and endoscopy.",
+    "moreQuestions": "Still have questions?",
+    "moreQuestionsDesc": "Our medical team is ready to answer all your inquiries and provide necessary advice.",
+    "contactUsNow": "Contact Us Now"
+  },
+  "admin": {
+    "login": "Admin Login",
+    "dashboard": "Dashboard",
+    "appointments": "Appointments",
+    "blog": "Blog Posts",
+    "services": "Services",
+    "testimonials": "Testimonials",
+    "messages": "Messages",
+    "logout": "Logout",
+    "media": "Media",
+    "settings": "Settings",
+    "email": "Email",
+    "password": "Password",
+    "loginBtn": "Login"
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome Back",
+      "subtitle": "Login to your account to manage your appointments and reports.",
+      "submit": "Login",
+      "email": "Email Address",
+      "password": "Password",
+      "forgotPassword": "Forgot password?",
+      "noAccount": "Don't have an account?",
+      "registerLink": "Register Now"
+    },
+    "verifyEmail": {
+      "title": "Verify Your Email",
+      "subtitle": "We've sent a 6-digit code to your email at {email}",
+      "submit": "Verify Code",
+      "resend": "Resend Code",
+      "resendSuccess": "Verification code resent successfully",
+      "code": "Verification Code"
+    },
+    "register": {
+      "title": "Create Account",
+      "subtitle": "Join our platform to get personalized medical care and video consultations.",
+      "submit": "Create Account",
+      "hasAccount": "Already have an account?",
+      "loginLink": "Login Now",
+      "fullName": "Full Name",
+      "email": "Email Address",
+      "phone": "Phone Number",
+      "password": "Password",
+      "confirmPassword": "Confirm Password"
+    }
+  },
+  "dashboard": {
+    "welcome": "Welcome, {name}",
+    "subtitle": "Manage your medical journey with ease",
+    "upcoming": "Upcoming",
+    "reportsLabel": "Reports",
+    "totalVisits": "Total Visits",
+    "upcomingAppointment": "Upcoming Appointment",
+    "joinMeeting": "Join Meeting",
+    "noAppointmentsFound": "No upcoming appointments found.",
+    "latestReports": "Latest Medical Reports",
+    "viewAll": "View All",
+    "downloadReport": "Download",
+    "needHelp": "Need Help?",
+    "helpDesc": "Contact our specialized medical support team.",
+    "contactSupport": "Contact Support",
+    "medicalConsultation": "Medical Consultation",
+    "menu": {
+      "overview": "Overview",
+      "appointments": "My Appointments",
+      "reports": "Medical Reports",
+      "profile": "My Profile",
+      "logout": "Logout"
+    },
+    "profile": {
+      "title": "My Profile",
+      "subtitle": "Manage your personal information and account settings.",
+      "personalInfo": "Personal Information",
+      "fullName": "Full Name",
+      "email": "Email Address",
+      "phone": "Phone Number",
+      "security": "Security",
+      "currentPassword": "Current Password",
+      "newPassword": "New Password",
+      "saveChanges": "Save Changes",
+      "saving": "Saving...",
+      "success": "Profile updated successfully!",
+      "error": "Failed to update profile. Please check your current password."
+    },
+    "appointments": {
+      "title": "My Appointments",
+      "noAppointments": "You don't have any appointments yet.",
+      "bookNow": "Book Now",
+      "meetingLink": "Join Video Consultation"
+    },
+    "reports": {
+      "title": "Medical Reports",
+      "noReports": "No medical reports available yet.",
+      "download": "Download Report"
+    },
+    "video": {
+      "title": "Online Consultation",
+      "encrypted": "End-to-end Encrypted",
+      "leaveRoom": "Leave Room",
+      "patientDetails": "Patient Details",
+      "registeredAccount": "Registered Account",
+      "instructions": "Instructions",
+      "allowCamera": "Ensure your camera and microphone are allowed.",
+      "useHeadphones": "Use headphones to avoid echo.",
+      "privateConsult": "The consultation is private between you and the doctor.",
+      "liveRoom": "Live Room"
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "success": "Operation successful",
+    "retry": "Retry",
+    "noData": "No data available",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "search": "Search",
+    "status": "Status",
+    "actions": "Actions",
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "draft": "Draft",
+    "published": "Published"
+  }
+}

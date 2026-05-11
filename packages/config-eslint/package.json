@@ -1,0 +1,12 @@
+{
+  "name": "@dr-ahmed/config-eslint",
+  "version": "0.0.1",
+  "private": true,
+  "main": "index.js",
+  "files": [
+    "index.js"
+  ],
+  "peerDependencies": {
+    "typescript": "^5.9.0"
+  }
+}

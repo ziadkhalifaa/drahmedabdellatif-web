@@ -1,0 +1,123 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { Card, Button } from '@/components/ui';
+import { useAuth } from '@/components/layout/admin-layout';
+import { api } from '@/lib/api';
+import type { Appointment } from '@dr-ahmed/shared';
+import { AppointmentStatus } from '@dr-ahmed/shared';
+import { Check, X, FileDown, Download } from 'lucide-react';
+import { exportToExcel, exportToPDF } from '@/lib/export-utils';
+
+export default function AdminAppointmentsPage() {
+  const { token } = useAuth();
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+
+  const fetchAppointments = () => {
+    if (token) api.get<Appointment[]>('/appointments', token).then(setAppointments).catch(() => {});
+  };
+
+  useEffect(() => { fetchAppointments(); }, [token]);
+
+  const updateStatus = async (id: string, status: AppointmentStatus) => {
+    if (!token) return;
+    await api.patch(`/appointments/${id}/status`, { status }, token);
+    fetchAppointments();
+  };
+
+  const handleExportExcel = () => {
+    const data = appointments.map(a => ({
+      Patient: a.patientName,
+      Phone: a.patientPhone,
+      Email: a.patientEmail,
+      Date: new Date(a.date).toLocaleDateString(),
+      Time: a.timeSlot,
+      Status: a.status,
+      Notes: a.notes || ''
+    }));
+    exportToExcel(data, 'Appointments_Report');
+  };
+
+  const handleExportPDF = () => {
+    const headers = ['Patient', 'Phone', 'Date', 'Time', 'Status'];
+    const data = appointments.map(a => [
+      a.patientName,
+      a.patientPhone,
+      new Date(a.date).toLocaleDateString(),
+      a.timeSlot,
+      a.status
+    ]);
+    exportToPDF(headers, data, 'Appointments_Report', 'Appointments List');
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-[var(--foreground)]">Appointments</h1>
+          <p className="text-sm text-[var(--muted)]">Manage patient bookings and schedules.</p>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={handleExportExcel} className="gap-2">
+            <Download size={16} /> Excel
+          </Button>
+          <Button variant="outline" size="sm" onClick={handleExportPDF} className="gap-2">
+            <FileDown size={16} /> PDF
+          </Button>
+        </div>
+      </div>
+
+      <Card>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-[var(--border)] text-left">
+                <th className="px-4 pb-3 font-bold text-[var(--muted)] uppercase text-[10px] tracking-wider">Patient</th>
+                <th className="px-4 pb-3 font-bold text-[var(--muted)] uppercase text-[10px] tracking-wider">Phone</th>
+                <th className="px-4 pb-3 font-bold text-[var(--muted)] uppercase text-[10px] tracking-wider">Date</th>
+                <th className="px-4 pb-3 font-bold text-[var(--muted)] uppercase text-[10px] tracking-wider">Time</th>
+                <th className="px-4 pb-3 font-bold text-[var(--muted)] uppercase text-[10px] tracking-wider">Status</th>
+                <th className="px-4 pb-3 font-bold text-[var(--muted)] uppercase text-[10px] tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[var(--border)]">
+              {appointments.map((apt) => (
+                <tr key={apt.id} className="hover:bg-[var(--card-hover)] transition-colors">
+                  <td className="p-4">
+                    <p className="font-bold text-[var(--foreground)]">{apt.patientName}</p>
+                    <p className="text-[10px] text-[var(--muted)]">{apt.patientEmail}</p>
+                  </td>
+                  <td className="p-4 text-[var(--muted)] font-medium">{apt.patientPhone}</td>
+                  <td className="p-4 text-[var(--muted)]">{new Date(apt.date).toLocaleDateString()}</td>
+                  <td className="p-4 text-[var(--muted)]">{apt.timeSlot}</td>
+                  <td className="p-4">
+                    <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase ${
+                      apt.status === 'approved' ? 'bg-emerald-100 text-emerald-700' :
+                      apt.status === 'rejected' ? 'bg-red-100 text-red-700' :
+                      'bg-amber-100 text-amber-700'
+                    }`}>{apt.status}</span>
+                  </td>
+                  <td className="p-4">
+                    {apt.status === 'pending' && (
+                      <div className="flex gap-1">
+                        <Button size="sm" variant="ghost" onClick={() => updateStatus(apt.id, AppointmentStatus.APPROVED)} className="h-8 w-8 p-0 text-emerald-600 hover:bg-emerald-50">
+                          <Check size={16} />
+                        </Button>
+                        <Button size="sm" variant="ghost" onClick={() => updateStatus(apt.id, AppointmentStatus.REJECTED)} className="h-8 w-8 p-0 text-red-600 hover:bg-red-50">
+                          <X size={16} />
+                        </Button>
+                      </div>
+                    )}
+                  </td>
+                </tr>
+              ))}
+              {appointments.length === 0 && (
+                <tr><td colSpan={6} className="py-12 text-center text-[var(--muted)] font-medium">No appointments found</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </Card>
+    </div>
+  );
+}

@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --primary: #0f4c81; /* Classic Blue - Premium & Trustworthy */
+  --primary-light: #2c7da0;
+  --primary-dark: #072a44;
+  --accent: #d4af37; /* Gold - Premium touch */
+  --accent-light: #e6c667;
+  --background: #ffffff;
+  --foreground: #1a1a1a;
+  --card: #ffffff;
+  --card-hover: #f8fafc;
+  --muted: #64748b;
+  --border: #e2e8f0;
+  --radius: 1rem;
+}
+
+.dark {
+  --background: #020617; /* Deepest blue/black */
+  --foreground: #f8fafc;
+  --card: #0f172a;
+  --card-hover: #1e293b;
+  --muted: #94a3b8;
+  --border: #1e293b;
+}
+
+
+@layer base {
+  * {
+    @apply border-[var(--border)];
+  }
+  body {
+    @apply bg-[var(--background)] text-[var(--foreground)] selection:bg-[var(--primary)] selection:text-white;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-white/70 backdrop-blur-lg border border-white/20 dark:bg-slate-900/70 dark:border-slate-800/20;
+  }
+  .glass-dark {
+    @apply bg-black/40 backdrop-blur-xl border border-white/10;
+  }
+  .text-gradient {
+    @apply bg-gradient-to-r from-[var(--primary)] to-[var(--primary-light)] bg-clip-text text-transparent;
+  }
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+
+::selection {
+  background: var(--primary);
+  color: white;
+}
