@@ -8,7 +8,8 @@
   ],
   "scripts": {
     "dev": "npx turbo dev",
-    "build": "npx prisma db push --schema=apps/api/prisma/schema.prisma --accept-data-loss && npm run db:seed && npm run db:generate && npx turbo build",
+    "build": "npm run db:generate && npx turbo build --filter=@dr-ahmed/web",
+    "start": "node server.js",
     "lint": "npx turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,js,json}\"",
     "db:generate": "npx prisma generate --schema=apps/api/prisma/schema.prisma",
