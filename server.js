@@ -1,34 +1,37 @@
-const { spawn } = require('child_process');
+const { createServer } = require('http');
+const { parse } = require('url');
 const path = require('path');
 
-const port = process.env.PORT || 3000;
-const webDir = path.join(__dirname, 'apps', 'web');
+const port = parseInt(process.env.PORT || '3000', 10);
+const dev = process.env.NODE_ENV !== 'production';
+const dir = path.join(__dirname, 'apps', 'web');
 
-// Find next binary - check root node_modules first (npm workspaces hoisting), then web
-const nextBin = path.join(__dirname, 'node_modules', '.bin', 'next');
+// Require next from root node_modules (added as root dependency)
+const next = require('next');
 
-console.log(`Starting Next.js from: ${webDir}`);
-console.log(`Using next binary: ${nextBin}`);
-console.log(`Port: ${port}`);
+const app = next({ dev, dir });
+const handle = app.getRequestHandler();
 
-const child = spawn(nextBin, ['start', '-p', String(port)], {
-  cwd: webDir,
-  stdio: 'inherit',
-  env: { ...process.env, PORT: String(port) }
-});
+console.log(`Starting Next.js app (dev=${dev}) from dir: ${dir}`);
+console.log(`PORT: ${port}`);
 
-child.on('close', (code) => {
-  console.log(`Next.js process exited with code ${code}`);
-  process.exit(code || 0);
-});
-
-child.on('error', (err) => {
-  console.error('Failed to start Next.js:', err.message);
-  // Try alternative: use npx
-  const alt = spawn('npx', ['next', 'start', '-p', String(port)], {
-    cwd: webDir,
-    stdio: 'inherit',
-    env: { ...process.env, PORT: String(port) }
+app.prepare()
+  .then(() => {
+    createServer((req, res) => {
+      try {
+        const parsedUrl = parse(req.url, true);
+        handle(req, res, parsedUrl);
+      } catch (err) {
+        console.error('Error handling request:', err);
+        res.statusCode = 500;
+        res.end('Internal Server Error');
+      }
+    }).listen(port, (err) => {
+      if (err) throw err;
+      console.log(`> Ready on http://localhost:${port}`);
+    });
+  })
+  .catch((err) => {
+    console.error('Failed to prepare Next.js app:', err);
+    process.exit(1);
   });
-  alt.on('close', (code) => process.exit(code || 0));
-});
