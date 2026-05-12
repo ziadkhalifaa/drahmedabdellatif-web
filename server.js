@@ -1,37 +1,29 @@
-const { createServer } = require('http');
-const { parse } = require('url');
 const path = require('path');
+const fs = require('fs');
 
-const port = parseInt(process.env.PORT || '3000', 10);
-const dev = process.env.NODE_ENV !== 'production';
-const dir = path.join(__dirname, 'apps', 'web');
+// Set environment variables
+process.env.NODE_ENV = 'production';
+process.env.PORT = process.env.PORT || '3000';
 
-// Require next from root node_modules (added as root dependency)
-const next = require('next');
+const standaloneServerPath = path.join(__dirname, 'apps/web/.next/standalone/server.js');
 
-const app = next({ dev, dir });
-const handle = app.getRequestHandler();
-
-console.log(`Starting Next.js app (dev=${dev}) from dir: ${dir}`);
-console.log(`PORT: ${port}`);
-
-app.prepare()
-  .then(() => {
-    createServer((req, res) => {
-      try {
-        const parsedUrl = parse(req.url, true);
-        handle(req, res, parsedUrl);
-      } catch (err) {
-        console.error('Error handling request:', err);
-        res.statusCode = 500;
-        res.end('Internal Server Error');
-      }
-    }).listen(port, (err) => {
-      if (err) throw err;
-      console.log(`> Ready on http://localhost:${port}`);
-    });
-  })
-  .catch((err) => {
-    console.error('Failed to prepare Next.js app:', err);
-    process.exit(1);
-  });
+if (fs.existsSync(standaloneServerPath)) {
+  console.log('🚀 Starting Standalone Next.js Server...');
+  console.log('Path:', standaloneServerPath);
+  
+  // In standalone mode, Next.js expects to be run from the standalone directory
+  // to correctly find the node_modules and .next folder
+  process.chdir(path.join(__dirname, 'apps/web/.next/standalone'));
+  
+  require('./server.js');
+} else {
+  console.error('❌ Standalone server not found at:', standaloneServerPath);
+  console.error('Please ensure the build command finished successfully and scripts/copy-assets.mjs ran.');
+  
+  // Fallback for Hostinger: bind to port anyway to avoid 503 while we debug
+  const http = require('http');
+  http.createServer((req, res) => {
+    res.writeHead(503, { 'Content-Type': 'text/plain' });
+    res.end('Server initialization in progress or failed. Check logs.');
+  }).listen(process.env.PORT);
+}

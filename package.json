@@ -8,7 +8,7 @@
   ],
   "scripts": {
     "dev": "npx turbo dev",
-    "build": "npm run db:generate && npx turbo build --filter=@dr-ahmed/web",
+    "build": "npm run db:generate && npx turbo build --filter=@dr-ahmed/web && node scripts/copy-assets.mjs",
     "start": "node server.js",
     "lint": "npx turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,js,json}\"",
@@ -37,10 +37,7 @@
     "@types/passport-jwt": "^4.0.1",
     "@types/bcryptjs": "^3.0.0",
     "@types/jest": "^29.5.14",
-    "@types/supertest": "^6.0.3",
-    "next": "^16.2.6",
-    "react": "^19.2.6",
-    "react-dom": "^19.2.6"
+    "@types/supertest": "^6.0.3"
   },
   "packageManager": "npm@10.0.0",
   "engines": {
