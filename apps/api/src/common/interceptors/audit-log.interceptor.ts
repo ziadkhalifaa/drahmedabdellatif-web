@@ -12,7 +12,7 @@ import { PrismaService } from '../prisma.service';
 export class AuditLogInterceptor implements NestInterceptor {
   constructor(private readonly prisma: PrismaService) {}
 
-  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+  intercept(context: ExecutionContext, next: CallHandler): any {
     const request = context.switchToHttp().getRequest();
     const user = request.user;
     
@@ -36,6 +36,6 @@ export class AuditLogInterceptor implements NestInterceptor {
           },
         }).catch((err: any) => console.error('Failed to save audit log:', err));
       }),
-    ) as Observable<any>;
+    ) as any;
   }
 }

@@ -12,7 +12,7 @@ export class SimpleCacheInterceptor implements NestInterceptor {
   private cache = new Map<string, { data: any; expiry: number }>();
   private readonly TTL = 1000 * 60 * 5; // 5 minutes
 
-  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+  intercept(context: ExecutionContext, next: CallHandler): any {
     const request = context.switchToHttp().getRequest();
     
     // Only cache GET requests
@@ -34,6 +34,6 @@ export class SimpleCacheInterceptor implements NestInterceptor {
           expiry: Date.now() + this.TTL,
         });
       }),
-    ) as Observable<any>;
+    ) as any;
   }
 }
