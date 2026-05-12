@@ -39,6 +39,11 @@ if (fs.existsSync(standaloneServerPath)) {
 
     require('./server.js');
     console.log('✅ Standalone server.js required successfully');
+
+    // Keep the process alive even if Next.js doesn't
+    setInterval(() => {
+      // console.log('Keep-alive tick');
+    }, 60000);
   } catch (err) {
     console.error('💥 Failed to require standalone server:', err);
     process.exit(1);
