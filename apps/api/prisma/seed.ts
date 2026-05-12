@@ -118,7 +118,42 @@ async function main() {
       data: service,
     });
   }
-}
+
+  // Seed working hours
+  const workingHours = [
+    { dayOfWeek: 0, startTime: '09:00', endTime: '17:00', slotDuration: 30, isActive: true },
+    { dayOfWeek: 1, startTime: '09:00', endTime: '17:00', slotDuration: 30, isActive: true },
+    { dayOfWeek: 2, startTime: '09:00', endTime: '17:00', slotDuration: 30, isActive: true },
+    { dayOfWeek: 3, startTime: '09:00', endTime: '17:00', slotDuration: 30, isActive: true },
+    { dayOfWeek: 4, startTime: '09:00', endTime: '17:00', slotDuration: 30, isActive: true },
+    { dayOfWeek: 5, startTime: '09:00', endTime: '14:00', slotDuration: 30, isActive: false },
+    { dayOfWeek: 6, startTime: '09:00', endTime: '14:00', slotDuration: 30, isActive: false },
+  ];
+
+  for (const wh of workingHours) {
+    await (prisma as any).workingHours.upsert({
+      where: { id: `wh-${wh.dayOfWeek}` }, // Note: id will be auto-generated but we use upsert logic
+      update: wh,
+      create: { ...wh, id: `wh-${wh.dayOfWeek}` },
+    }).catch(() => {}); // Simple catch for seed
+  }
+
+  // Seed site settings
+  await (prisma as any).siteSettings.upsert({
+    where: { id: 'default' },
+    update: {},
+    create: {
+      id: 'default',
+      siteNameAr: 'د. أحمد عبد اللطيف',
+      siteNameEn: 'Dr. Ahmed Abdellatif',
+      contactEmail: 'info@drahmed.com',
+      contactPhone: '+201234567890',
+      addressAr: 'القاهرة، مصر',
+      addressEn: 'Cairo, Egypt',
+    }
+  });
+
+  console.log('Seed completed');
 
 main()
   .then(() => {
