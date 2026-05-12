@@ -1,10 +1,25 @@
 const path = require('path');
 const fs = require('fs');
 
+// Global error handlers
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('💥 Unhandled Rejection at:', promise, 'reason:', reason);
+});
+process.on('uncaughtException', (err) => {
+  console.error('💥 Uncaught Exception:', err);
+  process.exit(1);
+});
+
 // Set environment variables
 process.env.NODE_ENV = 'production';
 process.env.PORT = process.env.PORT || '3000';
 process.env.HOSTNAME = '0.0.0.0';
+
+console.log('--- Process Info ---');
+console.log('Node Version:', process.version);
+console.log('Memory Usage:', process.memoryUsage());
+console.log('ENV PORT:', process.env.PORT);
+console.log('--------------------');
 
 const standaloneServerPath = path.join(__dirname, 'apps/web/.next/standalone/server.js');
 
