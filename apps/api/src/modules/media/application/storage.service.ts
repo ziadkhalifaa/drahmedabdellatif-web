@@ -58,4 +58,25 @@ export class StorageService {
       console.error('Error deleting file:', error);
     }
   }
+
+  async uploadFile(file: Express.Multer.File, folder = ''): Promise<string> {
+    const ext = path.extname(file.originalname);
+    const filename = `${randomUUID()}${ext}`;
+    const targetDir = folder ? path.join(this.uploadPath, folder) : this.uploadPath;
+    
+    if (!fs.existsSync(targetDir)) {
+      fs.mkdirSync(targetDir, { recursive: true });
+    }
+
+    const filePath = path.join(targetDir, filename);
+    const fileUrl = folder ? `/uploads/${folder}/${filename}` : `/uploads/${filename}`;
+
+    try {
+      fs.writeFileSync(filePath, file.buffer);
+      return fileUrl;
+    } catch (error) {
+      console.error('Error saving file:', error);
+      throw new InternalServerErrorException('Error saving file');
+    }
+  }
 }

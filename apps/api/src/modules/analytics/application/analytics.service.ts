@@ -55,12 +55,12 @@ export class AnalyticsService {
     ]);
     
     // Simple revenue calculation logic
-    const completedAppointments = await this.prisma.appointment.findMany({
+    const completedAppointments = await (this.prisma as any).appointment.findMany({
       where: { status: 'completed' },
       select: { type: true }
     });
 
-    const totalRevenue = completedAppointments.reduce((acc, apt) => {
+    const totalRevenue = completedAppointments.reduce((acc: number, apt: any) => {
       return acc + (apt.type === 'ONLINE' ? 300 : 500);
     }, 0);
 
@@ -83,9 +83,9 @@ export class AnalyticsService {
 
   async getNotifications() {
     const [pendingAppointments, unreadMessages, pendingTestimonials] = await Promise.all([
-      this.prisma.appointment.count({ where: { status: 'pending' } }),
-      this.prisma.contactMessage.count({ where: { isRead: false } }),
-      this.prisma.testimonial.count({ where: { isApproved: false } }),
+      (this.prisma as any).appointment.count({ where: { status: 'pending' } }),
+      (this.prisma as any).contactMessage.count({ where: { isRead: false } }),
+      (this.prisma as any).testimonial.count({ where: { isApproved: false } }),
     ]);
 
     return {
@@ -97,6 +97,6 @@ export class AnalyticsService {
   }
 
   async trackEvent(type: string, payload: Record<string, any>) {
-    return this.prisma.analyticsEvent.create({ data: { type, payload } });
+    return (this.prisma as any).analyticsEvent.create({ data: { type, payload } });
   }
 }

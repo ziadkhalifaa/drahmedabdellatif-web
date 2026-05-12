@@ -42,7 +42,7 @@ export class AnalyticsController {
       orderBy: { date: 'desc' },
     });
 
-    const formattedData = data.map((a) => ({
+    const formattedData = data.map((a: any) => ({
       ID: a.id,
       Patient: a.patient?.name || a.guestName || 'N/A',
       Email: a.patient?.email || a.guestEmail || 'N/A',
@@ -71,11 +71,11 @@ export class AnalyticsController {
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles('admin')
   async exportNewsletter(@Res() res: Response) {
-    const data = await this.prisma.newsletterSubscriber.findMany({
+    const data = await (this.prisma as any).newsletterSubscriber.findMany({
       orderBy: { createdAt: 'desc' },
     });
 
-    const formattedData = data.map((s) => ({
+    const formattedData = data.map((s: any) => ({
       Email: s.email,
       Name: s.name || 'N/A',
       Status: s.isActive ? 'Active' : 'Inactive',

@@ -46,7 +46,7 @@ export class AuthService {
       
       const emailVerificationExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
 
-      await this.prisma.user.update({
+      await (this.prisma.user as any).update({
         where: { id: existing.id },
         data: {
           ...data,
@@ -68,7 +68,7 @@ export class AuthService {
 
     const emailVerificationExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
 
-    const user = await this.prisma.user.create({
+    const user = await (this.prisma.user as any).create({
       data: {
         ...data,
         password: hashedPassword,
@@ -90,11 +90,12 @@ export class AuthService {
     const user = await this.prisma.user.findUnique({ where: { email } });
     if (!user) throw new UnauthorizedException('User not found');
 
-    if (user.emailVerificationCode !== code) {
+    const anyUser = user as any;
+    if (anyUser.emailVerificationCode !== code) {
       throw new UnauthorizedException('Invalid verification code');
     }
 
-    if (user.emailVerificationExpiry && user.emailVerificationExpiry < new Date()) {
+    if (anyUser.emailVerificationExpiry && anyUser.emailVerificationExpiry < new Date()) {
       throw new UnauthorizedException('Verification code has expired');
     }
 
@@ -122,7 +123,7 @@ export class AuthService {
 
     const emailVerificationExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
 
-    await this.prisma.user.update({
+    await (this.prisma.user as any).update({
       where: { id: user.id },
       data: { 
         emailVerificationCode: newCode,
@@ -168,11 +169,11 @@ export class AuthService {
     const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
     const passwordResetExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
 
-    await this.prisma.user.update({
+    await (this.prisma.user as any).update({
       where: { id: user.id },
       data: { 
         passwordResetCode: resetCode,
-        passwordResetExpiry
+        passwordResetExpiry: passwordResetExpiry
       },
     });
 
@@ -184,16 +185,17 @@ export class AuthService {
     const user = await this.prisma.user.findUnique({ where: { email } });
     if (!user) throw new UnauthorizedException('User not found');
 
-    if (user.passwordResetCode !== code) {
+    const anyUser = user as any;
+    if (anyUser.passwordResetCode !== code) {
       throw new UnauthorizedException('Invalid reset code');
     }
 
-    if (user.passwordResetExpiry && user.passwordResetExpiry < new Date()) {
+    if (anyUser.passwordResetExpiry && anyUser.passwordResetExpiry < new Date()) {
       throw new UnauthorizedException('Reset code has expired');
     }
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
-    await this.prisma.user.update({
+    await (this.prisma.user as any).update({
       where: { id: user.id },
       data: { 
         password: hashedPassword, 
@@ -209,7 +211,7 @@ export class AuthService {
     const accessToken = this.jwtService.sign(payload, { expiresIn: '15m' });
     
     const refreshToken = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-    await this.prisma.refreshToken.create({
+    await (this.prisma as any).refreshToken.create({
       data: {
         userId: user.id,
         token: refreshToken,
@@ -221,17 +223,17 @@ export class AuthService {
   }
 
   async refreshAccessToken(refreshToken: string) {
-    const token = await this.prisma.refreshToken.findUnique({
+    const token = await (this.prisma as any).refreshToken.findUnique({
       where: { token: refreshToken },
       include: { user: true },
     });
 
     if (!token || token.expiresAt < new Date()) {
-      if (token) await this.prisma.refreshToken.delete({ where: { id: token.id } });
+      if (token) await (this.prisma as any).refreshToken.delete({ where: { id: token.id } });
       throw new UnauthorizedException('Invalid or expired refresh token');
     }
 
-    await this.prisma.refreshToken.delete({ where: { id: token.id } });
+    await (this.prisma as any).refreshToken.delete({ where: { id: token.id } });
     return this.generateTokens(token.user);
   }
 }

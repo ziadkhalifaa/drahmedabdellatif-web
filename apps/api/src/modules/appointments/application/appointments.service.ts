@@ -57,7 +57,7 @@ export class AppointmentsService {
         });
         
         if (dailyRes.ok) {
-          const room = await dailyRes.json();
+          const room: any = await dailyRes.json();
           meetingId = room.name;
           meetingUrl = room.url;
         } else {
@@ -122,7 +122,7 @@ export class AppointmentsService {
     const dayOfWeek = date.getDay();
 
     // Check Working Hours
-    const workingHours = await this.prisma.workingHours.findFirst({
+    const workingHours = await (this.prisma as any).workingHours.findFirst({
       where: { dayOfWeek, isActive: true }
     });
     if (!workingHours) return { slots: [], reason: 'Day off' };
@@ -143,7 +143,7 @@ export class AppointmentsService {
     });
 
     // Get Blocked Slots
-    const blocked = await this.prisma.blockedSlot.findMany({
+    const blocked = await (this.prisma as any).blockedSlot.findMany({
       where: {
         date: {
           gte: new Date(dateStr + 'T00:00:00'),
@@ -152,9 +152,9 @@ export class AppointmentsService {
       }
     });
 
-    const bookedSet = new Set(booked.map(b => b.timeSlot));
-    const blockedSet = new Set(blocked.map(b => b.timeSlot).filter(Boolean));
-    const isFullDayBlocked = blocked.some(b => !b.timeSlot);
+    const bookedSet = new Set(booked.map((b: any) => b.timeSlot));
+    const blockedSet = new Set(blocked.map((b: any) => b.timeSlot).filter(Boolean));
+    const isFullDayBlocked = blocked.some((b: any) => !b.timeSlot);
 
     if (isFullDayBlocked) return { slots: [], reason: 'Day fully blocked' };
 

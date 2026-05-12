@@ -14,7 +14,7 @@ export class PrescriptionsService {
     instructionsAr?: string;
     instructionsEn?: string;
   }) {
-    return this.prisma.prescription.create({
+    return (this.prisma as any).prescription.create({
       data: {
         ...data,
         isIssued: true,
@@ -24,7 +24,7 @@ export class PrescriptionsService {
   }
 
   async findByPatient(patientId: string) {
-    return this.prisma.prescription.findMany({
+    return (this.prisma as any).prescription.findMany({
       where: { patientId },
       include: { appointment: { include: { patient: true } } },
       orderBy: { createdAt: 'desc' },
@@ -32,7 +32,7 @@ export class PrescriptionsService {
   }
 
   async findOne(id: string) {
-    const prescription = await this.prisma.prescription.findUnique({
+    const prescription = await (this.prisma as any).prescription.findUnique({
       where: { id },
       include: { 
         appointment: { include: { patient: true } },
@@ -44,7 +44,7 @@ export class PrescriptionsService {
   }
 
   async getMyPrescriptions(userId: string) {
-    return this.prisma.prescription.findMany({
+    return (this.prisma as any).prescription.findMany({
       where: { patientId: userId },
       include: { appointment: true },
       orderBy: { createdAt: 'desc' },

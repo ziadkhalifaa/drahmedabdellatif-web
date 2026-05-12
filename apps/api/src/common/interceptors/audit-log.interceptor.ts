@@ -26,16 +26,16 @@ export class AuditLogInterceptor implements NestInterceptor {
     return next.handle().pipe(
       tap(() => {
         // Log the action after successful completion
-        this.prisma.auditLog.create({
+        (this.prisma as any).auditLog.create({
           data: {
             userId: user.sub || user.id,
             action: `${method} ${url}`,
             resource: url.split('/')[2] || 'unknown',
             details: body,
-            ip: ip || request.headers['x-forwarded-for'] || request.connection.remoteAddress,
+            ip: ip || request.headers['x-forwarded-for'] || (request as any).connection?.remoteAddress,
           },
-        }).catch(err => console.error('Failed to save audit log:', err));
+        }).catch((err: any) => console.error('Failed to save audit log:', err));
       }),
-    );
+    ) as Observable<any>;
   }
 }

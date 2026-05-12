@@ -34,6 +34,6 @@ export class SimpleCacheInterceptor implements NestInterceptor {
           expiry: Date.now() + this.TTL,
         });
       }),
-    );
+    ) as Observable<any>;
   }
 }
