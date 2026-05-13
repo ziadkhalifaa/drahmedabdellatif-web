@@ -6,9 +6,8 @@ import { api } from '@/lib/api';
 import { useAuth } from '@/context/auth-context';
 import { Card, Button, Input } from '@/components/ui';
 import { toast } from 'sonner';
-import { Mail, Download, Send, Plus, Users, Search } from 'lucide-react';
+import { Mail, Download, Send, Plus, Users, Search, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 
 interface Subscriber {
   id: string;
@@ -117,64 +116,68 @@ export default function NewsletterPage() {
             {t('exportCSV', { fallback: 'Export to CSV' })}
           </Button>
 
-          <Dialog open={isCampaignModalOpen} onOpenChange={setIsCampaignModalOpen}>
-            <DialogTrigger asChild>
-              <Button className="rounded-xl font-bold bg-gradient-to-r from-[var(--primary)] to-[var(--primary-light)] gap-2 shadow-lg shadow-[var(--primary)]/20">
-                <Send size={18} />
-                {t('sendCampaign', { fallback: 'Send Campaign' })}
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[600px] p-0 overflow-hidden bg-[var(--background)] border-[var(--border)] rounded-3xl">
-              <div className="p-8">
-                <DialogHeader className="mb-6">
-                  <DialogTitle className="text-2xl font-black flex items-center gap-2">
-                    <Send className="text-[var(--primary)]" />
-                    {t('newCampaign', { fallback: 'New Email Campaign' })}
-                  </DialogTitle>
-                </DialogHeader>
-                
-                <form onSubmit={handleSendCampaign} className="space-y-6">
-                  <div className="space-y-2">
-                    <label className="text-sm font-bold text-[var(--muted)] ml-1">{t('subject', { fallback: 'Subject Line' })}</label>
-                    <Input 
-                      required
-                      value={campaignData.subject}
-                      onChange={(e) => setCampaignData({ ...campaignData, subject: e.target.value })}
-                      placeholder="e.g. New Urology Treatments Available"
-                      className="py-6 rounded-xl"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="text-sm font-bold text-[var(--muted)] ml-1">{t('content', { fallback: 'Email Content (HTML allowed)' })}</label>
-                    <textarea 
-                      required
-                      value={campaignData.content}
-                      onChange={(e) => setCampaignData({ ...campaignData, content: e.target.value })}
-                      placeholder="<p>Dear subscriber...</p>"
-                      className="w-full min-h-[200px] p-4 rounded-xl border border-[var(--border)] bg-[var(--card)] focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none transition-all resize-y"
-                    />
-                  </div>
-                  
-                  <div className="flex items-center gap-4 bg-[var(--primary)]/5 p-4 rounded-xl border border-[var(--primary)]/10 text-sm">
-                    <Users size={20} className="text-[var(--primary)] shrink-0" />
-                    <p>
-                      This campaign will be sent to <strong>{subscribers.length}</strong> active subscribers.
-                    </p>
-                  </div>
+          <Button onClick={() => setIsCampaignModalOpen(true)} className="rounded-xl font-bold bg-gradient-to-r from-[var(--primary)] to-[var(--primary-light)] gap-2 shadow-lg shadow-[var(--primary)]/20">
+            <Send size={18} />
+            {t('sendCampaign', { fallback: 'Send Campaign' })}
+          </Button>
 
-                  <div className="flex justify-end gap-3 pt-4 border-t border-[var(--border)]">
-                    <Button type="button" variant="ghost" onClick={() => setIsCampaignModalOpen(false)} className="rounded-xl font-bold">
-                      {tCommon('cancel', { fallback: 'Cancel' })}
-                    </Button>
-                    <Button type="submit" disabled={sending || !campaignData.subject || !campaignData.content} className="rounded-xl font-bold px-8">
-                      {sending ? tCommon('loading', { fallback: 'Sending...' }) : t('sendNow', { fallback: 'Send Now' })}
-                    </Button>
+          {isCampaignModalOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+              <div className="w-full sm:max-w-[600px] bg-[var(--background)] border border-[var(--border)] rounded-3xl overflow-hidden relative shadow-2xl">
+                <div className="p-8">
+                  <div className="mb-6 flex justify-between items-center">
+                    <h2 className="text-2xl font-black flex items-center gap-2">
+                      <Send className="text-[var(--primary)]" />
+                      {t('newCampaign', { fallback: 'New Email Campaign' })}
+                    </h2>
+                    <button onClick={() => setIsCampaignModalOpen(false)} className="text-[var(--muted)] hover:text-[var(--foreground)]">
+                      <X size={24} />
+                    </button>
                   </div>
-                </form>
+                  
+                  <form onSubmit={handleSendCampaign} className="space-y-6">
+                    <div className="space-y-2">
+                      <label className="text-sm font-bold text-[var(--muted)] ml-1">{t('subject', { fallback: 'Subject Line' })}</label>
+                      <Input 
+                        required
+                        value={campaignData.subject}
+                        onChange={(e) => setCampaignData({ ...campaignData, subject: e.target.value })}
+                        placeholder="e.g. New Urology Treatments Available"
+                        className="py-6 rounded-xl"
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label className="text-sm font-bold text-[var(--muted)] ml-1">{t('content', { fallback: 'Email Content (HTML allowed)' })}</label>
+                      <textarea 
+                        required
+                        value={campaignData.content}
+                        onChange={(e) => setCampaignData({ ...campaignData, content: e.target.value })}
+                        placeholder="<p>Dear subscriber...</p>"
+                        className="w-full min-h-[200px] p-4 rounded-xl border border-[var(--border)] bg-[var(--card)] focus:ring-2 focus:ring-[var(--primary)]/20 focus:outline-none transition-all resize-y"
+                      />
+                    </div>
+                    
+                    <div className="flex items-center gap-4 bg-[var(--primary)]/5 p-4 rounded-xl border border-[var(--primary)]/10 text-sm">
+                      <Users size={20} className="text-[var(--primary)] shrink-0" />
+                      <p>
+                        This campaign will be sent to <strong>{subscribers.length}</strong> active subscribers.
+                      </p>
+                    </div>
+
+                    <div className="flex justify-end gap-3 pt-4 border-t border-[var(--border)]">
+                      <Button type="button" variant="ghost" onClick={() => setIsCampaignModalOpen(false)} className="rounded-xl font-bold">
+                        {tCommon('cancel', { fallback: 'Cancel' })}
+                      </Button>
+                      <Button type="submit" disabled={sending || !campaignData.subject || !campaignData.content} className="rounded-xl font-bold px-8">
+                        {sending ? tCommon('loading', { fallback: 'Sending...' }) : t('sendNow', { fallback: 'Send Now' })}
+                      </Button>
+                    </div>
+                  </form>
+                </div>
               </div>
-            </DialogContent>
-          </Dialog>
+            </div>
+          )}
         </div>
       </div>
 

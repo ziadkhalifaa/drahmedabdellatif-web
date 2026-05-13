@@ -8,7 +8,6 @@ import { Card, Button, Input } from '@/components/ui';
 import { toast } from 'sonner';
 import { FileText, Upload, Search, User, FileUp, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 
 interface Patient {
   id: string;
@@ -202,90 +201,98 @@ export default function AdminReportsPage() {
       </Card>
 
       {/* Upload Dialog */}
-      <Dialog open={isUploadModalOpen} onOpenChange={setIsUploadModalOpen}>
-        <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden bg-[var(--background)] border-[var(--border)] rounded-3xl">
-          <div className="p-8">
-            <DialogHeader className="mb-6">
-              <DialogTitle className="text-2xl font-black flex items-center gap-2">
-                <FileUp className="text-[var(--primary)]" />
-                Upload Medical Report
-              </DialogTitle>
-              <div className="mt-2 p-3 bg-[var(--primary)]/5 border border-[var(--primary)]/10 rounded-xl flex items-center gap-3">
-                <div className="h-8 w-8 rounded-full bg-[var(--primary)]/20 text-[var(--primary)] font-bold flex items-center justify-center text-xs">
-                  {selectedPatient?.name?.[0]?.toUpperCase() || 'P'}
+      {isUploadModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="w-full sm:max-w-[500px] bg-[var(--background)] border border-[var(--border)] rounded-3xl overflow-hidden relative shadow-2xl">
+            <div className="p-8">
+              <div className="mb-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-2xl font-black flex items-center gap-2">
+                    <FileUp className="text-[var(--primary)]" />
+                    Upload Medical Report
+                  </h2>
+                  <button onClick={() => setIsUploadModalOpen(false)} className="text-[var(--muted)] hover:text-[var(--foreground)]">
+                    <X size={24} />
+                  </button>
                 </div>
-                <div>
-                  <div className="text-xs text-[var(--muted)] uppercase tracking-widest font-bold">Patient</div>
-                  <div className="font-bold text-sm leading-tight">{selectedPatient?.name}</div>
-                </div>
-              </div>
-            </DialogHeader>
-            
-            <form onSubmit={handleUploadSubmit} className="space-y-5">
-              <div className="space-y-2">
-                <label className="text-xs font-bold uppercase tracking-widest text-[var(--muted)] ml-1">Report Title</label>
-                <Input 
-                  required
-                  value={uploadData.title}
-                  onChange={(e) => setUploadData({ ...uploadData, title: e.target.value })}
-                  placeholder="e.g. Prostate Biopsy Results"
-                  className="py-6 rounded-xl font-medium"
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <label className="text-xs font-bold uppercase tracking-widest text-[var(--muted)] ml-1">Description (Optional)</label>
-                <textarea 
-                  value={uploadData.description}
-                  onChange={(e) => setUploadData({ ...uploadData, description: e.target.value })}
-                  placeholder="Additional notes about this report..."
-                  className="w-full min-h-[100px] p-4 rounded-xl border border-[var(--border)] bg-[var(--background)]/50 focus:ring-2 focus:ring-[var(--primary)]/20 focus:border-[var(--primary)] transition-all resize-y text-sm font-medium outline-none"
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <label className="text-xs font-bold uppercase tracking-widest text-[var(--muted)] ml-1">Select File</label>
                 
-                <div className="relative border-2 border-dashed border-[var(--border)] hover:border-[var(--primary)]/50 rounded-2xl p-8 text-center transition-all bg-[var(--background)]/30 group">
-                  <input 
-                    type="file" 
-                    onChange={handleFileChange}
-                    accept=".pdf,image/jpeg,image/png,image/webp"
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                    required
-                  />
-                  {file ? (
-                    <div className="flex flex-col items-center gap-2">
-                      <div className="p-3 bg-green-500/10 text-green-500 rounded-full">
-                        <FileText size={24} />
-                      </div>
-                      <div className="font-bold text-sm truncate max-w-[200px]">{file.name}</div>
-                      <div className="text-xs text-[var(--muted)]">{(file.size / 1024 / 1024).toFixed(2)} MB</div>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center gap-3">
-                      <div className="p-4 bg-[var(--primary)]/5 text-[var(--primary)] rounded-full group-hover:scale-110 transition-transform">
-                        <Upload size={24} />
-                      </div>
-                      <div className="font-bold text-sm">Click or drag file to upload</div>
-                      <div className="text-xs text-[var(--muted)]">PDF, JPG, PNG up to 10MB</div>
-                    </div>
-                  )}
+                <div className="p-3 bg-[var(--primary)]/5 border border-[var(--primary)]/10 rounded-xl flex items-center gap-3">
+                  <div className="h-8 w-8 rounded-full bg-[var(--primary)]/20 text-[var(--primary)] font-bold flex items-center justify-center text-xs">
+                    {selectedPatient?.name?.[0]?.toUpperCase() || 'P'}
+                  </div>
+                  <div>
+                    <div className="text-xs text-[var(--muted)] uppercase tracking-widest font-bold">Patient</div>
+                    <div className="font-bold text-sm leading-tight">{selectedPatient?.name}</div>
+                  </div>
                 </div>
               </div>
+              
+              <form onSubmit={handleUploadSubmit} className="space-y-5">
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase tracking-widest text-[var(--muted)] ml-1">Report Title</label>
+                  <Input 
+                    required
+                    value={uploadData.title}
+                    onChange={(e) => setUploadData({ ...uploadData, title: e.target.value })}
+                    placeholder="e.g. Prostate Biopsy Results"
+                    className="py-6 rounded-xl font-medium"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase tracking-widest text-[var(--muted)] ml-1">Description (Optional)</label>
+                  <textarea 
+                    value={uploadData.description}
+                    onChange={(e) => setUploadData({ ...uploadData, description: e.target.value })}
+                    placeholder="Additional notes about this report..."
+                    className="w-full min-h-[100px] p-4 rounded-xl border border-[var(--border)] bg-[var(--background)]/50 focus:ring-2 focus:ring-[var(--primary)]/20 focus:border-[var(--primary)] transition-all resize-y text-sm font-medium outline-none"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase tracking-widest text-[var(--muted)] ml-1">Select File</label>
+                  
+                  <div className="relative border-2 border-dashed border-[var(--border)] hover:border-[var(--primary)]/50 rounded-2xl p-8 text-center transition-all bg-[var(--background)]/30 group">
+                    <input 
+                      type="file" 
+                      onChange={handleFileChange}
+                      accept=".pdf,image/jpeg,image/png,image/webp"
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                      required
+                    />
+                    {file ? (
+                      <div className="flex flex-col items-center gap-2">
+                        <div className="p-3 bg-green-500/10 text-green-500 rounded-full">
+                          <FileText size={24} />
+                        </div>
+                        <div className="font-bold text-sm truncate max-w-[200px]">{file.name}</div>
+                        <div className="text-xs text-[var(--muted)]">{(file.size / 1024 / 1024).toFixed(2)} MB</div>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center gap-3">
+                        <div className="p-4 bg-[var(--primary)]/5 text-[var(--primary)] rounded-full group-hover:scale-110 transition-transform">
+                          <Upload size={24} />
+                        </div>
+                        <div className="font-bold text-sm">Click or drag file to upload</div>
+                        <div className="text-xs text-[var(--muted)]">PDF, JPG, PNG up to 10MB</div>
+                      </div>
+                    )}
+                  </div>
+                </div>
 
-              <div className="flex justify-end gap-3 pt-6">
-                <Button type="button" variant="ghost" onClick={() => setIsUploadModalOpen(false)} className="rounded-xl font-bold h-12 px-6">
-                  {tCommon('cancel', { fallback: 'Cancel' })}
-                </Button>
-                <Button type="submit" disabled={uploading || !uploadData.title || !file} className="rounded-xl font-bold px-8 h-12 bg-gradient-to-r from-[var(--primary)] to-[var(--primary-light)]">
-                  {uploading ? tCommon('loading', { fallback: 'Uploading...' }) : 'Upload Report'}
-                </Button>
-              </div>
-            </form>
+                <div className="flex justify-end gap-3 pt-6 border-t border-[var(--border)]">
+                  <Button type="button" variant="ghost" onClick={() => setIsUploadModalOpen(false)} className="rounded-xl font-bold h-12 px-6">
+                    {tCommon('cancel', { fallback: 'Cancel' })}
+                  </Button>
+                  <Button type="submit" disabled={uploading || !uploadData.title || !file} className="rounded-xl font-bold px-8 h-12 bg-gradient-to-r from-[var(--primary)] to-[var(--primary-light)] shadow-lg shadow-[var(--primary)]/20">
+                    {uploading ? tCommon('loading', { fallback: 'Uploading...' }) : 'Upload Report'}
+                  </Button>
+                </div>
+              </form>
+            </div>
           </div>
-        </DialogContent>
-      </Dialog>
+        </div>
+      )}
     </div>
   );
 }
