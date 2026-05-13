@@ -7,7 +7,7 @@ async function main() {
   // Clear existing services to avoid duplicates during re-seeding
   await prisma.service.deleteMany({});
 
-  const adminPassword = await bcrypt.hash('Drahmed2026', 12);
+  const adminPassword = await bcrypt.hash('admin123', 12);
 
   await prisma.user.upsert({
     where: { email: 'admin@drahmedabdellatif.com' },
