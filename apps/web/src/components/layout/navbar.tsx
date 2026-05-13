@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { usePathname, useRouter, Link } from '@/i18n/routing';
 import { useTranslations, useLocale } from 'next-intl';
 import { useTheme } from '@/components/theme-provider';
+import { useAuth } from '@/context/auth-context';
 
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui';
@@ -39,22 +40,14 @@ export function Navbar() {
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [services, setServices] = useState<Service[]>([]);
   const [mounted, setMounted] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const { user, token, logout } = useAuth();
+  const isLoggedIn = !!token;
 
   useEffect(() => {
     setMounted(true);
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener('scroll', handleScroll);
     
-    // Check Auth State
-    const token = localStorage.getItem('token');
-    const storedUser = localStorage.getItem('user');
-    if (token && storedUser) {
-      setIsLoggedIn(true);
-      setUser(JSON.parse(storedUser));
-    }
-
     // Fetch real services with images
     api.get<Service[]>('/services')
       .then(setServices)
@@ -64,11 +57,7 @@ export function Navbar() {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    setIsLoggedIn(false);
-    setUser(null);
-    router.push('/');
+    logout();
   };
 
   const resourceItems = [

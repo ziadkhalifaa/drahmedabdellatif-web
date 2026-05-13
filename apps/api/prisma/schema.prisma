@@ -1,3 +1,6 @@
+// Run this after deploying:
+// npx prisma migrate dev --name add_payments --schema=apps/api/prisma/schema.prisma
+
 generator client {
   provider      = "prisma-client-js"
   binaryTargets = ["native", "rhel-openssl-3.0.x"]
@@ -52,6 +55,7 @@ model User {
   refreshTokens         RefreshToken[]
   auditLogs             AuditLog[]
   prescriptions         Prescription[]
+  payments              Payment[]
   createdAt             DateTime       @default(now())
   updatedAt             DateTime       @updatedAt
 }
@@ -280,4 +284,27 @@ model Prescription {
   issuedAt      DateTime?
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  REFUNDED
+}
+
+model Payment {
+  id              String        @id @default(cuid())
+  userId          String
+  user            User          @relation(fields: [userId], references: [id])
+  appointmentId   String?
+  paymobOrderId   String?       @unique
+  amount          Float         // Amount in EGP
+  currency        String        @default("EGP")
+  status          PaymentStatus @default(PENDING)
+  transactionId   String?       // Paymob transaction ID
+  paymentMethod   String?       // e.g. "card", "wallet"
+  metadata        Json?         // Extra Paymob response data
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 }

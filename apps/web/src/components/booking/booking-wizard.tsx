@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
-import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
+import { useAuth } from '@/context/auth-context';
+import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, Button, Input } from '@/components/ui';
 import { cn } from '@/lib/utils';
@@ -29,17 +30,23 @@ export function BookingWizard() {
   const [selectedTime, setSelectedTime] = useState<string>('');
   const [patientInfo, setPatientInfo] = useState({ name: '', phone: '', email: '', notes: '' });
   const [submitting, setSubmitting] = useState(false);
+  const { user, token } = useAuth();
 
-  const timeSlots = [
-    '04:00 PM', '04:30 PM', '05:00 PM', '05:30 PM',
-    '06:00 PM', '06:30 PM', '07:00 PM', '07:30 PM'
-  ];
+  const [availableSlots, setAvailableSlots] = useState<{time: string, available: boolean}[]>([]);
+  const [loadingSlots, setLoadingSlots] = useState(false);
+
+  useEffect(() => {
+    if (!selectedDate) return;
+    setLoadingSlots(true);
+    api.get<{slots: {time: string, available: boolean}[]}>(`/appointments/slots?date=${selectedDate}`)
+      .then(res => setAvailableSlots(res.slots || []))
+      .catch(() => setAvailableSlots([]))
+      .finally(() => setLoadingSlots(false));
+  }, [selectedDate]);
 
   const handleConfirm = async () => {
     setSubmitting(true);
     try {
-      const token = localStorage.getItem('token');
-      const user = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')!) : null;
       await api.post('/appointments', {
         type: bookingType,
         date: selectedDate,
@@ -148,20 +155,32 @@ export function BookingWizard() {
                     {t('wizard.selectSlot')}
                   </h3>
                   <div className="grid grid-cols-2 gap-3">
-                    {timeSlots.map(slot => (
-                      <button
-                        key={slot}
-                        onClick={() => setSelectedTime(slot)}
-                        className={cn(
-                          "py-4 rounded-xl border-2 font-bold transition-all",
-                          selectedTime === slot
-                            ? "bg-[var(--primary)] text-white border-[var(--primary)] shadow-lg"
-                            : "bg-[var(--card)] border-[var(--border)] text-[var(--muted)] hover:border-[var(--primary)]"
-                        )}
-                      >
-                        {slot}
-                      </button>
-                    ))}
+                    {loadingSlots ? (
+                      Array.from({ length: 6 }).map((_, i) => (
+                        <div key={i} className="h-16 w-full animate-pulse rounded-xl bg-zinc-200 dark:bg-zinc-800" />
+                      ))
+                    ) : availableSlots.length > 0 ? (
+                      availableSlots.map(slot => (
+                        <button
+                          key={slot.time}
+                          disabled={!slot.available}
+                          onClick={() => setSelectedTime(slot.time)}
+                          className={cn(
+                            "py-4 rounded-xl border-2 font-bold transition-all",
+                            !slot.available ? "bg-[var(--card)] border-[var(--border)] opacity-50 cursor-not-allowed line-through text-[var(--muted)]" :
+                            selectedTime === slot.time
+                              ? "bg-[var(--primary)] text-white border-[var(--primary)] shadow-lg"
+                              : "bg-[var(--card)] border-[var(--border)] text-[var(--muted)] hover:border-[var(--primary)]"
+                          )}
+                        >
+                          {slot.time}
+                        </button>
+                      ))
+                    ) : (
+                      <div className="col-span-2 text-center py-4 text-[var(--muted)] font-bold">
+                        {t('wizard.noSlotsAvailable', { fallback: 'لا توجد مواعيد متاحة في هذا اليوم' })}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

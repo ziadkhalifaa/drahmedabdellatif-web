@@ -13,6 +13,7 @@ import { exportToExcel, exportToPDF } from '@/lib/export-utils';
 export default function AdminAppointmentsPage() {
   const { token } = useAuth();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [dateFilter, setDateFilter] = useState<string>('');
 
   const fetchAppointments = () => {
     if (token) api.get<Appointment[]>('/appointments', token).then(setAppointments).catch(() => {});
@@ -51,6 +52,12 @@ export default function AdminAppointmentsPage() {
     exportToPDF(headers, data, 'Appointments_Report', 'Appointments List');
   };
 
+  const filteredAppointments = appointments.filter(a => {
+    if (!dateFilter) return true;
+    const aDate = new Date(a.date).toISOString().split('T')[0];
+    return aDate === dateFilter;
+  });
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -58,13 +65,21 @@ export default function AdminAppointmentsPage() {
           <h1 className="text-2xl font-bold text-[var(--foreground)]">Appointments</h1>
           <p className="text-sm text-[var(--muted)]">Manage patient bookings and schedules.</p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={handleExportExcel} className="gap-2">
-            <Download size={16} /> Excel
-          </Button>
-          <Button variant="outline" size="sm" onClick={handleExportPDF} className="gap-2">
-            <FileDown size={16} /> PDF
-          </Button>
+        <div className="flex flex-col sm:flex-row items-center gap-3">
+          <input 
+            type="date" 
+            value={dateFilter}
+            onChange={(e) => setDateFilter(e.target.value)}
+            className="text-sm px-3 py-2 rounded-md border border-[var(--border)] bg-[var(--background)] focus:outline-none focus:ring-1 focus:ring-[var(--primary)]"
+          />
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={handleExportExcel} className="gap-2">
+              <Download size={16} /> Excel
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleExportPDF} className="gap-2">
+              <FileDown size={16} /> PDF
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -82,7 +97,7 @@ export default function AdminAppointmentsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-[var(--border)]">
-              {appointments.map((apt) => (
+              {filteredAppointments.map((apt) => (
                 <tr key={apt.id} className="hover:bg-[var(--card-hover)] transition-colors">
                   <td className="p-4">
                     <p className="font-bold text-[var(--foreground)]">{apt.patientName}</p>
@@ -119,7 +134,7 @@ export default function AdminAppointmentsPage() {
                   </td>
                 </tr>
               ))}
-              {appointments.length === 0 && (
+              {filteredAppointments.length === 0 && (
                 <tr><td colSpan={6} className="py-12 text-center text-[var(--muted)] font-medium">No appointments found</td></tr>
               )}
             </tbody>

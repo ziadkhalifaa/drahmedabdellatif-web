@@ -10,11 +10,13 @@ import { useState } from 'react';
 import { Mail, Lock, LogIn, UserPlus, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { api } from '@/lib/api';
+import { useAuth } from '@/context/auth-context';
 
 export default function LoginPage() {
   const t = useTranslations('auth.login');
   const tCommon = useTranslations('common');
   const router = useRouter();
+  const { login } = useAuth();
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -25,8 +27,7 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const data: any = await api.post('/auth/login', { email, password });
-      localStorage.setItem('token', data.accessToken);
-      localStorage.setItem('user', JSON.stringify(data.user));
+      login(data.accessToken, data.user);
       toast.success(tCommon('success') || 'Login Successful');
       router.push('/dashboard');
     } catch (error: any) {

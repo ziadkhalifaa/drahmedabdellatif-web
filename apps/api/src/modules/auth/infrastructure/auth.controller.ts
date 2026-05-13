@@ -1,6 +1,8 @@
-import { Controller, Post, Get, Body, UseGuards, Req } from '@nestjs/common';
+import { Controller, Post, Get, Body, UseGuards, Req, Res, UnauthorizedException, Query } from '@nestjs/common';
+import { Response, Request } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { Throttle } from '@nestjs/throttler';
+import { RolesGuard, Roles } from '../../common/decorators';
 import { AuthService } from '../application/auth.service';
 
 @Controller('auth')
@@ -9,8 +11,16 @@ export class AuthController {
 
   @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post('login')
-  async login(@Body() body: { email: string; password: string }) {
-    return this.authService.login(body.email, body.password);
+  async login(@Body() body: { email: string; password: string }, @Res({ passthrough: true }) res: Response) {
+    const data = await this.authService.login(body.email, body.password);
+    res.cookie('refreshToken', data.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'none',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      path: '/',
+    });
+    return { accessToken: data.accessToken, user: data.user };
   }
 
   @Post('register')
@@ -26,6 +36,13 @@ export class AuthController {
   @Post('resend-code')
   async resendCode(@Body() body: { email: string }) {
     return this.authService.resendCode(body.email);
+  }
+
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('admin', 'doctor')
+  @Get('users')
+  async getUsers(@Query('role') role?: string) {
+    return this.authService.getUsers(role);
   }
 
   @UseGuards(AuthGuard('jwt'))
@@ -52,7 +69,19 @@ export class AuthController {
   }
 
   @Post('refresh')
-  async refresh(@Body('refreshToken') refreshToken: string) {
-    return this.authService.refreshAccessToken(refreshToken);
+  async refresh(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    const refreshToken = req.cookies?.refreshToken;
+    if (!refreshToken) {
+      throw new UnauthorizedException('No refresh token provided');
+    }
+    const data = await this.authService.refreshAccessToken(refreshToken);
+    res.cookie('refreshToken', data.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'none',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      path: '/',
+    });
+    return { accessToken: data.accessToken };
   }
 }

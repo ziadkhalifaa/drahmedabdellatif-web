@@ -3,7 +3,9 @@
 import { motion } from 'framer-motion';
 import { Calendar, FileText, Pill, CheckCircle2, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Card } from '../ui';
+import { Card, Button } from '../ui';
+import { exportPrescriptionToPDF } from '@/lib/export-utils';
+import { Download } from 'lucide-react';
 
 interface TimelineItem {
   id: string;
@@ -12,6 +14,7 @@ interface TimelineItem {
   date: Date;
   status?: string;
   details?: string;
+  data?: any;
 }
 
 export function MedicalTimeline({ items }: { items: TimelineItem[] }) {
@@ -49,6 +52,19 @@ export function MedicalTimeline({ items }: { items: TimelineItem[] }) {
             </div>
             <h4 className="text-lg font-black text-[var(--foreground)]">{item.title}</h4>
             {item.details && <p className="text-sm text-[var(--muted)] mt-1 font-medium">{item.details}</p>}
+            
+            {item.type === 'prescription' && item.data && (
+              <div className="mt-4 pt-4 border-t border-[var(--border)]">
+                <Button 
+                  size="sm" 
+                  variant="outline" 
+                  onClick={() => exportPrescriptionToPDF(item.data, item.data.patient?.name || 'Patient')}
+                  className="gap-2 rounded-xl text-[var(--primary)] border-[var(--primary)] hover:bg-[var(--primary)] hover:text-white"
+                >
+                  <Download size={14} /> Download Prescription
+                </Button>
+              </div>
+            )}
           </Card>
         </motion.div>
       ))}

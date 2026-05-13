@@ -4,6 +4,8 @@ import { useParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Card, Button } from '@/components/ui';
 import { Navbar } from '@/components/layout/navbar';
+import { api } from '@/lib/api';
+import { useAuth } from '@/context/auth-context';
 import { Link } from '@/i18n/routing';
 import { Video, Shield, PhoneOff, Play } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -12,17 +14,22 @@ export default function VideoRoomPage() {
   const { meetingId } = useParams();
   const t = useTranslations('dashboard.video');
   const [mounted, setMounted] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const { user, token, isLoading } = useAuth();
+  const [meetingUrl, setMeetingUrl] = useState<string>(`https://meet.jit.si/${meetingId}`);
 
   useEffect(() => {
     setMounted(true);
-    const stored = localStorage.getItem('user');
-    if (stored) setUser(JSON.parse(stored));
-  }, []);
+    
+    if (token) {
+      api.get<{meetingUrl: string, patient: any}>(`/appointments/by-meeting/${meetingId}`, token)
+        .then(appt => {
+          if (appt.meetingUrl) setMeetingUrl(appt.meetingUrl);
+        })
+        .catch(console.error);
+    }
+  }, [meetingId, token]);
 
   if (!mounted) return null;
-
-  const meetingUrl = `https://meet.jit.si/${meetingId}`;
 
   return (
     <>

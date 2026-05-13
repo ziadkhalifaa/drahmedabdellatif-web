@@ -9,13 +9,14 @@ import { User, Shield, Lock, Save, Phone, Mail, FileText, Calendar, LogOut } fro
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import { toast } from 'sonner';
+import { useAuth } from '@/context/auth-context';
 
 export default function ProfilePage() {
   const t = useTranslations('dashboard');
   const tProfile = useTranslations('dashboard.profile');
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const { user, token, login, logout, isLoading } = useAuth();
   
   const [formData, setFormData] = useState({
     name: '',
@@ -26,17 +27,14 @@ export default function ProfilePage() {
 
   useEffect(() => {
     setMounted(true);
-    const stored = localStorage.getItem('user');
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      setUser(parsed);
+    if (user) {
       setFormData(prev => ({
         ...prev,
-        name: parsed.name || '',
-        phone: parsed.phone || '',
+        name: user.name || '',
+        phone: user.phone || '',
       }));
     }
-  }, []);
+  }, [user]);
 
   if (!mounted) return null;
 
@@ -44,7 +42,7 @@ export default function ProfilePage() {
     e.preventDefault();
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
+      if (!token) return;
       const payload: any = {
         name: formData.name,
         phone: formData.phone,
@@ -56,11 +54,9 @@ export default function ProfilePage() {
       }
 
       const res = await api.post('/auth/profile', payload, token || undefined);
-      
       // Update local storage
       const updatedUser = { ...user, ...res };
-      localStorage.setItem('user', JSON.stringify(updatedUser));
-      setUser(updatedUser);
+      login(token, updatedUser);
       
       // Reset password fields
       setFormData(prev => ({
@@ -78,9 +74,7 @@ export default function ProfilePage() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    window.location.href = '/auth/login';
+    logout();
   };
 
   return (

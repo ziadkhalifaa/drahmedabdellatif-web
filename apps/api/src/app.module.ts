@@ -16,6 +16,7 @@ import { ReportsModule } from './modules/reports/reports.module';
 import { NewsletterModule } from './modules/newsletter/newsletter.module';
 import { PrescriptionsModule } from './modules/prescriptions/prescriptions.module';
 import { WorkingHoursModule } from './modules/working-hours/working-hours.module';
+import { PaymentsModule } from './modules/payments/payments.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
@@ -52,6 +53,7 @@ import { AuditLogInterceptor } from './common/interceptors/audit-log.interceptor
     WorkingHoursModule,
     NewsletterModule,
     PrescriptionsModule,
+    PaymentsModule,
   ],
   providers: [
     {

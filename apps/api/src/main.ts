@@ -34,16 +34,18 @@ async function bootstrap() {
 
     app.use(cookieParser());
 
+    const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:3000')
+      .split(',')
+      .map(o => o.trim());
+
     app.enableCors({
-      origin: [
-        process.env.FRONTEND_URL || 'http://localhost:3000',
-        'https://drahmedabdellatif.com',
-        'http://gold-buffalo-912779.hostingersite.com',
-        'https://gold-buffalo-912779.hostingersite.com',
-      ],
+      origin: (origin, cb) => {
+        if (!origin || allowedOrigins.includes(origin)) cb(null, true);
+        else cb(new Error('Not allowed by CORS'));
+      },
       credentials: true,
-      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-      allowedHeaders: ['Content-Type', 'Authorization'],
+      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'x-cron-secret'],
     });
 
     app.useGlobalPipes(

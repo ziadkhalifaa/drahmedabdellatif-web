@@ -184,6 +184,13 @@ export class AppointmentsService {
     return slots;
   }
 
+  async findByMeetingId(meetingId: string) {
+    return this.prisma.appointment.findFirst({
+      where: { meetingId },
+      include: { patient: true }
+    });
+  }
+
   async findByPatientId(patientId: string) {
     return this.prisma.appointment.findMany({
       where: { patientId },

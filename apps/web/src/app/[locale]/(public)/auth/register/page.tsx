@@ -10,12 +10,14 @@ import { useState } from 'react';
 import { User, Mail, Phone, Lock, UserPlus, LogIn, ArrowRight, ShieldCheck } from 'lucide-react';
 import { toast } from 'sonner';
 import { api } from '@/lib/api';
+import { useAuth } from '@/context/auth-context';
 
 export default function RegisterPage() {
   const t = useTranslations('auth.register');
   const tVerify = useTranslations('auth.verifyEmail');
   const tCommon = useTranslations('common');
   const router = useRouter();
+  const { login } = useAuth();
   const [loading, setLoading] = useState(false);
   const [showVerify, setShowVerify] = useState(false);
   const [formData, setFormData] = useState({ name: '', email: '', phone: '', password: '' });
@@ -49,8 +51,7 @@ export default function RegisterPage() {
     setLoading(true);
     try {
       const data: any = await api.post('/auth/verify-email', { email: formData.email, code });
-      localStorage.setItem('token', data.accessToken);
-      localStorage.setItem('user', JSON.stringify(data.user));
+      login(data.accessToken, data.user);
       toast.success('Email verified successfully!');
       router.push('/dashboard');
     } catch (error: any) {

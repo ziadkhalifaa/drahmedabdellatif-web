@@ -4,8 +4,10 @@ import { CustomThemeProvider } from './theme-provider';
 import { NextIntlClientProvider } from 'next-intl';
 
 import { EditorProvider } from '@/context/editor-context';
+import { AuthProvider } from '@/context/auth-context';
 
 import { Toaster } from 'sonner';
+import { ErrorBoundary } from './error-boundary';
 
 export function Providers({ 
   children, 
@@ -19,14 +21,18 @@ export function Providers({
   initialSettings?: any;
 }) {
   return (
-    <CustomThemeProvider>
-      <NextIntlClientProvider messages={messages} locale={locale}>
-        <EditorProvider initialSettings={initialSettings}>
-          {children}
-          <Toaster position="top-center" richColors />
-        </EditorProvider>
-      </NextIntlClientProvider>
-    </CustomThemeProvider>
+    <ErrorBoundary>
+      <CustomThemeProvider>
+        <NextIntlClientProvider messages={messages} locale={locale}>
+          <EditorProvider initialSettings={initialSettings}>
+            <AuthProvider>
+              {children}
+              <Toaster position="top-center" richColors />
+            </AuthProvider>
+          </EditorProvider>
+        </NextIntlClientProvider>
+      </CustomThemeProvider>
+    </ErrorBoundary>
   );
 }
 

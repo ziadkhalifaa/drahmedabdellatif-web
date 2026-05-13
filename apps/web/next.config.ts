@@ -15,6 +15,14 @@ const config: NextConfig = {
         protocol: 'https',
         hostname: 'drahemedabdellalif-api.vercel.app',
       },
+      {
+        protocol: 'https',
+        hostname: '*.supabase.co',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.supabase.in',
+      },
     ],
   },
   experimental: {

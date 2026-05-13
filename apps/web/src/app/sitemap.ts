@@ -32,5 +32,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   } catch {}
 
-  return [...staticPages, ...blogPosts];
+  // Dynamic: Services
+  let servicePages: MetadataRoute.Sitemap = [];
+  try {
+    const res = await fetch(`${API_BASE}/services`, { cache: 'no-store' });
+    if (res.ok) {
+      const services = await res.json();
+      servicePages = services.flatMap((svc: any) =>
+        locales.map(locale => ({
+          url: `${BASE_URL}/${locale}/services/${svc.id}`,
+          lastModified: new Date(svc.updatedAt || svc.createdAt),
+          changeFrequency: 'monthly' as const,
+          priority: 0.8,
+        }))
+      );
+    }
+  } catch {}
+
+  return [...staticPages, ...blogPosts, ...servicePages];
 }

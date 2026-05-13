@@ -1,12 +1,27 @@
-import { Controller, Get, Post, Patch, Param, Body, UseGuards, Req, Query } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Param, Body, UseGuards, Req, Query, ForbiddenException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AppointmentsService } from '../application/appointments.service';
+import { AppointmentReminderService } from '../application/appointment-reminder.service';
 import { RolesGuard, Roles } from '../../../common/decorators';
 import { AppointmentStatus, AppointmentType } from '@dr-ahmed/shared';
 
 @Controller('appointments')
 export class AppointmentsController {
-  constructor(private readonly appointmentsService: AppointmentsService) { }
+  constructor(
+    private readonly appointmentsService: AppointmentsService,
+    private readonly reminderService: AppointmentReminderService
+  ) { }
+
+  @Post('trigger-reminders')
+  async triggerReminders(@Req() req: any) {
+    const secret = req.headers['x-cron-secret'];
+    const authHeader = req.headers['authorization'];
+    // Accept either the custom secret OR the Vercel OIDC token
+    if (secret !== process.env.CRON_SECRET && (!authHeader || !authHeader.startsWith('Bearer '))) {
+      throw new ForbiddenException('Invalid cron secret');
+    }
+    return this.reminderService.sendReminders();
+  }
 
   @Post()
   async create(@Body() body: {
@@ -39,6 +54,12 @@ export class AppointmentsController {
   @Get('stats')
   async getStats() {
     return this.appointmentsService.getStats();
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get('by-meeting/:meetingId')
+  async findByMeetingId(@Param('meetingId') meetingId: string) {
+    return this.appointmentsService.findByMeetingId(meetingId);
   }
 
   @UseGuards(AuthGuard('jwt'))

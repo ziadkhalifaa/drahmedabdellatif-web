@@ -236,4 +236,21 @@ export class AuthService {
     await (this.prisma as any).refreshToken.delete({ where: { id: token.id } });
     return this.generateTokens(token.user);
   }
+
+  async getUsers(role?: string) {
+    const whereClause = role ? { role } : {};
+    const users = await this.prisma.user.findMany({
+      where: whereClause,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        role: true,
+        createdAt: true,
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+    return users;
+  }
 }

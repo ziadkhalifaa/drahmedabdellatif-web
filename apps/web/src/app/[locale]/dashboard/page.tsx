@@ -15,7 +15,8 @@ import {
   Clock,
   ChevronRight,
   Pill,
-  History
+  History,
+  LayoutDashboard
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -23,11 +24,12 @@ import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
 import { useRouter } from '@/i18n/routing';
 import { MedicalTimeline } from '@/components/dashboard/medical-timeline';
+import { useAuth } from '@/context/auth-context';
 
 export default function DashboardPage() {
   const t = useTranslations('dashboard');
   const router = useRouter();
-  const [user, setUser] = useState<any>(null);
+  const { user, token, logout, isLoading } = useAuth();
   const [appointments, setAppointments] = useState<any[]>([]);
   const [reports, setReports] = useState<any[]>([]);
   const [prescriptions, setPrescriptions] = useState<any[]>([]);
@@ -35,15 +37,12 @@ export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState<'overview' | 'timeline'>('overview');
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const storedUser = localStorage.getItem('user');
-    
-    if (!token || !storedUser) {
+    if (isLoading) return;
+
+    if (!token || !user) {
       router.push('/auth/login');
       return;
     }
-
-    setUser(JSON.parse(storedUser));
 
     const fetchData = async () => {
       try {
@@ -63,18 +62,16 @@ export default function DashboardPage() {
     };
 
     fetchData();
-  }, []);
+  }, [token, user, isLoading, router]);
 
   const timelineItems = [
     ...appointments.map(a => ({ id: a.id, type: 'appointment' as const, title: a.service?.titleAr || 'Consultation', date: new Date(a.date), status: a.status })),
     ...reports.map(r => ({ id: r.id, type: 'report' as const, title: r.title, date: new Date(r.createdAt) })),
-    ...prescriptions.map(p => ({ id: p.id, type: 'prescription' as const, title: p.diagnosisAr || 'Prescription', date: new Date(p.createdAt) }))
+    ...prescriptions.map(p => ({ id: p.id, type: 'prescription' as const, title: p.diagnosisAr || p.diagnosisEn || 'Prescription', date: new Date(p.createdAt), data: { ...p, patient: user } }))
   ];
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    router.push('/');
+    logout();
   };
   
   const sidebarItems = [

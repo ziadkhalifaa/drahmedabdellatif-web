@@ -17,6 +17,7 @@ import {
   Clock
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/context/auth-context';
 
 import { useState, useEffect } from 'react';
 import { api, getMediaUrl } from '@/lib/api';
@@ -25,12 +26,14 @@ import { useRouter } from '@/i18n/routing';
 export default function ReportsPage() {
   const t = useTranslations('dashboard');
   const router = useRouter();
+  const { token, logout } = useAuth();
   const [reports, setReports] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    if (token === null) return;
+
     if (!token) {
       router.push('/auth/login');
       return;
@@ -40,12 +43,10 @@ export default function ReportsPage() {
       .then(setReports)
       .catch(err => console.error("Failed to fetch reports:", err))
       .finally(() => setLoading(false));
-  }, []);
+  }, [token]);
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    router.push('/');
+    logout();
   };
 
   const filteredReports = reports.filter(r => 
