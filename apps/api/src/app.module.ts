@@ -37,7 +37,18 @@ import { AuditLogInterceptor } from './common/interceptors/audit-log.interceptor
         },
       },
     }),
-    ThrottlerModule.forRoot([{ ttl: 60000, limit: 60 }]),
+    ThrottlerModule.forRoot([
+      {
+        name: 'default',
+        ttl: 60000,
+        limit: 30,
+      },
+      {
+        name: 'auth',
+        ttl: 300000,
+        limit: 5,
+      },
+    ]),
 
     PrismaModule,
     AuthModule,
