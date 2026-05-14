@@ -29,8 +29,8 @@ export function AboutSection() {
             <h2 className="text-4xl lg:text-5xl font-extrabold text-[var(--primary-dark)] dark:text-white mb-6 leading-tight">
               <EditableText 
                 contentKey="about.title" 
-                defaultAr="الأستاذ الدكتور انمار محمد حبيب" 
-                defaultEn="Prof. Dr. Enmar Mohamed Habib" 
+                defaultAr="الأستاذ الدكتور أحمد عبد اللطيف" 
+                defaultEn="Prof. Dr. Ahmed Abdellatif" 
                 as="span"
               />
             </h2>
@@ -40,8 +40,8 @@ export function AboutSection() {
             <div className="text-lg text-gray-600 dark:text-gray-300 leading-loose space-y-6">
               <EditableText 
                 contentKey="about.description1" 
-                defaultAr="أستاذ جراحة المسالك البولية ومسالك الأطفال بجامعة القاهرة وزميل جامعة ماكجيل-كندا، ورائد جراحات المسالك البولية في مصر والوطن العربي. بفضل خبرته العلمية العميقة ومهاراته الجراحية المتميزة، إلى جانب اعتماده على أحدث التقنيات الطبية مثل الهولميوم ليزر، استطاع تقديم حلول طبية مبتكرة." 
-                defaultEn="Professor of Urology at Cairo University and Fellow of McGill University..." 
+                defaultAr="أستاذ واستشاري جراحة المسالك البولية والكلى والمناظير والذكورة. بفضل خبرته العلمية العميقة ومهاراته الجراحية المتميزة، استطاع تقديم حلول طبية مبتكرة باستخدام أحدث التقنيات." 
+                defaultEn="Professor and Consultant of Urology, Nephrology, Endoscopy, and Andrology..." 
                 as="p"
               />
               <EditableText 
