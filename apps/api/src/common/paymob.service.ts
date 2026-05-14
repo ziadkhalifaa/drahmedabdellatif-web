@@ -105,7 +105,7 @@ export class PaymobService {
     this.logger.log(`Initiating Paymob payment: ${amountCents / 100} EGP`);
 
     const authToken = await this.authenticate();
-    const order = await this.createOrder(authToken, amountCents, items);
+    const order: any = await this.createOrder(authToken, amountCents, items);
     const paymentKey = await this.getPaymentKey(authToken, order.id, amountCents, billingData);
 
     return {

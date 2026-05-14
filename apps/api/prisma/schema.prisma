@@ -83,6 +83,7 @@ model Appointment {
   updatedAt      DateTime          @default(now()) @updatedAt
   review         AppointmentReview?
   prescription   Prescription?
+  payments       Payment[]
 }
 
 model MedicalReport {
@@ -298,6 +299,7 @@ model Payment {
   userId          String
   user            User          @relation(fields: [userId], references: [id])
   appointmentId   String?
+  appointment     Appointment?  @relation(fields: [appointmentId], references: [id])
   paymobOrderId   String?       @unique
   amount          Float         // Amount in EGP
   currency        String        @default("EGP")

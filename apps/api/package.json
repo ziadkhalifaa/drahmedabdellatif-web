@@ -34,6 +34,7 @@
     "@nestjs/swagger": "^11.4.2",
     "@nestjs/throttler": "^6.5.0",
     "@prisma/client": "^6.6.0",
+    "@supabase/supabase-js": "^2.49.1",
     "@types/sharp": "^0.32.0",
     "@types/uuid": "^11.0.0",
     "bcryptjs": "^3.0.3",

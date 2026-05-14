@@ -241,7 +241,7 @@ export class AuthService {
   }
 
   async getUsers(role?: string) {
-    const whereClause = role ? { role } : {};
+    const whereClause = role ? { role: role as any } : {};
     const users = await this.prisma.user.findMany({
       where: whereClause,
       select: {

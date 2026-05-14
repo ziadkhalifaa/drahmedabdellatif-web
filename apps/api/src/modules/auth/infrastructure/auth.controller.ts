@@ -2,7 +2,7 @@ import { Controller, Post, Get, Body, UseGuards, Req, Res, UnauthorizedException
 import { Response, Request } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { Throttle } from '@nestjs/throttler';
-import { RolesGuard, Roles } from '../../common/decorators';
+import { RolesGuard, Roles } from '../../../common/decorators';
 import { AuthService } from '../application/auth.service';
 
 @Controller('auth')
