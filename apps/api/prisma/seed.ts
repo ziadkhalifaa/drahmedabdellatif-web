@@ -13,12 +13,14 @@ async function main() {
     where: { email: 'admin@drahmedabdellatif.com' },
     update: {
       name: 'Prof. Dr. Ahmed Abdellatif',
+      image: '/images/dr-ahmed.png',
     },
     create: {
       email: 'admin@drahmedabdellatif.com',
       password: adminPassword,
       name: 'Prof. Dr. Ahmed Abdellatif',
       role: 'admin',
+      image: '/images/dr-ahmed.png',
     },
   });
 
@@ -29,6 +31,7 @@ async function main() {
       descriptionAr: 'علاج تضخم البروستاتا الحميد باستخدام أحدث التقنيات الجراحية وغير الجراحية.',
       descriptionEn: 'Treatment of Benign Prostatic Hyperplasia (BPH) using the latest surgical and non-surgical techniques.',
       icon: 'Shield',
+      image: 'https://images.unsplash.com/photo-1579154235602-3c35bd79951e?q=80&w=800&auto=format&fit=crop',
       order: 1,
     },
     {
@@ -37,6 +40,7 @@ async function main() {
       descriptionAr: 'استخدام المناظير المرنة لتفتيت حصوات الكلى والحالب بدون جراحة.',
       descriptionEn: 'Using flexible endoscopes to fragment kidney and ureteral stones without traditional surgery.',
       icon: 'Scan',
+      image: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?q=80&w=800&auto=format&fit=crop',
       order: 2,
     },
     {
@@ -45,6 +49,7 @@ async function main() {
       descriptionAr: 'تفتيت حصوات الكلى، الحالب والمثانة باستخدام تقنية الهولميوم ليزر المتقدمة.',
       descriptionEn: 'Fragmentation of kidney, ureter, and bladder stones using advanced Holmium laser technology.',
       icon: 'Activity',
+      image: 'https://images.unsplash.com/photo-1581595220892-b0739db3ba8c?q=80&w=800&auto=format&fit=crop',
       order: 3,
     },
     {
@@ -53,6 +58,7 @@ async function main() {
       descriptionAr: 'تشخيص وعلاج أورام وسرطان البروستاتا باستخدام أحدث البروتوكولات العالمية.',
       descriptionEn: 'Diagnosis and treatment of prostate tumors and cancer using the latest international protocols.',
       icon: 'Gem',
+      image: 'https://images.unsplash.com/photo-1551076805-e18690c5e53b?q=80&w=800&auto=format&fit=crop',
       order: 4,
     },
     {
@@ -61,6 +67,7 @@ async function main() {
       descriptionAr: 'علاج مشاكل الضعف الجنسي، تأخر الإنجاب، ودوالي الخصية عند الرجال.',
       descriptionEn: 'Treatment of erectile dysfunction, male infertility, and varicocele in men.',
       icon: 'Heart',
+      image: 'https://images.unsplash.com/photo-1516549655169-df83a0774514?q=80&w=800&auto=format&fit=crop',
       order: 5,
     },
     {
@@ -69,6 +76,7 @@ async function main() {
       descriptionAr: 'استئصال أورام المثانة ومتابعتها لضمان الشفاء التام ومنع الارتجاع.',
       descriptionEn: 'Surgical resection and follow-up of bladder tumors to ensure full recovery and prevent recurrence.',
       icon: 'Shield',
+      image: 'https://images.unsplash.com/photo-1586773860418-d3b9a8ec81a2?q=80&w=800&auto=format&fit=crop',
       order: 6,
     },
     {
@@ -77,6 +85,7 @@ async function main() {
       descriptionAr: 'تقنية تبخير البروستاتا الحديثة التي تضمن سرعة التعافي وتقليل النزيف.',
       descriptionEn: 'Modern prostate vaporization technology ensuring fast recovery and minimal bleeding.',
       icon: 'Stethoscope',
+      image: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=800&auto=format&fit=crop',
       order: 7,
     },
     {
@@ -85,6 +94,7 @@ async function main() {
       descriptionAr: 'إجراء عمليات البروستاتا المعقدة عن طريق فتحات صغيرة جداً باستخدام المنظار.',
       descriptionEn: 'Performing complex prostate surgeries through tiny incisions using laparoscopic techniques.',
       icon: 'Scan',
+      image: 'https://images.unsplash.com/photo-1551601651-2a8555f1a136?q=80&w=800&auto=format&fit=crop',
       order: 8,
     },
     {
@@ -93,6 +103,7 @@ async function main() {
       descriptionAr: 'أحدث علاج غير جراحي لتضخم البروستاتا باستخدام بخار الماء في دقائق معدودة.',
       descriptionEn: 'The latest non-surgical treatment for prostate enlargement using water vapor in just minutes.',
       icon: 'Activity',
+      image: 'https://images.unsplash.com/photo-1584017911766-d451b3d0e843?q=80&w=800&auto=format&fit=crop',
       order: 9,
     },
     {
@@ -101,6 +112,7 @@ async function main() {
       descriptionAr: 'استخدام الموجات فوق الصوتية والليزر لعلاج تضخم البروستاتا بدون تخدير كلي.',
       descriptionEn: 'Using ultrasound and laser for treating prostate enlargement without general anesthesia.',
       icon: 'Scan',
+      image: 'https://images.unsplash.com/photo-1583324113626-70df0f43aaad?q=80&w=800&auto=format&fit=crop',
       order: 10,
     },
     {
@@ -109,6 +121,7 @@ async function main() {
       descriptionAr: 'علاج العيوب الخلقية والمشاكل التناسلية عند الأطفال بأعلى درجات الدقة.',
       descriptionEn: 'Treating congenital defects and reproductive issues in children with maximum precision.',
       icon: 'Stethoscope',
+      image: 'https://images.unsplash.com/photo-1584362946045-121f8ad92139?q=80&w=800&auto=format&fit=crop',
       order: 11,
     }
   ];

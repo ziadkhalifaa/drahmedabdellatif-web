@@ -78,9 +78,9 @@ export function AboutSection() {
             <div className="relative rounded-[2rem] overflow-hidden shadow-2xl z-10 border-8 border-white dark:border-[#222]">
               <EditableImage 
                 contentKey="about.image"
-                defaultSrc="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=1000&auto=format&fit=crop"
+                defaultSrc="/images/dr-ahmed.png"
                 alt="Prof. Dr. Ahmed"
-                className="w-full h-auto aspect-[4/5] object-cover"
+                className="w-full h-auto aspect-[4/5] object-contain bg-gray-50 dark:bg-[#111]"
               />
               
               {/* Floating Badge */}

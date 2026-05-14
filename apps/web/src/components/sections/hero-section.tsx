@@ -10,19 +10,20 @@ import { Calendar, ChevronRight, ChevronLeft } from 'lucide-react';
 const slides = [
   {
     id: 1,
-    image: 'https://images.unsplash.com/photo-1551076805-e18690c5e53b?q=80&w=2000&auto=format&fit=crop', // High quality clinic/doctor image
-    title: 'الريادة في جراحات المسالك البولية',
-    subtitle: 'الأستاذ الدكتور أحمد عبد اللطيف، خبرة عالمية وتقنيات حديثة لعلاج المسالك البولية بأقل تدخل جراحي وأسرع تعافي.',
+    image: '/images/dr-ahmed.png',
+    title: 'أ.د. أحمد عبد اللطيف',
+    subtitle: 'أستاذ واستشاري جراحة المسالك البولية والكلى والمناظير والذكورة، خبرة عالمية في علاج أمراض المسالك البولية بأحدث التقنيات.',
+    isPortrait: true
   },
   {
     id: 2,
-    image: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?q=80&w=2000&auto=format&fit=crop', // Surgery/Tech image
+    image: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?q=80&w=2000&auto=format&fit=crop',
     title: 'أحدث التقنيات الطبية',
     subtitle: 'نستخدم تقنيات متطورة مثل الهولميوم ليزر والريزيوم لعلاج تضخم البروستاتا بفعالية وأمان تام.',
   },
   {
     id: 3,
-    image: 'https://images.unsplash.com/photo-1584515933487-779824d29309?q=80&w=2000&auto=format&fit=crop', // Patient care image
+    image: 'https://images.unsplash.com/photo-1584515933487-779824d29309?q=80&w=2000&auto=format&fit=crop',
     title: 'رعاية فائقة وقصص نجاح',
     subtitle: 'آلاف الحالات الناجحة التي استعادت جودة حياتها بفضل الرعاية الطبية المتميزة والتشخيص الدقيق.',
   }
@@ -55,11 +56,27 @@ export function HeroSection() {
         >
           <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent z-10" />
           <div className="absolute inset-0 bg-gradient-to-t from-[var(--primary-dark)]/90 via-transparent to-transparent z-10" />
-          <img
-            src={slides[currentSlide].image}
-            alt="Hero Background"
-            className="w-full h-full object-cover"
-          />
+          
+          {slides[currentSlide].isPortrait ? (
+            <div className="relative w-full h-full bg-[#0a1a2f]">
+              <div className="absolute right-0 bottom-0 h-full w-full lg:w-1/2 flex items-end justify-center lg:justify-end z-20">
+                <motion.img
+                  initial={{ y: 100, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ duration: 1, delay: 0.5 }}
+                  src={slides[currentSlide].image}
+                  alt={slides[currentSlide].title}
+                  className="h-[80%] lg:h-[95%] object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
+                />
+              </div>
+            </div>
+          ) : (
+            <img
+              src={slides[currentSlide].image}
+              alt="Hero Background"
+              className="w-full h-full object-cover"
+            />
+          )}
         </motion.div>
       </AnimatePresence>
 
