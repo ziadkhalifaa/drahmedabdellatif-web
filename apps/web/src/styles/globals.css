@@ -2,38 +2,143 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800;900&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap');
+
 :root {
-  --primary: #0f4c81; /* Classic Blue - Premium & Trustworthy */
-  --primary-light: #2c7da0;
-  --primary-dark: #072a44;
-  --accent: #d4af37; /* Gold - Premium touch */
-  --accent-light: #e6c667;
-  --background: #ffffff;
-  --foreground: #1a1a1a;
-  --card: #ffffff;
-  --card-hover: #f8fafc;
-  --muted: #64748b;
-  --border: #e2e8f0;
-  --radius: 1rem;
+  /* Core Brand */
+  --primary:        #0B3D6B;   /* أزرق ملكي داكن — ثقة وعلم */
+  --primary-mid:    #1A5F9C;
+  --primary-light:  #2E86C1;
+  --primary-glow:   rgba(11,61,107,0.15);
+
+  /* Gold Accent — لمسة فخامة */
+  --accent:         #C9A84C;
+  --accent-light:   #E2C370;
+  --accent-dark:    #A07830;
+  --accent-glow:    rgba(201,168,76,0.2);
+
+  /* Neutral Surface */
+  --surface-0:      #FFFFFF;
+  --surface-1:      #F7F9FC;
+  --surface-2:      #EEF2F7;
+  --surface-3:      #E0E8F0;
+
+  /* Semantic */
+  --success:        #1A7F5A;
+  --warning:        #D4860A;
+  --error:          #C0392B;
+
+  /* Typography */
+  --text-primary:   #0D1B2A;
+  --text-secondary: #4A6080;
+  --text-muted:     #8097AF;
+
+  /* Borders & Shadows */
+  --border:         #DDE6EF;
+  --border-strong:  #B8CCDE;
+  --shadow-sm:      0 2px 8px rgba(11,61,107,0.06);
+  --shadow-md:      0 8px 32px rgba(11,61,107,0.12);
+  --shadow-lg:      0 20px 60px rgba(11,61,107,0.18);
+  --shadow-gold:    0 8px 32px rgba(201,168,76,0.25);
+
+  /* Border Radius */
+  --radius-sm:  8px;
+  --radius-md:  16px;
+  --radius-lg:  24px;
+  --radius-xl:  40px;
+
+  /* Transition */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Typography Fonts */
+  --font-display:  'Playfair Display', 'IBM Plex Sans Arabic', serif;
+  --font-body:     'IBM Plex Sans Arabic', 'Playfair Display', sans-serif;
+  --font-accent:   'Instrument Serif', serif;
+  --font-mono:     'JetBrains Mono', monospace;
+
+  /* Typography Scale */
+  --text-xs:   0.75rem;    /* 12px */
+  --text-sm:   0.875rem;   /* 14px */
+  --text-base: 1rem;       /* 16px */
+  --text-lg:   1.125rem;   /* 18px */
+  --text-xl:   1.25rem;    /* 20px */
+  --text-2xl:  1.5rem;     /* 24px */
+  --text-3xl:  2rem;       /* 32px */
+  --text-4xl:  2.5rem;     /* 40px */
+  --text-5xl:  3.25rem;    /* 52px */
+  --text-6xl:  4.5rem;     /* 72px */
+  --text-hero: clamp(3.5rem, 8vw, 6rem);
 }
 
 .dark {
-  --background: #020617; /* Deepest blue/black */
-  --foreground: #f8fafc;
-  --card: #0f172a;
-  --card-hover: #1e293b;
-  --muted: #94a3b8;
-  --border: #1e293b;
+  --primary:        #1E6DB5;
+  --primary-light:  #3A90D4;
+  --surface-0:      #050D1A;
+  --surface-1:      #0A1628;
+  --surface-2:      #0F2040;
+  --surface-3:      #152A52;
+  --text-primary:   #E8F0F8;
+  --text-secondary: #8DAEC8;
+  --text-muted:     #4A6A85;
+  --border:         #1A2E4A;
 }
 
+@theme {
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+  --font-accent: var(--font-accent);
+  --font-mono: var(--font-mono);
+
+  --color-primary: var(--primary);
+  --color-primary-mid: var(--primary-mid);
+  --color-primary-light: var(--primary-light);
+  --color-primary-glow: var(--primary-glow);
+  --color-accent: var(--accent);
+  --color-accent-light: var(--accent-light);
+  --color-accent-dark: var(--accent-dark);
+  --color-accent-glow: var(--accent-glow);
+  
+  --color-surface-0: var(--surface-0);
+  --color-surface-1: var(--surface-1);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-error: var(--error);
+
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+  --shadow-gold: var(--shadow-gold);
+
+  --ease-spring: var(--ease-spring);
+  --ease-smooth: var(--ease-smooth);
+}
 
 @layer base {
-  * {
-    @apply border-[var(--border)];
-  }
   body {
-    @apply bg-[var(--background)] text-[var(--foreground)] selection:bg-[var(--primary)] selection:text-white;
+    @apply bg-[var(--surface-0)] text-[var(--text-primary)] selection:bg-[var(--primary)] selection:text-white;
+    font-family: var(--font-body);
     font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
   }
 }
 
@@ -45,10 +150,13 @@
     @apply bg-black/40 backdrop-blur-xl border border-white/10;
   }
   .text-gradient {
-    @apply bg-gradient-to-r from-[var(--primary)] to-[var(--primary-light)] bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-[var(--primary)] to-[var(--accent)] bg-clip-text text-transparent;
   }
   .animate-float {
     animation: float 6s ease-in-out infinite;
+  }
+  .animate-marquee {
+    animation: marquee 30s linear infinite;
   }
 }
 
@@ -57,10 +165,14 @@
   50% { transform: translateY(-20px); }
 }
 
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
+}
+
 html {
   scroll-behavior: smooth;
 }
-
 
 ::selection {
   background: var(--primary);
