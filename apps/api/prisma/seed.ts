@@ -153,16 +153,29 @@ async function main() {
 
   // Seed site settings
   await (prisma as any).siteSettings.upsert({
-    where: { id: 'default' },
+    where: { key: 'default' },
     update: {},
     create: {
-      id: 'default',
-      siteNameAr: 'د. أحمد عبد اللطيف',
-      siteNameEn: 'Dr. Ahmed Abdellatif',
-      contactEmail: 'info@drahmedabdellatif.com',
-      contactPhone: '+201234567890',
-      addressAr: 'القاهرة، مصر',
-      addressEn: 'Cairo, Egypt',
+      key: 'default',
+      value: {
+        siteNameAr: 'د. أحمد عبد اللطيف',
+        siteNameEn: 'Dr. Ahmed Abdellatif',
+        contactEmail: 'info@drahmedabdellatif.com',
+        contactPhone: '+201234567890',
+        addressAr: 'القاهرة، مصر',
+        addressEn: 'Cairo, Egypt',
+      }
+    }
+  });
+
+  await (prisma as any).siteSettings.upsert({
+    where: { key: 'about.image' },
+    update: {
+      value: { src: '/images/dr-ahmed.png', alt: 'Prof. Dr. Ahmed' }
+    },
+    create: {
+      key: 'about.image',
+      value: { src: '/images/dr-ahmed.png', alt: 'Prof. Dr. Ahmed' }
     }
   });
 
