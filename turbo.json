@@ -4,7 +4,22 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [".next/**", "dist/**"]
+      "outputs": [".next/**", "dist/**"],
+      "env": [
+        "DATABASE_URL",
+        "DIRECT_URL",
+        "JWT_SECRET",
+        "JWT_REFRESH_SECRET",
+        "SUPABASE_URL",
+        "SUPABASE_SERVICE_KEY",
+        "CRON_SECRET",
+        "ALLOWED_ORIGINS",
+        "FRONTEND_URL",
+        "SMTP_HOST",
+        "SMTP_PORT",
+        "SMTP_USER",
+        "SMTP_PASS"
+      ]
     },
     "dev": {
       "cache": false,
