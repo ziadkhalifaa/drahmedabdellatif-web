@@ -78,8 +78,8 @@ export class AppointmentsController {
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles('admin')
   @Patch(':id/status')
-  async updateStatus(@Param('id') id: string, @Body() body: { status: AppointmentStatus }) {
-    return this.appointmentsService.updateStatus(id, body.status);
+  async updateStatus(@Param('id') id: string, @Body() body: { status: AppointmentStatus; cancellationReason?: string }) {
+    return this.appointmentsService.updateStatus(id, body.status, body.cancellationReason);
   }
 
   @UseGuards(AuthGuard('jwt'))

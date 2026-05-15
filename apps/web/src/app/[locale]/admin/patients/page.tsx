@@ -15,6 +15,9 @@ interface Patient {
   email: string;
   phone: string;
   role: string;
+  gender?: string;
+  dateOfBirth?: string;
+  address?: string;
   createdAt: string;
 }
 
@@ -94,6 +97,7 @@ export default function PatientsManagementPage() {
             <thead>
               <tr className="border-b border-[var(--border)] text-left">
                 <th className="px-4 py-3 font-bold text-[var(--muted)] uppercase text-[10px] tracking-wider">Patient</th>
+                <th className="px-4 py-3 font-bold text-[var(--muted)] uppercase text-[10px] tracking-wider">Info</th>
                 <th className="px-4 py-3 font-bold text-[var(--muted)] uppercase text-[10px] tracking-wider">Contact</th>
                 <th className="px-4 py-3 font-bold text-[var(--muted)] uppercase text-[10px] tracking-wider">Registered</th>
                 <th className="px-4 py-3 font-bold text-[var(--muted)] uppercase text-[10px] tracking-wider">Actions</th>
@@ -115,12 +119,29 @@ export default function PatientsManagementPage() {
                   </td>
                   <td className="p-4">
                     <div className="flex flex-col gap-1">
+                      <span className="text-xs font-bold text-[var(--foreground)] capitalize">
+                        {patient.gender || 'N/A'}
+                      </span>
+                      {patient.dateOfBirth && (
+                        <span className="text-[10px] text-[var(--muted)]">
+                          {Math.floor((new Date().getTime() - new Date(patient.dateOfBirth).getTime()) / (31557600000))} Years old
+                        </span>
+                      )}
+                    </div>
+                  </td>
+                  <td className="p-4">
+                    <div className="flex flex-col gap-1">
                       <span className="flex items-center gap-1.5 text-sm">
                         <Mail size={12} className="text-[var(--muted)]" /> {patient.email}
                       </span>
                       <span className="flex items-center gap-1.5 text-xs text-[var(--muted)]">
                         <Phone size={12} /> {patient.phone || 'No phone'}
                       </span>
+                      {patient.address && (
+                        <span className="text-[10px] text-[var(--muted)] truncate max-w-[150px]">
+                          {patient.address}
+                        </span>
+                      )}
                     </div>
                   </td>
                   <td className="p-4 text-[var(--muted)] text-sm">

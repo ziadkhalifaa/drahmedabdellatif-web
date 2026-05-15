@@ -50,6 +50,12 @@ model User {
   passwordResetCode      String?
   passwordResetExpiry    DateTime?
   role                  UserRole       @default(patient)
+  
+  // Patient Profile Fields
+  gender                String?        // "male", "female"
+  dateOfBirth           DateTime?
+  address               String?
+  
   appointments          Appointment[]
   medicalReports        MedicalReport[]
   refreshTokens         RefreshToken[]
@@ -74,6 +80,7 @@ model Appointment {
   timeSlot       String
   status         AppointmentStatus @default(pending)
   notes          String?
+  cancellationReason String?
   
   // Video Meeting Info
   meetingId      String?           @unique
@@ -161,6 +168,13 @@ model Service {
   image         String?
   order         Int      @default(0)
   isActive      Boolean  @default(true)
+  
+  // SEO Fields
+  metaTitleAr       String?
+  metaTitleEn       String?
+  metaDescriptionAr String?
+  metaDescriptionEn String?
+  
   createdAt     DateTime @default(now())
   updatedAt     DateTime @default(now()) @updatedAt
 }
@@ -212,6 +226,12 @@ model Technique {
   slug          String   @unique
   order         Int      @default(0)
   isActive      Boolean  @default(true)
+  
+  // SEO Fields
+  metaTitleAr       String?
+  metaTitleEn       String?
+  metaDescriptionAr String?
+  metaDescriptionEn String?
 }
 
 model ContactMessage {

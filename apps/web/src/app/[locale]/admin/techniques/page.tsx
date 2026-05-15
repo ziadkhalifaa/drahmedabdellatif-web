@@ -18,6 +18,10 @@ interface Technique {
   image: string;
   order: number;
   isActive: boolean;
+  metaTitleAr?: string;
+  metaTitleEn?: string;
+  metaDescriptionAr?: string;
+  metaDescriptionEn?: string;
 }
 
 export default function AdminTechniquesPage() {
@@ -30,7 +34,9 @@ export default function AdminTechniquesPage() {
     slug: '',
     titleAr: '', titleEn: '', 
     descriptionAr: '', descriptionEn: '', 
-    icon: 'Stethoscope', image: '', order: 0, isActive: true 
+    icon: 'Stethoscope', image: '', order: 0, isActive: true,
+    metaTitleAr: '', metaTitleEn: '',
+    metaDescriptionAr: '', metaDescriptionEn: ''
   });
 
   const fetchTechniques = () => {
@@ -57,7 +63,9 @@ export default function AdminTechniquesPage() {
       slug: '',
       titleAr: '', titleEn: '', 
       descriptionAr: '', descriptionEn: '', 
-      icon: 'Stethoscope', image: '', order: 0, isActive: true 
+      icon: 'Stethoscope', image: '', order: 0, isActive: true,
+      metaTitleAr: '', metaTitleEn: '',
+      metaDescriptionAr: '', metaDescriptionEn: ''
     });
   };
 
@@ -80,7 +88,11 @@ export default function AdminTechniquesPage() {
       icon: technique.icon || 'Stethoscope',
       image: technique.image || '',
       order: technique.order,
-      isActive: technique.isActive
+      isActive: technique.isActive,
+      metaTitleAr: technique.metaTitleAr || '',
+      metaTitleEn: technique.metaTitleEn || '',
+      metaDescriptionAr: technique.metaDescriptionAr || '',
+      metaDescriptionEn: technique.metaDescriptionEn || ''
     });
     setShowForm(true);
   };
@@ -120,7 +132,12 @@ export default function AdminTechniquesPage() {
                   </div>
                   <div>
                     <label className="text-xs font-bold text-[var(--muted)] uppercase mb-1 block">Description (AR)</label>
-                    <Textarea value={form.descriptionAr} onChange={e => setForm({...form, descriptionAr: e.target.value})} placeholder="وصف التقنية" rows={4} />
+                    <Textarea value={form.descriptionAr} onChange={e => setForm({...form, descriptionAr: e.target.value})} placeholder="وصف التقنية" rows={3} />
+                  </div>
+                  <div className="pt-2 space-y-3 bg-gray-50 dark:bg-white/5 p-3 rounded-xl border border-dashed border-gray-200 dark:border-white/10">
+                    <p className="text-[10px] font-black uppercase tracking-tighter text-primary">SEO Settings (AR)</p>
+                    <Input label="Meta Title" value={form.metaTitleAr} onChange={e => setForm({...form, metaTitleAr: e.target.value})} placeholder="عنوان البحث" />
+                    <Textarea label="Meta Description" value={form.metaDescriptionAr} onChange={e => setForm({...form, metaDescriptionAr: e.target.value})} placeholder="وصف البحث" rows={2} />
                   </div>
                 </div>
               </div>
@@ -134,7 +151,12 @@ export default function AdminTechniquesPage() {
                   </div>
                   <div>
                     <label className="text-xs font-bold text-[var(--muted)] uppercase mb-1 block">Description (EN)</label>
-                    <Textarea value={form.descriptionEn} onChange={e => setForm({...form, descriptionEn: e.target.value})} placeholder="Technique Description" rows={4} dir="ltr" />
+                    <Textarea value={form.descriptionEn} onChange={e => setForm({...form, descriptionEn: e.target.value})} placeholder="Technique Description" rows={3} dir="ltr" />
+                  </div>
+                  <div className="pt-2 space-y-3 bg-gray-50 dark:bg-white/5 p-3 rounded-xl border border-dashed border-gray-200 dark:border-white/10">
+                    <p className="text-[10px] font-black uppercase tracking-tighter text-primary">SEO Settings (EN)</p>
+                    <Input label="Meta Title" value={form.metaTitleEn} onChange={e => setForm({...form, metaTitleEn: e.target.value})} placeholder="Search Title" dir="ltr" />
+                    <Textarea label="Meta Description" value={form.metaDescriptionEn} onChange={e => setForm({...form, metaDescriptionEn: e.target.value})} placeholder="Search Description" rows={2} dir="ltr" />
                   </div>
                 </div>
               </div>

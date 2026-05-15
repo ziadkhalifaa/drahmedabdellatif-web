@@ -17,7 +17,9 @@ export default function AdminServicesPage() {
   const [form, setForm] = useState({ 
     titleAr: '', titleEn: '', 
     descriptionAr: '', descriptionEn: '', 
-    icon: 'Stethoscope', image: '', order: 0, isActive: true 
+    icon: 'Stethoscope', image: '', order: 0, isActive: true,
+    metaTitleAr: '', metaTitleEn: '',
+    metaDescriptionAr: '', metaDescriptionEn: ''
   });
 
 
@@ -44,7 +46,9 @@ export default function AdminServicesPage() {
     setForm({ 
       titleAr: '', titleEn: '', 
       descriptionAr: '', descriptionEn: '', 
-      icon: 'Stethoscope', image: '', order: 0, isActive: true 
+      icon: 'Stethoscope', image: '', order: 0, isActive: true,
+      metaTitleAr: '', metaTitleEn: '',
+      metaDescriptionAr: '', metaDescriptionEn: ''
     });
   };
 
@@ -67,7 +71,11 @@ export default function AdminServicesPage() {
       icon: service.icon,
       image: service.image || '',
       order: service.order,
-      isActive: service.isActive
+      isActive: service.isActive,
+      metaTitleAr: service.metaTitleAr || '',
+      metaTitleEn: service.metaTitleEn || '',
+      metaDescriptionAr: service.metaDescriptionAr || '',
+      metaDescriptionEn: service.metaDescriptionEn || ''
     });
     setShowForm(true);
   };
@@ -104,14 +112,26 @@ export default function AdminServicesPage() {
                     <Globe size={14} /> Arabic Content
                   </div>
                   <Input label="Service Title (Arabic)" placeholder="اسم الخدمة باللغة العربية" value={form.titleAr} onChange={(e) => setForm({ ...form, titleAr: e.target.value })} />
-                  <Textarea label="Service Description (Arabic)" placeholder="وصف الخدمة باللغة العربية..." rows={4} value={form.descriptionAr} onChange={(e) => setForm({ ...form, descriptionAr: e.target.value })} />
+                  <Textarea label="Service Description (Arabic)" placeholder="وصف الخدمة باللغة العربية..." rows={3} value={form.descriptionAr} onChange={(e) => setForm({ ...form, descriptionAr: e.target.value })} />
+                  
+                  <div className="pt-2 space-y-3">
+                    <p className="text-[10px] font-black uppercase tracking-tighter text-primary/60">Search Engine Optimization (AR)</p>
+                    <Input label="Meta Title (Arabic)" placeholder="عنوان البحث" value={form.metaTitleAr} onChange={(e) => setForm({ ...form, metaTitleAr: e.target.value })} />
+                    <Textarea label="Meta Description (Arabic)" placeholder="وصف البحث المختصر" rows={2} value={form.metaDescriptionAr} onChange={(e) => setForm({ ...form, metaDescriptionAr: e.target.value })} />
+                  </div>
                </div>
                <div className="space-y-4">
                   <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[var(--muted)]">
                     <Globe size={14} /> English Content
                   </div>
                   <Input label="Service Title (English)" placeholder="Service name in English" value={form.titleEn} onChange={(e) => setForm({ ...form, titleEn: e.target.value })} />
-                  <Textarea label="Service Description (English)" placeholder="Service description in English..." rows={4} value={form.descriptionEn} onChange={(e) => setForm({ ...form, descriptionEn: e.target.value })} />
+                  <Textarea label="Service Description (English)" placeholder="Service description in English..." rows={3} value={form.descriptionEn} onChange={(e) => setForm({ ...form, descriptionEn: e.target.value })} />
+                  
+                  <div className="pt-2 space-y-3">
+                    <p className="text-[10px] font-black uppercase tracking-tighter text-primary/60">Search Engine Optimization (EN)</p>
+                    <Input label="Meta Title (English)" placeholder="Search Title" value={form.metaTitleEn} onChange={(e) => setForm({ ...form, metaTitleEn: e.target.value })} />
+                    <Textarea label="Meta Description (English)" placeholder="Short search description" rows={2} value={form.metaDescriptionEn} onChange={(e) => setForm({ ...form, metaDescriptionEn: e.target.value })} />
+                  </div>
                </div>
             </div>
             

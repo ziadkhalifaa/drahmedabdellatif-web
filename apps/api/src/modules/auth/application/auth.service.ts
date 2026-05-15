@@ -132,16 +132,28 @@ export class AuthService {
   async getProfile(userId: string) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user) throw new UnauthorizedException('User not found');
-    return { id: user.id, email: user.email, name: user.name, phone: user.phone, role: user.role };
+    return { 
+      id: user.id, 
+      email: user.email, 
+      name: user.name, 
+      phone: user.phone, 
+      role: user.role,
+      gender: user.gender,
+      dateOfBirth: user.dateOfBirth,
+      address: user.address
+    };
   }
 
-  async updateProfile(userId: string, data: { name?: string; phone?: string; currentPassword?: string; newPassword?: string }) {
+  async updateProfile(userId: string, data: { name?: string; phone?: string; gender?: string; dateOfBirth?: string; address?: string; currentPassword?: string; newPassword?: string }) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user) throw new UnauthorizedException('User not found');
 
     const updateData: any = {};
     if (data.name) updateData.name = data.name;
     if (data.phone) updateData.phone = data.phone;
+    if (data.gender) updateData.gender = data.gender;
+    if (data.dateOfBirth) updateData.dateOfBirth = new Date(data.dateOfBirth);
+    if (data.address) updateData.address = data.address;
 
     if (data.currentPassword && data.newPassword) {
       const isPasswordValid = await bcrypt.compare(data.currentPassword, user.password);
@@ -154,7 +166,16 @@ export class AuthService {
       data: updateData,
     });
 
-    return { id: updatedUser.id, email: updatedUser.email, name: updatedUser.name, phone: updatedUser.phone, role: updatedUser.role };
+    return { 
+      id: updatedUser.id, 
+      email: updatedUser.email, 
+      name: updatedUser.name, 
+      phone: updatedUser.phone, 
+      role: updatedUser.role,
+      gender: updatedUser.gender,
+      dateOfBirth: updatedUser.dateOfBirth,
+      address: updatedUser.address
+    };
   }
 
   async forgotPassword(email: string) {
@@ -245,6 +266,9 @@ export class AuthService {
         email: true,
         phone: true,
         role: true,
+        gender: true,
+        dateOfBirth: true,
+        address: true,
         createdAt: true,
       },
       orderBy: { createdAt: 'desc' }

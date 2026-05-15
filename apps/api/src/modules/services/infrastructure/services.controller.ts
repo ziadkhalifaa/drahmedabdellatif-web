@@ -25,7 +25,20 @@ export class ServicesController {
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles('admin')
   @Post()
-  async create(@Body() body: { titleAr: string; titleEn: string; descriptionAr: string; descriptionEn: string; slug: string; icon: string; image?: string; order?: number }) {
+  async create(@Body() body: { 
+    titleAr: string; 
+    titleEn: string; 
+    descriptionAr: string; 
+    descriptionEn: string; 
+    slug: string; 
+    icon: string; 
+    image?: string; 
+    order?: number;
+    metaTitleAr?: string;
+    metaTitleEn?: string;
+    metaDescriptionAr?: string;
+    metaDescriptionEn?: string;
+  }) {
     return this.servicesService.create(body);
   }
 

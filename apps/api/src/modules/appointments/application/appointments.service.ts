@@ -213,7 +213,7 @@ export class AppointmentsService {
     return appointment;
   }
 
-  async updateStatus(id: string, status: AppointmentStatus) {
+  async updateStatus(id: string, status: AppointmentStatus, cancellationReason?: string) {
     const appointment = await this.prisma.appointment.findUnique({ 
       where: { id },
       include: { patient: true }
@@ -223,7 +223,7 @@ export class AppointmentsService {
     
     const updated = await this.prisma.appointment.update({ 
       where: { id }, 
-      data: { status },
+      data: { status, cancellationReason },
       include: { patient: true }
     });
 

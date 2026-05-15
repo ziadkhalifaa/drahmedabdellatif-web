@@ -26,11 +26,38 @@ export class ServicesService {
     return service;
   }
 
-  async create(data: { titleAr: string; titleEn: string; descriptionAr: string; descriptionEn: string; slug: string; icon: string; image?: string; order?: number }) {
+  async create(data: { 
+    titleAr: string; 
+    titleEn: string; 
+    descriptionAr: string; 
+    descriptionEn: string; 
+    slug: string; 
+    icon: string; 
+    image?: string; 
+    order?: number;
+    metaTitleAr?: string;
+    metaTitleEn?: string;
+    metaDescriptionAr?: string;
+    metaDescriptionEn?: string;
+  }) {
     return this.prisma.service.create({ data });
   }
 
-  async update(id: string, data: Partial<{ titleAr: string; titleEn: string; descriptionAr: string; descriptionEn: string; slug: string; icon: string; image: string; order: number; isActive: boolean }>) {
+  async update(id: string, data: Partial<{ 
+    titleAr: string; 
+    titleEn: string; 
+    descriptionAr: string; 
+    descriptionEn: string; 
+    slug: string; 
+    icon: string; 
+    image: string; 
+    order: number; 
+    isActive: boolean;
+    metaTitleAr: string;
+    metaTitleEn: string;
+    metaDescriptionAr: string;
+    metaDescriptionEn: string;
+  }>) {
     await this.findOne(id);
     return this.prisma.service.update({ where: { id }, data });
   }
