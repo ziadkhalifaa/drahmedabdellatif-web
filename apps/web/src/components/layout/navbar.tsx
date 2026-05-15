@@ -215,7 +215,7 @@ export function Navbar() {
                       services.map((service) => (
                         <Link 
                           key={service.id} 
-                          href={`/services/${service.id}`}
+                          href={`/services/${service.slug || service.id}`}
                           className="flex items-center gap-5 p-4 rounded-3xl transition-all hover:bg-[var(--primary)]/5 group/item border border-transparent hover:border-[var(--primary)]/10"
                         >
                           <div className="h-16 w-16 rounded-2xl overflow-hidden bg-slate-100 flex-shrink-0 shadow-inner border border-[var(--border)]">
@@ -300,7 +300,7 @@ export function Navbar() {
                   <h4 className="px-4 text-[10px] font-black uppercase tracking-[0.3em] text-[var(--primary)] opacity-50">{t('services')}</h4>
                   <div className="grid gap-2">
                     {services.map((service) => (
-                      <Link key={service.id} href={`/services/${service.id}`} onClick={() => setMobileOpen(false)} className="flex items-center gap-4 px-4 py-3 rounded-2xl bg-[var(--primary)]/[0.02] border border-[var(--border)]/50">
+                      <Link key={service.id} href={`/services/${service.slug || service.id}`} onClick={() => setMobileOpen(false)} className="flex items-center gap-4 px-4 py-3 rounded-2xl bg-[var(--primary)]/[0.02] border border-[var(--border)]/50">
                         <div className="h-10 w-10 rounded-xl overflow-hidden bg-slate-100 flex-shrink-0">
                            <img src={service.image || '/images/placeholder.png'} alt={service.titleAr} className="w-full h-full object-cover" />
                         </div>

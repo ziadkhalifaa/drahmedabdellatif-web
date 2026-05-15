@@ -85,6 +85,7 @@ export interface Service {
   titleEn: string;
   descriptionAr: string;
   descriptionEn: string;
+  slug: string;
   icon: string;
   image?: string;
   order: number;

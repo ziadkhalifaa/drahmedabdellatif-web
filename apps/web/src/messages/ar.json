@@ -179,7 +179,7 @@
     "searchPlaceholder": "ابحث عن مقال...",
     "viewAll": "عرض جميع المقالات",
     "readMore": "اقرأ المزيد",
-    "backToBlog": "العودة للمقالات",
+    "backToBlog": "العودة للنصائح الطبية",
     "noPosts": "لا توجد مقالات حالياً."
   },
   "booking": {
@@ -311,7 +311,7 @@
     "login": "دخول الإدارة",
     "dashboard": "لوحة التحكم",
     "appointments": "المواعيد",
-    "blog": "المقالات",
+    "blog": "نصائح وتوعية",
     "services": "الخدمات",
     "testimonials": "التقييمات",
     "messages": "الرسائل",

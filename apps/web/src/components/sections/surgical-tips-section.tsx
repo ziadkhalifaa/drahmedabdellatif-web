@@ -88,7 +88,7 @@ export function SurgicalTipsSection() {
                 const slug = locale === 'ar' ? post.slugAr : post.slugEn;
                 return (
                   <div className="embla__slide flex-[0_0_100%] sm:flex-[0_0_50%] lg:flex-[0_0_33.333%] min-w-0 pl-6 rtl:pl-0 rtl:pr-6" key={post.id}>
-                    <div className="bg-white dark:bg-[#1a1a1a] rounded-2xl overflow-hidden shadow-lg border border-gray-100 dark:border-gray-800 h-full flex flex-col group">
+                    <Link href={`/blog/${slug}`} className="bg-white dark:bg-[#1a1a1a] rounded-2xl overflow-hidden shadow-lg border border-gray-100 dark:border-gray-800 h-full flex flex-col group block">
                       <div className="relative h-56 overflow-hidden bg-gray-100 dark:bg-gray-800">
                         {post.featuredImage ? (
                           <img 
@@ -114,12 +114,12 @@ export function SurgicalTipsSection() {
                             {excerpt}
                           </p>
                         )}
-                        <Link href={`/blog/${slug}`} className="inline-flex items-center text-[var(--primary)] font-semibold hover:text-[var(--primary-dark)] dark:hover:text-white transition-colors mt-auto">
+                        <div className="inline-flex items-center text-[var(--primary)] font-semibold group-hover:text-[var(--primary-dark)] dark:hover:text-white transition-colors mt-auto">
                           {locale === 'ar' ? 'اقرأ المزيد' : 'Read More'}
                           <ArrowLeft size={16} className="mr-2" />
-                        </Link>
+                        </div>
                       </div>
-                    </div>
+                    </Link>
                   </div>
                 );
               })}

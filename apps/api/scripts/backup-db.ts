@@ -20,6 +20,8 @@ async function main() {
     contactMessages: await prisma.contactMessage.findMany(),
     media: await prisma.media.findMany(),
     siteSettings: await prisma.siteSettings.findMany(),
+    heroSlides: await prisma.heroSlide.findMany(),
+    techniques: await prisma.technique.findMany(),
   };
 
   const backupPath = resolve(__dirname, '../backup_data.json');

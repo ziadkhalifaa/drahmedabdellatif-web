@@ -156,6 +156,7 @@ model Service {
   titleEn       String
   descriptionAr String
   descriptionEn String
+  slug          String?  @unique
   icon          String
   image         String?
   order         Int      @default(0)

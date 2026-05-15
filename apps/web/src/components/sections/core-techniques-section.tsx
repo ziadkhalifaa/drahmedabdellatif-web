@@ -58,33 +58,37 @@ export function CoreTechniquesSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: index * 0.2 }}
-            className="group cursor-pointer rounded-2xl overflow-hidden bg-white dark:bg-[#111] shadow-xl hover:shadow-2xl transition-all duration-300 border border-gray-100 dark:border-gray-800"
           >
-            <Link href={`/techniques/${tech.slug}`} className="block relative h-64 overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10" />
-              {tech.image ? (
-                <img 
-                  src={getMediaUrl(tech.image)} 
-                  alt={locale === 'ar' ? tech.titleAr : tech.titleEn}
-                  className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-in-out"
-                />
-              ) : (
-                <div className="w-full h-full bg-gradient-to-br from-[var(--primary)]/30 to-[var(--primary-dark)]/50" />
-              )}
-              <h3 className="absolute bottom-6 left-6 right-6 z-20 text-2xl font-bold text-white text-center">
-                {locale === 'ar' ? tech.titleAr : tech.titleEn}
-              </h3>
-            </Link>
-            <div className="p-8">
-              <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-center line-clamp-3">
-                {locale === 'ar' ? tech.descriptionAr : tech.descriptionEn}
-              </p>
-              <div className="mt-6 flex justify-center">
-                <Link href={`/techniques/${tech.slug}`} className="text-[var(--primary)] dark:text-[var(--accent)] font-semibold hover:underline">
-                  {locale === 'ar' ? 'اقرأ المزيد' : 'Read More'} &larr;
-                </Link>
+            <Link 
+              href={`/techniques/${tech.slug}`} 
+              className="group cursor-pointer rounded-2xl overflow-hidden bg-white dark:bg-[#111] shadow-xl hover:shadow-2xl transition-all duration-300 border border-gray-100 dark:border-gray-800 flex flex-col h-full block"
+            >
+              <div className="relative h-64 overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10" />
+                {tech.image ? (
+                  <img 
+                    src={getMediaUrl(tech.image)} 
+                    alt={locale === 'ar' ? tech.titleAr : tech.titleEn}
+                    className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-in-out"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-[var(--primary)]/30 to-[var(--primary-dark)]/50" />
+                )}
+                <h3 className="absolute bottom-6 left-6 right-6 z-20 text-2xl font-bold text-white text-center">
+                  {locale === 'ar' ? tech.titleAr : tech.titleEn}
+                </h3>
               </div>
-            </div>
+              <div className="p-8 flex-grow">
+                <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-center line-clamp-3">
+                  {locale === 'ar' ? tech.descriptionAr : tech.descriptionEn}
+                </p>
+                <div className="mt-6 flex justify-center">
+                  <div className="text-[var(--primary)] dark:text-[var(--accent)] font-semibold hover:underline">
+                    {locale === 'ar' ? 'اقرأ المزيد' : 'Read More'} &larr;
+                  </div>
+                </div>
+              </div>
+            </Link>
           </motion.div>
         ))}
       </div>

@@ -103,7 +103,7 @@ export function ServicesCarouselSection() {
           <div className="embla__container flex -ml-4 rtl:-ml-0 rtl:-mr-4">
             {services.map((service) => (
               <div className="embla__slide flex-[0_0_100%] sm:flex-[0_0_50%] lg:flex-[0_0_33.333%] min-w-0 pl-4 rtl:pl-0 rtl:pr-4" key={service.id}>
-                <div className="relative group rounded-3xl overflow-hidden h-[400px] shadow-lg bg-gray-100 dark:bg-gray-800">
+                <Link href={`/services/${service.slug || service.id}`} className="block relative group rounded-3xl overflow-hidden h-[400px] shadow-lg bg-gray-100 dark:bg-gray-800">
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent z-10 transition-opacity duration-300 group-hover:from-black/95" />
                   {service.image && (
                     <img 
@@ -119,12 +119,12 @@ export function ServicesCarouselSection() {
                     <p className="text-gray-300 text-sm mb-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100 line-clamp-2">
                       {locale === 'ar' ? service.descriptionAr : service.descriptionEn}
                     </p>
-                    <Link href={`/services/${service.id}`} className="inline-flex items-center text-[var(--accent)] font-semibold hover:text-white transition-colors opacity-0 group-hover:opacity-100 duration-300 delay-200">
+                    <div className="inline-flex items-center text-[var(--accent)] font-semibold group-hover:text-white transition-colors opacity-0 group-hover:opacity-100 duration-300 delay-200">
                       تفاصيل الخدمة
                       <ChevronLeft size={16} className="ml-1" />
-                    </Link>
+                    </div>
                   </div>
-                </div>
+                </Link>
               </div>
             ))}
           </div>
