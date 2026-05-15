@@ -1,12 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useLocale } from 'next-intl';
 import { Card, Button, Input, Textarea } from '@/components/ui';
 import { useAuth } from '@/components/layout/admin-layout';
 import { api, getMediaUrl } from '@/lib/api';
 
-import { Plus, Edit2, Trash2, CheckCircle2, XCircle, Image as ImageIcon } from 'lucide-react';
+import { Plus, Edit2, Trash2, CheckCircle2, XCircle, Image as ImageIcon, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { MediaPickerModal } from '@/components/media-picker';
 
 interface HeroSlide {
   id: string;
@@ -22,9 +24,11 @@ interface HeroSlide {
 
 export default function AdminHeroSlidesPage() {
   const { token } = useAuth();
+  const locale = useLocale();
   const [slides, setSlides] = useState<HeroSlide[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<HeroSlide | null>(null);
+  const [showPicker, setShowPicker] = useState(false);
   
   const [form, setForm] = useState({ 
     titleAr: '', titleEn: '', 
@@ -131,7 +135,18 @@ export default function AdminHeroSlidesPage() {
               <div className="space-y-4">
                 <div>
                   <label className="text-xs font-bold text-[var(--muted)] uppercase mb-1 block">Image URL</label>
-                  <Input value={form.image} onChange={e => setForm({...form, image: e.target.value})} placeholder="/images/..." dir="ltr" />
+                  <div className="flex gap-2">
+                    <Input className="flex-1" value={form.image} onChange={e => setForm({...form, image: e.target.value})} placeholder="/images/..." dir="ltr" />
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      onClick={() => setShowPicker(true)}
+                      className="shrink-0 border-dashed border-2 hover:border-primary hover:bg-primary/5 transition-all"
+                    >
+                      <ImageIcon size={18} className="mr-2" />
+                      {locale === 'ar' ? 'المكتبة' : 'Gallery'}
+                    </Button>
+                  </div>
                 </div>
                 <div className="flex gap-4">
                   <div className="flex-1">
@@ -174,6 +189,15 @@ export default function AdminHeroSlidesPage() {
           </div>
         </Card>
       )}
+
+      <MediaPickerModal 
+        isOpen={showPicker}
+        onClose={() => setShowPicker(false)}
+        onSelect={(url) => {
+          setForm({ ...form, image: url });
+          setShowPicker(false);
+        }}
+      />
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {slides.map((slide) => (

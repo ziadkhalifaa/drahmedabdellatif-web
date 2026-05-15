@@ -1,19 +1,23 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useLocale } from 'next-intl';
 import { Card, Button, Input, Textarea } from '@/components/ui';
 import { useAuth } from '@/components/layout/admin-layout';
 import { api, getMediaUrl } from '@/lib/api';
 import type { Service } from '@dr-ahmed/shared';
 
-import { Plus, Edit2, Trash2, Package, Globe, Layout, CheckCircle2, XCircle } from 'lucide-react';
+import { Plus, Edit2, Trash2, Package, Globe, Layout, CheckCircle2, XCircle, Image as ImageIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { MediaPickerModal } from '@/components/media-picker';
 
 export default function AdminServicesPage() {
   const { token } = useAuth();
+  const locale = useLocale();
   const [services, setServices] = useState<Service[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<Service | null>(null);
+  const [showPicker, setShowPicker] = useState(false);
   const [form, setForm] = useState({ 
     titleAr: '', titleEn: '', 
     descriptionAr: '', descriptionEn: '', 
@@ -137,7 +141,22 @@ export default function AdminServicesPage() {
             
             <div className="grid gap-6 md:grid-cols-4 border-t pt-6">
               <Input label="Lucide Icon Name" placeholder="e.g., Stethoscope, Heart" value={form.icon} onChange={(e) => setForm({ ...form, icon: e.target.value })} />
-              <Input label="Service Image URL" placeholder="e.g., doctor.webp" value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })} />
+              
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">Service Image URL</label>
+                <div className="flex gap-2">
+                  <Input placeholder="e.g., doctor.webp" value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })} />
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={() => setShowPicker(true)}
+                    className="shrink-0 border-dashed border-2 hover:border-primary hover:bg-primary/5 transition-all"
+                  >
+                    <ImageIcon size={18} className="mr-2" />
+                    {locale === 'ar' ? 'المكتبة' : 'Gallery'}
+                  </Button>
+                </div>
+              </div>
               <Input label="Display Order" type="number" value={form.order} onChange={(e) => setForm({ ...form, order: parseInt(e.target.value) || 0 })} />
 
               <div className="flex items-end pb-2">
@@ -162,6 +181,15 @@ export default function AdminServicesPage() {
           </div>
         </Card>
       )}
+
+      <MediaPickerModal 
+        isOpen={showPicker}
+        onClose={() => setShowPicker(false)}
+        onSelect={(url) => {
+          setForm({ ...form, image: url });
+          setShowPicker(false);
+        }}
+      />
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {services.map((service) => (

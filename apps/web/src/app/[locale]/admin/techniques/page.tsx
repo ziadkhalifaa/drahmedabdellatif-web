@@ -1,11 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useLocale } from 'next-intl';
 import { Card, Button, Input, Textarea } from '@/components/ui';
 import { useAuth } from '@/components/layout/admin-layout';
 import { api, getMediaUrl } from '@/lib/api';
 
-import { Plus, Edit2, Trash2, CheckCircle2, XCircle, Layout } from 'lucide-react';
+import { Plus, Edit2, Trash2, CheckCircle2, XCircle, Layout, Image as ImageIcon } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { MediaPickerModal } from '@/components/media-picker';
 
 interface Technique {
   id: string;
@@ -26,9 +29,11 @@ interface Technique {
 
 export default function AdminTechniquesPage() {
   const { token } = useAuth();
+  const locale = useLocale();
   const [techniques, setTechniques] = useState<Technique[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<Technique | null>(null);
+  const [showPicker, setShowPicker] = useState(false);
   
   const [form, setForm] = useState({ 
     slug: '',
@@ -168,6 +173,21 @@ export default function AdminTechniquesPage() {
                   <label className="text-xs font-bold text-[var(--muted)] uppercase mb-1 block">Slug (URL)</label>
                   <Input value={form.slug} onChange={e => setForm({...form, slug: e.target.value})} placeholder="e.g. holmium-laser" dir="ltr" />
                 </div>
+                <div>
+                  <label className="text-xs font-bold text-[var(--muted)] uppercase mb-1 block">Image URL</label>
+                  <div className="flex gap-2">
+                    <Input className="flex-1" value={form.image} onChange={e => setForm({...form, image: e.target.value})} placeholder="/images/..." dir="ltr" />
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      onClick={() => setShowPicker(true)}
+                      className="shrink-0 border-dashed border-2 hover:border-primary hover:bg-primary/5 transition-all"
+                    >
+                      <ImageIcon size={18} className="mr-2" />
+                      {locale === 'ar' ? 'المكتبة' : 'Gallery'}
+                    </Button>
+                  </div>
+                </div>
               </div>
 
               <div className="space-y-4">
@@ -205,6 +225,15 @@ export default function AdminTechniquesPage() {
           </div>
         </Card>
       )}
+
+      <MediaPickerModal 
+        isOpen={showPicker}
+        onClose={() => setShowPicker(false)}
+        onSelect={(url) => {
+          setForm({ ...form, image: url });
+          setShowPicker(false);
+        }}
+      />
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {techniques.map((technique) => (
