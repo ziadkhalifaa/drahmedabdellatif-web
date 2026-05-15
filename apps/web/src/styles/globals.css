@@ -14,7 +14,11 @@
   --card-hover: #f8fafc;
   --muted: #64748b;
   --border: #e2e8f0;
-  --radius: 1rem;
+  --radius: 1.5rem;
+  --gold-gradient: linear-gradient(135deg, #d4af37 0%, #f1d27b 50%, #d4af37 100%);
+  --blue-gradient: linear-gradient(135deg, #0f4c81 0%, #2c7da0 100%);
+  --glass-shadow: 0 8px 32px 0 rgba(15, 76, 129, 0.1);
+  --premium-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.15);
 }
 
 .dark {
@@ -24,6 +28,7 @@
   --card-hover: #1e293b;
   --muted: #94a3b8;
   --border: #1e293b;
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
 }
 
 
@@ -39,17 +44,34 @@
 
 @layer utilities {
   .glass {
-    @apply bg-white/70 backdrop-blur-lg border border-white/20 dark:bg-slate-900/70 dark:border-slate-800/20;
+    @apply bg-white/70 backdrop-blur-xl border border-white/20 dark:bg-slate-950/70 dark:border-white/10;
+    box-shadow: var(--glass-shadow);
   }
   .glass-dark {
-    @apply bg-black/40 backdrop-blur-xl border border-white/10;
+    @apply bg-black/40 backdrop-blur-2xl border border-white/10;
   }
   .text-gradient {
     @apply bg-gradient-to-r from-[var(--primary)] to-[var(--primary-light)] bg-clip-text text-transparent;
   }
+  .text-gradient-gold {
+    background: var(--gold-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .bg-gradient-gold {
+    background: var(--gold-gradient);
+  }
   .animate-float {
     animation: float 6s ease-in-out infinite;
   }
+  .animate-pulse-slow {
+    animation: pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+}
+
+@keyframes pulse-slow {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.02); }
 }
 
 @keyframes float {
