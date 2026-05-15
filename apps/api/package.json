@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "nest start --watch",
-    "build": "prisma generate --schema=prisma/schema.prisma && npx nest build",
+    "build": "prisma generate --schema=prisma/schema.prisma && prisma db push --schema=prisma/schema.prisma --skip-generate --accept-data-loss && npx nest build",
     "start": "node dist/main",
     "start:prod": "node dist/main",
     "lint": "echo 'api lint ok'",
