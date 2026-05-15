@@ -31,14 +31,41 @@ export default function AdminMediaPage() {
 
   useEffect(() => { fetchItems(); }, [token]);
 
+  const compressImage = (file: File): Promise<Blob> => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const width = img.width;
+          const height = img.height;
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, width, height);
+          canvas.toBlob((blob) => resolve(blob || file), 'image/webp', 0.90);
+        };
+        img.src = e.target?.result as string;
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !token) return;
 
     setUploading(true);
     try {
+      let uploadFile: Blob | File = file;
+      if (file.type.startsWith('image/')) {
+        uploadFile = await compressImage(file);
+      }
+
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append('file', uploadFile, file.name.split('.')[0] + '.webp');
 
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'}/media/upload`, {
         method: 'POST',
@@ -46,11 +73,14 @@ export default function AdminMediaPage() {
         body: formData,
       });
 
-      if (!res.ok) throw new Error('Upload failed');
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text || 'Upload failed');
+      }
       const data = await res.json();
       setForm({ ...form, url: data.url });
     } catch (error) {
-      alert('Upload failed');
+      alert('Upload failed: ' + (error instanceof Error ? error.message : 'Unknown error'));
     } finally {
       setUploading(false);
     }
