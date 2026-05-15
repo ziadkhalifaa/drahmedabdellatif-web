@@ -30,6 +30,7 @@ const config: NextConfig = {
   webpack(webpackConfig) {
     webpackConfig.resolve.alias = {
       ...webpackConfig.resolve.alias,
+      '@': path.resolve(__dirname, 'src'),
       '@dr-ahmed/shared': path.resolve(__dirname, 'src/lib/shared.ts'),
     };
     return webpackConfig;
