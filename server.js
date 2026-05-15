@@ -1,5 +1,6 @@
 const path = require('path');
 const fs = require('fs');
+const http = require('http');
 
 // Global error handlers
 process.on('unhandledRejection', (reason, promise) => {
@@ -32,7 +33,6 @@ if (fs.existsSync(standaloneServerPath)) {
     const standaloneDir = path.join(__dirname, 'apps/web/.next/standalone');
     process.chdir(standaloneDir);
 
-    // Check if node_modules exists in standalone
     if (!fs.existsSync(path.join(standaloneDir, 'node_modules'))) {
       console.warn('⚠️ Warning: node_modules not found in standalone directory!');
     }
@@ -47,8 +47,6 @@ if (fs.existsSync(standaloneServerPath)) {
   console.error('❌ Build output not found. Did `npm run build` complete successfully?');
   console.error('Expected path:', standaloneServerPath);
 
-  // Fallback for Hostinger: bind to port anyway to avoid 503 while we debug
-  const http = require('http');
   http.createServer((req, res) => {
     res.writeHead(503, { 'Content-Type': 'text/plain' });
     res.end('Server initialization in progress or failed. Check logs.');
