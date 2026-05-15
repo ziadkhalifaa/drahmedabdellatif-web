@@ -1,6 +1,6 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { motion } from 'framer-motion';
 import { Section, SectionHeader, Card } from '@/components/ui';
 import { Navbar } from '@/components/layout/navbar';
@@ -11,6 +11,7 @@ import { EditableText, EditableImage } from '@/components/editor/editable-compon
 
 export default function AboutPage() {
   const t = useTranslations('about');
+  const locale = useLocale();
 
   const stats = [
     { icon: Award, key: 'experience', value: '20+' },
