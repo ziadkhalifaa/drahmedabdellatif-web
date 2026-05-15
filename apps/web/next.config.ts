@@ -28,11 +28,6 @@ const config: NextConfig = {
   },
   experimental: {
     optimizeCss: false,
-    turbo: {
-      resolveAlias: {
-        '@dr-ahmed/shared': './src/lib/shared.ts',
-      },
-    },
   },
   webpack(webpackConfig) {
     webpackConfig.resolve.alias = {
