@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui';
 import { Link } from '@/i18n/routing';
 import { Calendar, ChevronRight, ChevronLeft, Edit } from 'lucide-react';
-import { useEditor } from '@/components/editor/editor-context';
+import { useEditor } from '@/context/editor-context';
 import useSWR from 'swr';
 import { api, getMediaUrl } from '@/lib/api';
 
