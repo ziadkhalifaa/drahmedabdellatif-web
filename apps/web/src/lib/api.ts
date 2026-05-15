@@ -92,12 +92,19 @@ export const api = {
 
 export function getMediaUrl(url: string): string {
   if (!url) return '';
-  // Already absolute URL (Supabase, external, or data URI)
-  if (url.startsWith('http') || url.startsWith('https') || url.startsWith('data:')) return url;
-  // Public folder images (in apps/web/public/)
-  if (url.startsWith('/images/')) return url;
   
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://dkqmympallxpdfypwxlr.supabase.co';
+
+  // If it's a placeholder URL from a misconfigured API, fix it
+  if (url.includes('placeholder.supabase.co')) {
+    return url.replace('https://placeholder.supabase.co', supabaseUrl);
+  }
+
+  // Already absolute URL (Supabase, external, or data URI)
+  if (url.startsWith('http') || url.startsWith('https') || url.startsWith('data:')) return url;
+  
+  // Public folder images (in apps/web/public/)
+  if (url.startsWith('/images/')) return url;
   
   // Legacy /uploads/ paths — convert to Supabase Storage URL
   if (url.startsWith('/uploads/')) {
@@ -106,7 +113,6 @@ export function getMediaUrl(url: string): string {
   }
 
   // Relative path (likely from Supabase)
-  // Ensure it doesn't have a double slash if the url starts with /
   const cleanPath = url.startsWith('/') ? url.slice(1) : url;
   return `${supabaseUrl}/storage/v1/object/public/media/${cleanPath}`;
 }

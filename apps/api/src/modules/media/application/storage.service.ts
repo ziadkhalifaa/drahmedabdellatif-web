@@ -7,7 +7,7 @@ import * as path from 'path';
 @Injectable()
 export class StorageService {
   private supabase = createClient(
-    process.env.SUPABASE_URL || 'https://placeholder.supabase.co',
+    process.env.SUPABASE_URL || 'https://dkqmympallxpdfypwxlr.supabase.co',
     process.env.SUPABASE_SERVICE_KEY || 'placeholder'
   );
   private bucket = 'media';
