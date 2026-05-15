@@ -63,17 +63,24 @@ export function HeroSection() {
           <div className="absolute inset-0 bg-gradient-to-t from-[var(--primary-dark)]/90 via-transparent to-transparent z-10" />
           
           {slides[currentSlide].isPortrait ? (
-            <div className="relative w-full h-full bg-[#0a1a2f]">
-              <div className="absolute right-0 bottom-0 h-full w-full lg:w-1/2 flex items-end justify-center lg:justify-end z-20">
+            <div className="absolute inset-0 w-full h-full">
+              <div 
+                className="absolute inset-y-0 right-0 w-full lg:w-[60%] z-0"
+                style={{
+                  maskImage: 'linear-gradient(to right, transparent 0%, black 35%, black 100%)',
+                  WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 35%, black 100%)'
+                }}
+              >
                 <motion.img
-                  initial={{ y: 100, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ duration: 1, delay: 0.5 }}
+                  initial={{ opacity: 0, scale: 1.1 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 1.5, ease: "easeOut" }}
                   src={getMediaUrl(slides[currentSlide].image)}
                   alt={locale === 'ar' ? slides[currentSlide].titleAr : slides[currentSlide].titleEn}
-                  className="h-[80%] lg:h-[95%] object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
+                  className="w-full h-full object-cover object-[70%_center]"
                 />
               </div>
+              <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/40 to-transparent z-10" />
             </div>
           ) : (
             <img
