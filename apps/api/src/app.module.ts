@@ -17,8 +17,6 @@ import { NewsletterModule } from './modules/newsletter/newsletter.module';
 import { PrescriptionsModule } from './modules/prescriptions/prescriptions.module';
 import { WorkingHoursModule } from './modules/working-hours/working-hours.module';
 import { PaymentsModule } from './modules/payments/payments.module';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { AuditLogInterceptor } from './common/interceptors/audit-log.interceptor';
@@ -29,16 +27,6 @@ import { TechniquesModule } from './modules/techniques/techniques.module';
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     ScheduleModule.forRoot(),
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'uploads'),
-      serveRoot: '/uploads',
-      serveStaticOptions: {
-        setHeaders: (res) => {
-          res.set('Access-Control-Allow-Origin', '*');
-          res.set('Cross-Origin-Resource-Policy', 'cross-origin');
-        },
-      },
-    }),
     ThrottlerModule.forRoot([
       {
         name: 'default',

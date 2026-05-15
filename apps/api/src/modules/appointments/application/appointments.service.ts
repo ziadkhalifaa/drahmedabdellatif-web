@@ -38,35 +38,41 @@ export class AppointmentsService {
     let meetingId = null;
     let meetingUrl = null;
     if (data.type === AppointmentType.ONLINE) {
-      try {
-        const dailyRes = await fetch('https://api.daily.co/v1/rooms', {
-          method: 'POST',
-          headers: { 
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${process.env.DAILY_API_KEY}` 
-          },
-          body: JSON.stringify({
-            name: `dr-ahmed-${Date.now()}`,
-            privacy: 'private',
-            properties: {
-              exp: Math.floor(Date.now() / 1000) + 7200, // Expires in 2 hours
-              enable_prejoin_ui: true,
-              lang: 'ar'
-            }
-          })
-        });
-        
-        if (dailyRes.ok) {
-          const room: any = await dailyRes.json();
-          meetingId = room.name;
-          meetingUrl = room.url;
-        } else {
-          // Fallback to Jitsi if Daily.co fails
+      const dailyApiKey = process.env.DAILY_API_KEY;
+      if (dailyApiKey) {
+        try {
+          const dailyRes = await fetch('https://api.daily.co/v1/rooms', {
+            method: 'POST',
+            headers: { 
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${dailyApiKey}` 
+            },
+            body: JSON.stringify({
+              name: `dr-ahmed-${Date.now()}`,
+              privacy: 'private',
+              properties: {
+                exp: Math.floor(Date.now() / 1000) + 7200,
+                enable_prejoin_ui: true,
+                lang: 'ar'
+              }
+            })
+          });
+          
+          if (dailyRes.ok) {
+            const room: any = await dailyRes.json();
+            meetingId = room.name;
+            meetingUrl = room.url;
+          } else {
+            meetingId = `room-${Math.random().toString(36).substring(2, 9)}`;
+            meetingUrl = `https://meet.jit.si/${meetingId}`;
+          }
+        } catch (error) {
           meetingId = `room-${Math.random().toString(36).substring(2, 9)}`;
           meetingUrl = `https://meet.jit.si/${meetingId}`;
         }
-      } catch (error) {
-        // Fallback
+      } else {
+        // DAILY_API_KEY not set — use Jitsi fallback
+        console.warn('DAILY_API_KEY not set — using Jitsi fallback for video meetings');
         meetingId = `room-${Math.random().toString(36).substring(2, 9)}`;
         meetingUrl = `https://meet.jit.si/${meetingId}`;
       }
@@ -122,7 +128,7 @@ export class AppointmentsService {
     const dayOfWeek = date.getDay();
 
     // Check Working Hours
-    const workingHours = await (this.prisma as any).workingHours.findFirst({
+    const workingHours = await this.prisma.workingHours.findFirst({
       where: { dayOfWeek, isActive: true }
     });
     if (!workingHours) return { slots: [], reason: 'Day off' };
@@ -143,7 +149,7 @@ export class AppointmentsService {
     });
 
     // Get Blocked Slots
-    const blocked = await (this.prisma as any).blockedSlot.findMany({
+    const blocked = await this.prisma.blockedSlot.findMany({
       where: {
         date: {
           gte: new Date(dateStr + 'T00:00:00'),

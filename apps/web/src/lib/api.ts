@@ -92,10 +92,17 @@ export const api = {
 
 export function getMediaUrl(url: string): string {
   if (!url) return '';
-  if (url.startsWith('http') || url.startsWith('data:') || url.startsWith('/images/')) return url;
-  
-  // Legacy local path support (fallback)
-  const API_ROOT = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api').replace('/api', '');
-  const clean = url.startsWith('/') ? url.slice(1) : url;
-  return `${API_ROOT}/${clean}`;
+  // Already absolute URL (Supabase, external, or data URI)
+  if (url.startsWith('http') || url.startsWith('https') || url.startsWith('data:')) return url;
+  // Public folder images (in apps/web/public/)
+  if (url.startsWith('/images/')) return url;
+  // Legacy /uploads/ paths — convert to Supabase Storage URL
+  if (url.startsWith('/uploads/')) {
+    const filename = url.replace('/uploads/', '');
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    if (supabaseUrl) {
+      return `${supabaseUrl}/storage/v1/object/public/media/images/${filename}`;
+    }
+  }
+  return url;
 }

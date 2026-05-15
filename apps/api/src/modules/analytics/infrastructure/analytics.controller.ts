@@ -71,7 +71,7 @@ export class AnalyticsController {
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles('admin')
   async exportNewsletter(@Res() res: Response) {
-    const data = await (this.prisma as any).newsletterSubscriber.findMany({
+    const data = await this.prisma.newsletterSubscriber.findMany({
       orderBy: { createdAt: 'desc' },
     });
 

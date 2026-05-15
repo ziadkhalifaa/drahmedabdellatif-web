@@ -55,7 +55,7 @@ export class AnalyticsService {
     ]);
     
     // Simple revenue calculation logic
-    const completedAppointments = await (this.prisma as any).appointment.findMany({
+    const completedAppointments = await this.prisma.appointment.findMany({
       where: { status: 'completed' },
       select: { type: true }
     });
@@ -83,9 +83,9 @@ export class AnalyticsService {
 
   async getNotifications() {
     const [pendingAppointments, unreadMessages, pendingTestimonials] = await Promise.all([
-      (this.prisma as any).appointment.count({ where: { status: 'pending' } }),
-      (this.prisma as any).contactMessage.count({ where: { isRead: false } }),
-      (this.prisma as any).testimonial.count({ where: { isApproved: false } }),
+      this.prisma.appointment.count({ where: { status: 'pending' } }),
+      this.prisma.contactMessage.count({ where: { isRead: false } }),
+      this.prisma.testimonial.count({ where: { isApproved: false } }),
     ]);
 
     return {
@@ -98,10 +98,9 @@ export class AnalyticsService {
 
   async trackEvent(type: string, payload: Record<string, any>) {
     try {
-      return await (this.prisma as any).analyticsEvent.create({ data: { type, payload } });
+      return await this.prisma.analyticsEvent.create({ data: { type, payload } });
     } catch (error) {
       console.error(`[AnalyticsService] Failed to track event ${type}:`, (error as Error).message);
-      // Don't throw to avoid 500 on frontend for tracking failures
       return null;
     }
   }

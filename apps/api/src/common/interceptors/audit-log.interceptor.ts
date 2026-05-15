@@ -26,7 +26,7 @@ export class AuditLogInterceptor implements NestInterceptor {
     return (next.handle() as any).pipe(
       tap(() => {
         // Log the action after successful completion
-        (this.prisma as any).auditLog.create({
+        this.prisma.auditLog.create({
           data: {
             userId: user.sub || user.id,
             action: `${method} ${url}`,
