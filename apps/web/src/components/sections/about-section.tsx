@@ -75,13 +75,16 @@ export function AboutSection() {
             transition={{ duration: 0.8 }}
             className="order-1 lg:order-2 relative"
           >
-            <div className="relative rounded-[2rem] overflow-hidden shadow-2xl z-10 border-8 border-white dark:border-[#222]">
+            <div className="relative rounded-[2rem] overflow-hidden shadow-2xl z-10">
               <EditableImage
                 contentKey="about.image"
                 defaultSrc="/images/dr-ahmed.png"
                 alt="Prof. Dr. Ahmed"
-                className="w-full h-auto aspect-[4/5] object-contain bg-gray-50 dark:bg-[#111]"
+                className="w-full h-auto aspect-[4/5] object-cover object-top"
               />
+
+              {/* Gradient overlay at bottom */}
+              <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-[var(--primary-dark)]/40 to-transparent pointer-events-none" />
 
               {/* Floating Badge */}
               <motion.div
@@ -89,15 +92,15 @@ export function AboutSection() {
                 whileInView={{ y: 0, opacity: 1 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.6 }}
-                className="absolute bottom-6 -right-6 bg-white dark:bg-[#1a1a1a] p-6 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-800 hidden md:block"
+                className="absolute bottom-6 left-6 bg-white/95 dark:bg-[#1a1a1a]/95 backdrop-blur-sm p-4 rounded-2xl shadow-xl border border-white/20"
               >
-                <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 bg-[var(--accent)]/20 rounded-full flex items-center justify-center text-[var(--accent)] font-bold text-2xl">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-[var(--accent)]/20 rounded-full flex items-center justify-center text-[var(--accent)] font-bold text-xl">
                     +15
                   </div>
                   <div>
-                    <p className="font-bold text-gray-900 dark:text-white">عاماً من الخبرة</p>
-                    <p className="text-sm text-gray-500">في جراحة المسالك البولية</p>
+                    <p className="font-bold text-gray-900 dark:text-white text-sm">عاماً من الخبرة</p>
+                    <p className="text-xs text-gray-500">في جراحة المسالك البولية</p>
                   </div>
                 </div>
               </motion.div>
