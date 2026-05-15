@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "npx next build && node -e \"const fs=require('fs-extra');fs.copySync('.next/static','.next/standalone/.next/static');fs.copySync('public','.next/standalone/public');\" 2>/dev/null || npx next build",
+    "build": "npx next build && node -e \"const fs=require('fs');try{fs.cpSync('.next/static','.next/standalone/.next/static',{recursive:true});fs.cpSync('public','.next/standalone/public',{recursive:true});console.log('Static files copied to standalone.')}catch(e){console.warn('Copy skipped:',e.message)}\"",
     "start": "next start",
     "lint": "next lint"
   },
