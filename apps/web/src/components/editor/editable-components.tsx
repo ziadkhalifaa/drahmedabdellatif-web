@@ -120,14 +120,52 @@ export function EditableImage({
   }
 
 
+  const compressImage = (file: File): Promise<Blob> => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          const maxDim = 1920;
+
+          if (width > maxDim || height > maxDim) {
+            if (width > height) {
+              height *= maxDim / width;
+              width = maxDim;
+            } else {
+              width *= maxDim / height;
+              height = maxDim;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, width, height);
+          canvas.toBlob((blob) => resolve(blob || file), 'image/webp', 0.85);
+        };
+        img.src = e.target?.result as string;
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     const token = localStorage.getItem('admin_token');
     if (!file || !token) return;
 
     try {
+      let uploadFile: Blob | File = file;
+      if (file.type.startsWith('image/')) {
+        uploadFile = await compressImage(file);
+      }
+
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append('file', uploadFile, file.name.split('.')[0] + '.webp');
 
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'}/media/upload`, {
         method: 'POST',
@@ -138,6 +176,16 @@ export function EditableImage({
       if (!res.ok) throw new Error('Upload failed');
       const data = await res.json();
       updateContent(contentKey, { src: data.url, alt });
+      
+      // Also register in gallery
+      await api.post('/media', {
+        type: 'image',
+        url: data.url,
+        titleEn: 'Live Editor Upload',
+        titleAr: 'رفع من المحرر',
+        order: 0
+      }, token);
+
     } catch (error) {
       alert('Upload failed');
     }
