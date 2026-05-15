@@ -58,8 +58,8 @@ export interface BlogPost {
   tags?: Tag[];
   status: BlogPostStatus;
   featuredImage?: string;
+  showOnHomepage?: boolean;
   createdAt: string;
-
   updatedAt: string;
 }
 
@@ -101,7 +101,42 @@ export interface Testimonial {
   rating: number;
   isApproved: boolean;
   isVisible: boolean;
+  isSuccessStory?: boolean;
+  storyTitle?: string;
+  storyTitleEn?: string;
+  storyContent?: string;
+  storyContentEn?: string;
+  patientImages?: string[];
+  patientCity?: string;
+  treatmentType?: string;
   createdAt: string;
+  updatedAt?: string;
+}
+
+export interface HeroSlide {
+  id: string;
+  titleAr: string;
+  titleEn: string;
+  subtitleAr: string;
+  subtitleEn: string;
+  image: string;
+  isPortrait: boolean;
+  order: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Technique {
+  id: string;
+  slug: string;
+  titleAr: string;
+  titleEn: string;
+  descriptionAr: string;
+  descriptionEn: string;
+  image?: string;
+  order: number;
+  isActive: boolean;
 }
 
 export interface ContactMessage {
