@@ -23,7 +23,7 @@ export function Providers({
   return (
     <ErrorBoundary>
       <CustomThemeProvider>
-        <NextIntlClientProvider messages={messages} locale={locale}>
+        <NextIntlClientProvider messages={messages} locale={locale} timeZone="Africa/Cairo">
           <EditorProvider initialSettings={initialSettings}>
             <AuthProvider>
               {children}
