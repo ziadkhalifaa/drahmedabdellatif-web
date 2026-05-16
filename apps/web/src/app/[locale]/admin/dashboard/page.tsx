@@ -279,14 +279,16 @@ export default function AdminDashboardPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/10">
-                    {stats?.recentAppointments?.map((apt) => (
+                    {stats?.recentAppointments?.map((apt) => {
+                      const name = apt.patientName || apt.guestName || apt.patient?.name || 'مجهول';
+                      return (
                       <tr key={apt.id} className="group hover:bg-primary/5 transition-all duration-300">
                         <td className="px-8 py-6">
                            <div className="flex items-center gap-3">
                               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/20 to-blue-500/20 flex items-center justify-center font-black text-xs text-primary border border-primary/10">
-                                {apt.patientName.charAt(0)}
+                                {name.charAt(0)}
                               </div>
-                              <span className="font-black text-sm tracking-tight">{apt.patientName}</span>
+                              <span className="font-black text-sm tracking-tight">{name}</span>
                            </div>
                         </td>
                         <td className="px-8 py-6">
@@ -305,7 +307,8 @@ export default function AdminDashboardPage() {
                           </span>
                         </td>
                       </tr>
-                    ))}
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
