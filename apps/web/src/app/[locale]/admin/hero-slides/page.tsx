@@ -223,7 +223,7 @@ export default function AdminHeroSlidesPage() {
           <Card key={slide.id} className={cn("overflow-hidden border-2 transition-all group", slide.isActive ? "border-transparent" : "border-red-100 opacity-75")}>
             <div className="h-48 relative bg-slate-100 overflow-hidden">
                {slide.image ? (
-                  <img src={getMediaUrl(slide.image)} alt={slide.titleEn} className="w-full h-full object-cover" />
+                  <img src={getMediaUrl(slide.image)} alt={slide.titleEn} className="w-full h-full object-contain bg-slate-200/50" />
                ) : (
                   <div className="w-full h-full flex items-center justify-center text-slate-300">
                      <ImageIcon size={48} />
