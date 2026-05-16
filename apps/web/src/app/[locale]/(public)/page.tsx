@@ -42,12 +42,12 @@ export default function HomePage() {
       <main className="overflow-hidden">
         <HeroSection />
         <StatisticsSection />
-        <CoreTechniquesSection />
-        <AboutSection />
         <ServicesCarouselSection />
+        <AboutSection />
+        <CoreTechniquesSection />
+        <TestimonialsSection />
         <WhyUsSection />
         <SurgicalTipsSection />
-        <TestimonialsSection />
         <BookingCTASection />
         <section className="py-16 md:py-24 bg-gray-50 dark:bg-[#050505]">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
