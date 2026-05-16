@@ -35,7 +35,10 @@ export async function generateMetadata({
 }
 
 
-export default function HomePage() {
+export default async function HomePage() {
+  const locale = await getLocale();
+  const isAr = locale === 'ar';
+
   return (
     <>
       <Navbar />
@@ -73,22 +76,27 @@ export default function HomePage() {
               {/* Left: Info Column */}
               <div className="text-white">
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-[var(--accent)] text-xs font-black uppercase tracking-widest mb-8">
-                  احجز الآن
+                  {isAr ? 'احجز الآن' : 'Book Now'}
                 </div>
                 <h2 className="text-4xl md:text-5xl font-black leading-tight mb-6">
-                  ابدأ رحلتك نحو <span className="text-[var(--accent)]">الصحة</span> اليوم
+                  {isAr ? <>ابدأ رحلتك نحو <span className="text-[var(--accent)]">الصحة</span> اليوم</> : <>Start Your Journey to <span className="text-[var(--accent)]">Health</span> Today</>}
                 </h2>
                 <p className="text-white/60 text-lg leading-relaxed mb-10">
-                  فريقنا الطبي المتخصص جاهز للإجابة على استفساراتك وحجز موعدك في أقرب وقت ممكن.
+                  {isAr ? 'فريقنا الطبي المتخصص جاهز للإجابة على استفساراتك وحجز موعدك في أقرب وقت ممكن.' : 'Our specialized medical team is ready to answer your inquiries and schedule your appointment as soon as possible.'}
                 </p>
 
                 <div className="space-y-5">
-                  {[
+                  {(isAr ? [
                     { icon: '🩺', text: 'كشف وتشخيص دقيق بأحدث الأجهزة' },
                     { icon: '⚡', text: 'تقنيات ليزر متقدمة بدون جراحة تقليدية' },
                     { icon: '🌟', text: 'خبرة +15 سنة في جراحة المسالك البولية' },
                     { icon: '📞', text: 'متابعة ما بعد العلاج حتى الشفاء الكامل' },
-                  ].map((item, i) => (
+                  ] : [
+                    { icon: '🩺', text: 'Accurate examination and diagnosis with modern equipment' },
+                    { icon: '⚡', text: 'Advanced laser techniques without traditional surgery' },
+                    { icon: '🌟', text: '+15 years experience in urological surgeries' },
+                    { icon: '📞', text: 'Post-treatment follow-up until complete recovery' },
+                  ]).map((item, i) => (
                     <div key={i} className="flex items-center gap-4">
                       <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-lg flex-shrink-0">
                         {item.icon}

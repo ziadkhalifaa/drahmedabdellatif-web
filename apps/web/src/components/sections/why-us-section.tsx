@@ -1,6 +1,6 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { motion } from 'framer-motion';
 import { Trophy, Cpu, Activity, Stethoscope, CheckCircle2, Star } from 'lucide-react';
 
@@ -8,6 +8,8 @@ const icons = [Trophy, Cpu, Activity, Stethoscope];
 
 export function WhyUsSection() {
   const t = useTranslations('whyUs');
+  const locale = useLocale();
+  const isAr = locale === 'ar';
   const reasons = t.raw('reasons') as { title: string; description: string }[];
 
   return (
@@ -38,7 +40,15 @@ export function WhyUsSection() {
               transition={{ delay: 0.1 }}
               className="text-4xl md:text-6xl font-black text-white mb-6 tracking-tight leading-tight"
             >
-              لماذا نحن الخيار <span className="text-[var(--primary)] text-glow">الأفضل</span> لصحتك؟
+              {t.raw('heading') ? (
+                <div dangerouslySetInnerHTML={{ __html: t('heading') }} />
+              ) : (
+                isAr ? (
+                  <>لماذا نحن الخيار <span className="text-[var(--primary)] text-glow">الأفضل</span> لصحتك؟</>
+                ) : (
+                  <>Why We Are the <span className="text-[var(--primary)] text-glow">Best</span> Choice for Your Health?</>
+                )
+              )}
             </motion.h2>
           </div>
           

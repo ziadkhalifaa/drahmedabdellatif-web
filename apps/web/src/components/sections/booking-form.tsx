@@ -26,11 +26,25 @@ export function BookingForm() {
     notes: '',
   });
   const [clinics, setClinics] = useState<any[]>([]);
+  const [availableSlots, setAvailableSlots] = useState<string[]>([]);
+  const [slotsLoading, setSlotsLoading] = useState(false);
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error' | 'conflict'>('idle');
 
   useEffect(() => {
     clinicsApi.getAll().then(setClinics).catch(console.error);
   }, []);
+
+  useEffect(() => {
+    if (!form.date || !form.clinicId) {
+      setAvailableSlots([]);
+      return;
+    }
+    setSlotsLoading(true);
+    clinicsApi.getAvailableSlots(form.clinicId, form.date)
+      .then(setAvailableSlots)
+      .catch(console.error)
+      .finally(() => setSlotsLoading(false));
+  }, [form.date, form.clinicId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -203,7 +217,7 @@ export function BookingForm() {
           {/* Date */}
           {renderField(
             <Calendar size={16} />,
-            t('date'),
+            isAr ? 'تاريخ الحجز' : 'Appointment Date',
             <Input
               id="date"
               type="date"
@@ -223,15 +237,19 @@ export function BookingForm() {
               value={form.timeSlot}
               onChange={(e) => setForm({ ...form, timeSlot: e.target.value })}
               required
+              disabled={!form.date || !form.clinicId || slotsLoading}
               className={cn(
                 "w-full h-12 rounded-xl border border-white/10 bg-white/5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)] text-white transition-colors appearance-none",
-                isAr ? "pr-11 pl-4 text-right" : "pl-11 pr-4 text-left"
+                isAr ? "pr-11 pl-4 text-right" : "pl-11 pr-4 text-left",
+                (!form.date || !form.clinicId || slotsLoading) && "opacity-50 cursor-not-allowed"
               )}
             >
-              <option value="" className="bg-[#050e1a]">{isAr ? 'اختر وقتاً' : 'Select a time'}</option>
-              {TIME_SLOTS.map((slot) => (
+              <option value="" className="bg-[#050e1a]">{slotsLoading ? (isAr ? 'جاري التحميل...' : 'Loading...') : (isAr ? 'اختر وقتاً' : 'Select a time')}</option>
+              {availableSlots.length > 0 ? availableSlots.map((slot) => (
                 <option key={slot} value={slot} className="bg-[#050e1a]">{slot}</option>
-              ))}
+              )) : (
+                form.date && form.clinicId && !slotsLoading && <option value="" disabled className="bg-[#050e1a]">{isAr ? 'لا توجد مواعيد متاحة' : 'No available slots'}</option>
+              )}
             </select>
           )}
         </div>

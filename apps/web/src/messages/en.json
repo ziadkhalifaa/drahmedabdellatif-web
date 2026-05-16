@@ -196,7 +196,7 @@
       "name": "Full Name",
       "phone": "Phone Number",
       "email": "Email Address",
-      "date": "Birth Date",
+      "date": "Appointment Date",
       "time": "Preferred Time",
       "notes": "Additional Notes",
       "next": "Next: Patient Details",
