@@ -3,6 +3,7 @@ import { getMessages } from 'next-intl/server';
 import { Providers } from '@/components/providers';
 import { AnalyticsTracker } from '@/components/analytics-tracker';
 import { EditorToolbar } from '@/components/editor/editable-components';
+import { Preloader } from '@/components/preloader';
 import { api } from '@/lib/api';
 
 
@@ -95,7 +96,7 @@ export default async function LocaleLayout({
       </head>
       <body className="min-h-screen bg-[var(--background)] font-sans antialiased">
         <Providers messages={messages} locale={locale} initialSettings={initialSettings}>
-          {/* <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID!} /> */}
+          <Preloader />
           <AnalyticsTracker />
           <EditorToolbar />
           {children}
