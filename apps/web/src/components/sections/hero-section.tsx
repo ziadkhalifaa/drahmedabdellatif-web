@@ -5,7 +5,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui';
 import { Link } from '@/i18n/routing';
-import { Calendar, ChevronRight, ChevronLeft, Edit } from 'lucide-react';
+import { Calendar, ChevronRight, ChevronLeft, Edit, Star } from 'lucide-react';
 import { useEditor } from '@/context/editor-context';
 import useSWR from 'swr';
 import { api, getMediaUrl } from '@/lib/api';
@@ -113,10 +113,14 @@ export function HeroSection() {
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.8, delay: 0.3 }}
             >
-              <h1 className="text-4xl sm:text-5xl lg:text-7xl font-extrabold text-white leading-tight tracking-tight drop-shadow-lg">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 backdrop-blur-md text-[var(--accent)] text-xs font-black uppercase tracking-widest mb-8">
+                <Star size={14} className="fill-[var(--accent)]" />
+                {locale === 'ar' ? 'رعاية طبية عالمية' : 'World Class Care'}
+              </div>
+              <h1 className="text-5xl sm:text-6xl lg:text-8xl font-black text-white leading-[1.1] tracking-tight drop-shadow-2xl mb-8">
                 {locale === 'ar' ? slides[currentSlide].titleAr : slides[currentSlide].titleEn}
               </h1>
-              <p className="mt-6 text-lg sm:text-2xl text-white/90 max-w-2xl leading-relaxed font-light drop-shadow-md">
+              <p className="text-xl sm:text-2xl text-white/80 max-w-2xl leading-relaxed font-medium drop-shadow-lg border-r-4 border-[var(--accent)] pr-6">
                 {locale === 'ar' ? slides[currentSlide].subtitleAr : slides[currentSlide].subtitleEn}
               </p>
               
