@@ -38,11 +38,21 @@ export default function AdminDashboardPage() {
   const t = useTranslations('admin');
   const { token } = useAuth();
   const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  const fetchStats = () => {
+    if (!token) return;
+    setLoading(true);
+    setError(false);
+    api.get<DashboardStats>('/analytics/dashboard', token)
+      .then(setStats)
+      .catch(() => setError(true))
+      .finally(() => setLoading(false));
+  };
 
   useEffect(() => {
-    if (token) {
-      api.get<DashboardStats>('/analytics/dashboard', token).then(setStats).catch(() => {});
-    }
+    fetchStats();
   }, [token]);
 
   const cards = [
@@ -102,13 +112,33 @@ export default function AdminDashboardPage() {
           <p className="text-sm text-[var(--muted)]">Welcome back! Here&apos;s what&apos;s happening today.</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={handleExport} className="gap-2">
+          {error && (
+            <Button variant="destructive" size="sm" onClick={fetchStats} className="gap-2">
+              Retry Connection
+            </Button>
+          )}
+          <Button variant="outline" size="sm" onClick={handleExport} className="gap-2" disabled={loading || error}>
             <Download size={16} /> Export Summary
           </Button>
         </div>
       </div>
 
-      {/* Quick Stats */}
+      {loading ? (
+        <div className="flex flex-col items-center justify-center py-20 text-[var(--muted)]">
+          <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4" />
+          <p className="font-bold">Loading dashboard data...</p>
+          <p className="text-xs">Waking up server, this may take a few seconds.</p>
+        </div>
+      ) : error ? (
+        <div className="flex flex-col items-center justify-center py-20 text-red-500 bg-red-50 dark:bg-red-900/10 rounded-2xl border border-red-100 dark:border-red-900/30">
+          <Activity size={32} className="mb-4 opacity-50" />
+          <p className="font-bold">Failed to load data</p>
+          <p className="text-xs mt-1 mb-4 opacity-70">The server took too long to respond. Please try again.</p>
+          <Button variant="outline" onClick={fetchStats}>Retry Now</Button>
+        </div>
+      ) : (
+        <>
+          {/* Quick Stats */}
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {cards.map((card) => (
           <Card key={card.label} className="relative overflow-hidden group hover:border-[var(--primary)] transition-all">
@@ -248,6 +278,8 @@ export default function AdminDashboardPage() {
           </div>
         </Card>
       </div>
+      </>
+      )}
     </div>
   );
 }
