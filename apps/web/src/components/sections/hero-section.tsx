@@ -65,10 +65,13 @@ export function HeroSection() {
           {slides[currentSlide].isPortrait ? (
             <div className="absolute inset-0 w-full h-full">
               <div 
-                className="absolute inset-y-0 right-0 w-full lg:w-[60%] z-0"
+                className={cn(
+                  "absolute inset-y-0 w-full lg:w-[60%] z-0",
+                  locale === 'ar' ? "right-0" : "left-0"
+                )}
                 style={{
-                  maskImage: 'linear-gradient(to right, transparent 0%, black 35%, black 100%)',
-                  WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 35%, black 100%)'
+                  maskImage: `linear-gradient(to ${locale === 'ar' ? 'right' : 'left'}, transparent 0%, black 35%, black 100%)`,
+                  WebkitMaskImage: `linear-gradient(to ${locale === 'ar' ? 'right' : 'left'}, transparent 0%, black 35%, black 100%)`
                 }}
               >
                 <motion.img
@@ -77,10 +80,18 @@ export function HeroSection() {
                   transition={{ duration: 1.5, ease: "easeOut" }}
                   src={getMediaUrl(slides[currentSlide].image)}
                   alt={locale === 'ar' ? slides[currentSlide].titleAr : slides[currentSlide].titleEn}
-                  className="w-full h-full object-contain object-right lg:object-right-bottom drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
+                  className={cn(
+                    "w-full h-full object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]",
+                    locale === 'ar' ? "object-right lg:object-right-bottom" : "object-left lg:object-left-bottom"
+                  )}
                 />
               </div>
-              <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/40 to-transparent z-10" />
+              <div className={cn(
+                "absolute inset-0 z-10",
+                locale === 'ar' 
+                  ? "bg-gradient-to-r from-black/90 via-black/40 to-transparent" 
+                  : "bg-gradient-to-l from-black/90 via-black/40 to-transparent"
+              )} />
             </div>
           ) : (
             <img
@@ -93,7 +104,7 @@ export function HeroSection() {
       </AnimatePresence>
 
       {isEditing && (
-        <div className="absolute top-24 right-8 z-50">
+        <div className={cn("absolute top-24 z-50", locale === 'ar' ? "right-8" : "left-8")}>
           <Link href="/admin/hero-slides">
             <Button className="bg-white/20 hover:bg-white/40 backdrop-blur-md text-white border border-white/30 gap-2">
               <Edit size={16} />
@@ -104,7 +115,7 @@ export function HeroSection() {
       )}
 
       <div className="relative z-20 w-full mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="max-w-3xl">
+        <div className={cn("max-w-4xl", locale === 'ar' ? "text-right" : "text-left")}>
           <AnimatePresence mode="wait">
             <motion.div
               key={currentSlide}
@@ -120,7 +131,10 @@ export function HeroSection() {
               <h1 className="text-5xl sm:text-6xl lg:text-8xl font-black text-white leading-[1.1] tracking-tight drop-shadow-2xl mb-8">
                 {locale === 'ar' ? slides[currentSlide].titleAr : slides[currentSlide].titleEn}
               </h1>
-              <p className="text-xl sm:text-2xl text-white/80 max-w-2xl leading-relaxed font-medium drop-shadow-lg border-r-4 border-[var(--accent)] pr-6">
+              <p className={cn(
+                "text-xl sm:text-2xl text-white/80 max-w-2xl leading-relaxed font-medium drop-shadow-lg",
+                locale === 'ar' ? "border-r-4 pr-6 border-[var(--accent)]" : "border-l-4 pl-6 border-[var(--accent)]"
+              )}>
                 {locale === 'ar' ? slides[currentSlide].subtitleAr : slides[currentSlide].subtitleEn}
               </p>
               
@@ -145,7 +159,7 @@ export function HeroSection() {
       {/* Carousel Controls */}
       <div className="absolute bottom-10 left-0 right-0 z-30 flex justify-center items-center gap-4">
         <button onClick={prevSlide} className="w-12 h-12 rounded-full border border-white/30 flex items-center justify-center text-white hover:bg-white/20 backdrop-blur-sm transition-all">
-          <ChevronRight size={24} />
+          {locale === 'ar' ? <ChevronRight size={24} /> : <ChevronLeft size={24} />}
         </button>
         <div className="flex gap-2">
           {slides.map((_, index) => (
@@ -159,7 +173,7 @@ export function HeroSection() {
           ))}
         </div>
         <button onClick={nextSlide} className="w-12 h-12 rounded-full border border-white/30 flex items-center justify-center text-white hover:bg-white/20 backdrop-blur-sm transition-all">
-          <ChevronLeft size={24} />
+          {locale === 'ar' ? <ChevronLeft size={24} /> : <ChevronRight size={24} />}
         </button>
       </div>
     </section>
