@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { getMessages } from 'next-intl/server';
+import { getMessages, getLocale } from 'next-intl/server';
 import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
 import { WhatsAppWidget } from '@/components/ui/whatsapp-widget';
