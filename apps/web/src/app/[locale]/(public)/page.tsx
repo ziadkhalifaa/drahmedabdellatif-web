@@ -40,15 +40,25 @@ export default function HomePage() {
     <>
       <Navbar />
       <main className="overflow-hidden">
+        {/* 1 - Hero */}
         <HeroSection />
-        <StatisticsSection />
+        {/* 2 - Services */}
         <ServicesCarouselSection />
+        {/* 3 - About */}
         <AboutSection />
+        {/* 4 - Statistics */}
+        <StatisticsSection />
+        {/* 5 - Core Techniques */}
         <CoreTechniquesSection />
-        <TestimonialsSection />
+        {/* 6 - Why Us */}
         <WhyUsSection />
-        <SurgicalTipsSection />
+        {/* 7 - Testimonials */}
+        <TestimonialsSection />
+        {/* 8 - Booking CTA (choice section) */}
         <BookingCTASection />
+        {/* 9 - Surgical Tips */}
+        <SurgicalTipsSection />
+        {/* 10 - Booking Form */}
         <section id="booking-section" className="relative py-28 overflow-hidden bg-[#050e1a]">
           {/* Background */}
           <div className="absolute inset-0 pointer-events-none">
