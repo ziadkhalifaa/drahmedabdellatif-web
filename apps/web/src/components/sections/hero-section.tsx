@@ -9,6 +9,7 @@ import { Calendar, ChevronRight, ChevronLeft, Edit, Star } from 'lucide-react';
 import { useEditor } from '@/context/editor-context';
 import useSWR from 'swr';
 import { api, getMediaUrl } from '@/lib/api';
+import { cn } from '@/lib/utils';
 
 interface Slide {
   id: string;
