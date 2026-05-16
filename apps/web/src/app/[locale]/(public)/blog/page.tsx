@@ -2,112 +2,222 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { Section, SectionHeader, Card, Button, Input } from '@/components/ui';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { api, getMediaUrl } from '@/lib/api';
 import { Link } from '@/i18n/routing';
-import { Calendar, Search, ArrowRight, Tag as TagIcon } from 'lucide-react';
+import { Calendar, Search, BookOpen, Tag as TagIcon, ArrowLeft, ArrowRight, Clock } from 'lucide-react';
 import type { BlogPost } from '@dr-ahmed/shared';
 import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
 import { WhatsAppButton } from '@/components/layout/whatsapp-button';
+import { cn } from '@/lib/utils';
 
 export default function BlogPage() {
   const t = useTranslations('blog');
   const locale = useLocale();
+  const isAr = locale === 'ar';
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [search, setSearch] = useState('');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get<BlogPost[]>('/blog/published').then(setPosts).catch(() => {});
+    api.get<BlogPost[]>('/blog/published')
+      .then(setPosts)
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, []);
 
   const filteredPosts = posts.filter(post => {
-    const title = locale === 'ar' ? post.titleAr : post.titleEn;
+    const title = isAr ? post.titleAr : post.titleEn;
     return title.toLowerCase().includes(search.toLowerCase());
   });
+
+  const featuredPost = filteredPosts[0];
+  const restPosts = filteredPosts.slice(1);
 
   return (
     <>
       <Navbar />
-      <main className="min-h-screen pt-24">
-        <Section className="bg-gradient-to-b from-[var(--primary)]/5 to-transparent">
-          <SectionHeader title={t('title')} subtitle={t('subtitle')} />
-          
-          {/* Search Bar */}
-          <div className="mx-auto max-w-2xl mb-12">
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--muted)]" size={20} />
+      <main className="min-h-screen bg-[#050e1a]">
+
+        {/* ── Hero Header ─────────────────────────────────── */}
+        <div className="relative pt-32 pb-20 overflow-hidden">
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-[var(--primary)]/15 rounded-full blur-[150px]" />
+            <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-5" />
+          </div>
+          <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-[var(--accent)] text-xs font-black uppercase tracking-widest mb-6">
+              <BookOpen size={14} />
+              {isAr ? 'المدونة الطبية' : 'Medical Blog'}
+            </div>
+            <h1 className="text-5xl md:text-6xl font-black text-white mb-5 leading-tight">
+              {t('title')}
+            </h1>
+            <p className="text-white/60 text-xl leading-relaxed max-w-2xl mx-auto mb-10">
+              {t('subtitle')}
+            </p>
+
+            {/* Search */}
+            <div className="relative max-w-xl mx-auto">
+              <div className={cn(
+                "absolute top-1/2 -translate-y-1/2 text-white/40 pointer-events-none",
+                isAr ? "right-5" : "left-5"
+              )}>
+                <Search size={20} />
+              </div>
               <input
                 type="text"
                 placeholder={t('searchPlaceholder')}
                 value={search}
-
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 rounded-2xl border border-[var(--border)] bg-[var(--card)] focus:border-[var(--primary)] outline-none transition-all shadow-sm"
+                className={cn(
+                  "w-full py-4 rounded-2xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-[var(--primary)] outline-none transition-all backdrop-blur-md text-sm",
+                  isAr ? "pr-14 pl-5 text-right" : "pl-14 pr-5 text-left"
+                )}
               />
             </div>
           </div>
+        </div>
 
-          {filteredPosts.length === 0 ? (
-            <div className="text-center py-20">
-              <p className="text-[var(--muted)] text-lg">{t('noPosts')}</p>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
+
+          {loading ? (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[1,2,3,4,5,6].map(i => (
+                <div key={i} className="h-80 rounded-[1.75rem] bg-white/5 animate-pulse" />
+              ))}
+            </div>
+          ) : filteredPosts.length === 0 ? (
+            <div className="text-center py-24">
+              <BookOpen size={64} className="text-white/10 mx-auto mb-6" />
+              <p className="text-white/40 text-xl font-medium">{t('noPosts')}</p>
             </div>
           ) : (
-            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-              {filteredPosts.map((post, i) => {
-                const title = locale === 'ar' ? post.titleAr : post.titleEn;
-                const excerpt = locale === 'ar' ? post.excerptAr : post.excerptEn;
-                const slug = locale === 'ar' ? post.slugAr : post.slugEn;
-
-                return (
-                  <motion.div
-                    key={post.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: i * 0.1 }}
-                  >
-                    <Card hover className="h-full flex flex-col group">
-                      <div className="aspect-video bg-gray-100 dark:bg-white/5 rounded-t-xl overflow-hidden relative border-b border-gray-100 dark:border-white/5">
-                         {post.featuredImage ? (
-                           <img 
-                             src={getMediaUrl(post.featuredImage)} 
-                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
-                             alt={title} 
-                           />
-                         ) : (
-                           <div className="absolute inset-0 flex items-center justify-center opacity-20 group-hover:scale-110 transition-transform duration-500">
-                              <TagIcon size={64} />
-                           </div>
-                         )}
-                         <div className="absolute top-4 right-4 bg-white/90 dark:bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold text-[var(--primary)] uppercase tracking-wider">
-                            {post.category?.nameAr || (locale === 'ar' ? 'مقال طبي' : 'Medical Article')}
-                         </div>
-                      </div>
-                      <div className="p-6 flex flex-col flex-1">
-                        <div className="mb-3 flex items-center gap-2 text-xs text-[var(--muted)]">
-                          <Calendar size={14} />
-                          {new Date(post.createdAt).toLocaleDateString(locale)}
+            <>
+              {/* Featured Post */}
+              {featuredPost && !search && (
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mb-10"
+                >
+                  <Link href={`/blog/${isAr ? featuredPost.slugAr : featuredPost.slugEn}`}>
+                    <div className="group relative rounded-[2rem] overflow-hidden h-[420px] border border-white/10 hover:border-[var(--primary)]/50 transition-all duration-500 hover:-translate-y-1 shadow-2xl">
+                      {featuredPost.featuredImage ? (
+                        <img
+                          src={getMediaUrl(featuredPost.featuredImage)}
+                          alt={isAr ? featuredPost.titleAr : featuredPost.titleEn}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-[var(--primary)]/20 to-[var(--primary-dark)]/40" />
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+                      <div className={cn(
+                        "absolute bottom-0 p-10",
+                        isAr ? "right-0 text-right" : "left-0 text-left"
+                      )}>
+                        <span className="inline-flex items-center gap-1.5 bg-[var(--accent)] text-black text-xs font-black px-3 py-1.5 rounded-full mb-4">
+                          <TagIcon size={10} />
+                          {isAr ? 'مقال مميز' : 'Featured'}
+                        </span>
+                        <h2 className="text-3xl md:text-4xl font-black text-white leading-tight mb-4 max-w-2xl">
+                          {isAr ? featuredPost.titleAr : featuredPost.titleEn}
+                        </h2>
+                        <div className={cn("flex items-center gap-4 text-white/50 text-sm", isAr ? "flex-row-reverse justify-end" : "")}>
+                          <div className={cn("flex items-center gap-1.5", isAr ? "flex-row-reverse" : "")}>
+                            <Calendar size={14} />
+                            {new Date(featuredPost.createdAt).toLocaleDateString(locale)}
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            {isAr ? <ArrowLeft size={16} className="text-[var(--accent)]" /> : <ArrowRight size={16} className="text-[var(--accent)]" />}
+                            <span className="text-[var(--accent)] font-bold">{isAr ? 'اقرأ المقال' : 'Read Article'}</span>
+                          </div>
                         </div>
-                        <h3 className="text-xl font-bold text-[var(--foreground)] group-hover:text-[var(--primary)] transition-colors line-clamp-2">
-                          {title}
-                        </h3>
-                        {excerpt && (
-                          <p className="mt-3 flex-1 text-sm text-[var(--muted)] line-clamp-3 leading-relaxed">
-                            {excerpt}
-                          </p>
-                        )}
-                        <Link href={`/blog/${slug}`} className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-[var(--primary)] group-hover:gap-3 transition-all">
-                          {t('readMore')} <ArrowRight size={16} />
-                        </Link>
                       </div>
-                    </Card>
-                  </motion.div>
-                );
-              })}
-            </div>
+                    </div>
+                  </Link>
+                </motion.div>
+              )}
+
+              {/* Rest of posts */}
+              <AnimatePresence>
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  {(search ? filteredPosts : restPosts).map((post, i) => {
+                    const title = isAr ? post.titleAr : post.titleEn;
+                    const excerpt = isAr ? post.excerptAr : post.excerptEn;
+                    const slug = isAr ? post.slugAr : post.slugEn;
+
+                    return (
+                      <motion.div
+                        key={post.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: i * 0.05, duration: 0.5 }}
+                      >
+                        <Link href={`/blog/${slug}`} className="group block h-full">
+                          <div className="h-full bg-white/5 border border-white/10 rounded-[1.75rem] overflow-hidden hover:border-[var(--primary)]/40 hover:-translate-y-2 transition-all duration-400 hover:shadow-xl hover:shadow-[var(--primary)]/10 flex flex-col">
+                            {/* Image */}
+                            <div className="relative h-52 overflow-hidden flex-shrink-0">
+                              {post.featuredImage ? (
+                                <img
+                                  src={getMediaUrl(post.featuredImage)}
+                                  alt={title}
+                                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-600"
+                                />
+                              ) : (
+                                <div className="w-full h-full bg-gradient-to-br from-[var(--primary)]/10 to-[var(--primary-dark)]/20 flex items-center justify-center">
+                                  <BookOpen size={40} className="text-white/10" />
+                                </div>
+                              )}
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                              {/* Category */}
+                              <div className={cn("absolute top-4 z-10", isAr ? "right-4" : "left-4")}>
+                                <span className="inline-flex items-center gap-1 bg-[var(--accent)] text-black text-xs font-black px-2.5 py-1 rounded-full">
+                                  <TagIcon size={9} />
+                                  {post.category?.nameAr || (isAr ? 'مقال طبي' : 'Medical Article')}
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Content */}
+                            <div className={cn("p-6 flex flex-col flex-grow", isAr ? "text-right" : "text-left")}>
+                              <div className={cn("flex items-center gap-2 text-white/30 text-xs mb-3", isAr ? "flex-row-reverse justify-end" : "")}>
+                                <Calendar size={12} />
+                                {new Date(post.createdAt).toLocaleDateString(locale)}
+                              </div>
+                              <h3 className="text-lg font-black text-white mb-3 line-clamp-2 leading-snug group-hover:text-[var(--accent)] transition-colors duration-200">
+                                {title}
+                              </h3>
+                              {excerpt && (
+                                <p className="text-white/40 text-sm flex-grow line-clamp-3 leading-relaxed mb-5">
+                                  {excerpt}
+                                </p>
+                              )}
+                              <div className={cn(
+                                "inline-flex items-center gap-2 text-[var(--primary)] text-sm font-black mt-auto",
+                                isAr ? "flex-row-reverse" : ""
+                              )}>
+                                {isAr ? <ArrowLeft size={15} /> : <ArrowRight size={15} />}
+                                {isAr ? 'اقرأ المزيد' : 'Read More'}
+                              </div>
+                            </div>
+
+                            {/* Bottom progress bar */}
+                            <div className="h-0.5 bg-white/5">
+                              <div className="h-full w-0 group-hover:w-full bg-gradient-to-r from-[var(--primary)] to-[var(--accent)] transition-all duration-500" />
+                            </div>
+                          </div>
+                        </Link>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              </AnimatePresence>
+            </>
           )}
-        </Section>
+        </div>
       </main>
       <Footer />
       <WhatsAppButton />
