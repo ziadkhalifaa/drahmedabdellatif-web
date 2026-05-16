@@ -49,9 +49,51 @@ export default function HomePage() {
         <WhyUsSection />
         <SurgicalTipsSection />
         <BookingCTASection />
-        <section className="py-16 md:py-24 bg-gray-50 dark:bg-[#050505]">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <BookingForm />
+        <section id="booking-section" className="relative py-28 overflow-hidden bg-[#050e1a]">
+          {/* Background */}
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-[var(--primary)]/10 rounded-full blur-[150px]" />
+            <div className="absolute bottom-0 right-0 w-64 h-64 bg-[var(--accent)]/5 rounded-full blur-[100px]" />
+            <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-5" />
+          </div>
+
+          <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="grid lg:grid-cols-2 gap-16 items-start">
+
+              {/* Left: Info Column */}
+              <div className="text-white">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-[var(--accent)] text-xs font-black uppercase tracking-widest mb-8">
+                  احجز الآن
+                </div>
+                <h2 className="text-4xl md:text-5xl font-black leading-tight mb-6">
+                  ابدأ رحلتك نحو <span className="text-[var(--accent)]">الصحة</span> اليوم
+                </h2>
+                <p className="text-white/60 text-lg leading-relaxed mb-10">
+                  فريقنا الطبي المتخصص جاهز للإجابة على استفساراتك وحجز موعدك في أقرب وقت ممكن.
+                </p>
+
+                <div className="space-y-5">
+                  {[
+                    { icon: '🩺', text: 'كشف وتشخيص دقيق بأحدث الأجهزة' },
+                    { icon: '⚡', text: 'تقنيات ليزر متقدمة بدون جراحة تقليدية' },
+                    { icon: '🌟', text: 'خبرة +15 سنة في جراحة المسالك البولية' },
+                    { icon: '📞', text: 'متابعة ما بعد العلاج حتى الشفاء الكامل' },
+                  ].map((item, i) => (
+                    <div key={i} className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-lg flex-shrink-0">
+                        {item.icon}
+                      </div>
+                      <span className="text-white/70 text-sm font-medium">{item.text}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Right: Form */}
+              <div className="bg-white/5 border border-white/10 backdrop-blur-md rounded-[2rem] p-8">
+                <BookingForm />
+              </div>
+            </div>
           </div>
         </section>
       </main>
