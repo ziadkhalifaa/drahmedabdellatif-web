@@ -7,7 +7,8 @@ import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
 import { Link, useRouter } from '@/i18n/routing';
 import { useState } from 'react';
-import { User, Mail, Phone, Lock, UserPlus, LogIn, ArrowRight, ShieldCheck } from 'lucide-react';
+import { User, Mail, Phone, Lock, UserPlus, LogIn, ArrowRight, ShieldCheck, MessageCircle } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { api } from '@/lib/api';
 import { useAuth } from '@/context/auth-context';
@@ -21,14 +22,15 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [showVerify, setShowVerify] = useState(false);
   const [formData, setFormData] = useState({ name: '', email: '', phone: '', password: '' });
+  const [method, setMethod] = useState<'email' | 'whatsapp'>('email');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     
     try {
-      console.log("Submitting registration...", formData);
-      await api.post('/auth/register', formData);
+      console.log("Submitting registration...", { ...formData, method });
+      await api.post('/auth/register', { ...formData, method });
       console.log("Registration successful, switching to verify view");
       setShowVerify(true);
       toast.success(tCommon('success') || 'Verification code sent!');
@@ -63,7 +65,7 @@ export default function RegisterPage() {
 
   const handleResend = async () => {
     try {
-      await api.post('/auth/resend-code', { email: formData.email });
+      await api.post('/auth/resend-code', { email: formData.email, method });
       toast.success(tVerify('resendSuccess') || 'New code sent!');
     } catch (error: any) {
       toast.error(error.message || tCommon('error'));
@@ -165,6 +167,41 @@ export default function RegisterPage() {
                     </div>
                   </div>
 
+                  {/* Method Selection */}
+                  <div className="md:col-span-2 space-y-4 pt-2">
+                    <label className="text-xs font-bold uppercase tracking-widest text-[var(--muted)] block text-center">
+                      {tCommon('verificationMethod') || 'How should we send your code?'}
+                    </label>
+                    <div className="grid grid-cols-2 gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setMethod('email')}
+                        className={cn(
+                          "flex items-center justify-center gap-2 p-3 rounded-xl border-2 transition-all font-bold",
+                          method === 'email' 
+                            ? "border-[var(--primary)] bg-[var(--primary)]/10 text-[var(--primary)]" 
+                            : "border-[var(--border)] bg-[var(--background)]/50 text-[var(--muted)]"
+                        )}
+                      >
+                        <Mail size={18} />
+                        {tCommon('email') || 'Email'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setMethod('whatsapp')}
+                        className={cn(
+                          "flex items-center justify-center gap-2 p-3 rounded-xl border-2 transition-all font-bold",
+                          method === 'whatsapp' 
+                            ? "border-[#25D366] bg-[#25D366]/10 text-[#25D366]" 
+                            : "border-[var(--border)] bg-[var(--background)]/50 text-[var(--muted)]"
+                        )}
+                      >
+                        <Phone size={18} />
+                        WhatsApp
+                      </button>
+                    </div>
+                  </div>
+
                   <div className="md:col-span-2 pt-4">
                     <Button 
                       type="submit" 
@@ -196,7 +233,10 @@ export default function RegisterPage() {
                 </div>
                 <h2 className="text-3xl font-black mb-4">{tVerify('title')}</h2>
                 <p className="text-[var(--muted)] mb-8 text-sm">
-                  {tVerify('subtitle', { email: formData.email })}
+                  {method === 'email' 
+                    ? tVerify('subtitle', { email: formData.email })
+                    : (tCommon('verifyWhatsApp') || 'We sent a verification code to your WhatsApp number') + ': ' + formData.phone
+                  }
                 </p>
 
                 <form onSubmit={handleVerify} className="space-y-6">

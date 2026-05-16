@@ -24,7 +24,7 @@ export class AuthController {
   }
 
   @Post('register')
-  async register(@Body() body: { email: string; password: string; name: string; phone?: string }) {
+  async register(@Body() body: { email: string; password: string; name: string; phone?: string; method?: 'email' | 'whatsapp' }) {
     return this.authService.register(body);
   }
 
@@ -34,8 +34,8 @@ export class AuthController {
   }
 
   @Post('resend-code')
-  async resendCode(@Body() body: { email: string }) {
-    return this.authService.resendCode(body.email);
+  async resendCode(@Body() body: { email: string; method?: 'email' | 'whatsapp' }) {
+    return this.authService.resendCode(body.email, body.method);
   }
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)

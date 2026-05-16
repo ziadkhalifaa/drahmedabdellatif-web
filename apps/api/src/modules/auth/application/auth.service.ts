@@ -32,8 +32,9 @@ export class AuthService {
     };
   }
 
-  async register(data: { email: string; password: string; name: string; phone?: string }) {
+  async register(data: { email: string; password: string; name: string; phone?: string; method?: 'email' | 'whatsapp' }) {
     const existing = await this.prisma.user.findUnique({ where: { email: data.email } });
+    const method = data.method || 'email';
     
     if (existing) {
       if (existing.isEmailVerified) {
@@ -54,7 +55,12 @@ export class AuthService {
         },
       });
 
-      await this.emailService.sendOTP(data.email, verificationCode);
+      if (method === 'whatsapp' && data.phone) {
+        await this.whatsappService.sendOTP(data.phone, verificationCode);
+      } else {
+        await this.emailService.sendOTP(data.email, verificationCode);
+      }
+
       return {
         user: { id: existing.id, email: existing.email, name: data.name, role: existing.role, isEmailVerified: false },
         message: 'Verification code resent'
@@ -67,8 +73,10 @@ export class AuthService {
 
     const user = await this.prisma.user.create({
       data: {
-        ...data,
+        email: data.email,
         password: hashedPassword,
+        name: data.name,
+        phone: data.phone,
         role: 'patient',
         isEmailVerified: false,
         emailVerificationCode: verificationCode,
@@ -76,7 +84,11 @@ export class AuthService {
       },
     });
 
-    await this.emailService.sendOTP(data.email, verificationCode);
+    if (method === 'whatsapp' && data.phone) {
+      await this.whatsappService.sendOTP(data.phone, verificationCode);
+    } else {
+      await this.emailService.sendOTP(data.email, verificationCode);
+    }
 
     return {
       user: { id: user.id, email: user.email, name: user.name, role: user.role, isEmailVerified: user.isEmailVerified },
@@ -111,7 +123,7 @@ export class AuthService {
     };
   }
 
-  async resendCode(email: string) {
+  async resendCode(email: string, method: 'email' | 'whatsapp' = 'email') {
     const user = await this.prisma.user.findUnique({ where: { email } });
     if (!user) throw new UnauthorizedException('User not found');
 
@@ -126,6 +138,9 @@ export class AuthService {
       }
     });
 
+    if (method === 'whatsapp' && user.phone) {
+      return this.whatsappService.sendOTP(user.phone, newCode);
+    }
     return this.emailService.sendOTP(email, newCode);
   }
 
