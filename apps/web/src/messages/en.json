@@ -458,9 +458,19 @@
   },
   "admin": {
     "dashboard_overview": "Dashboard Overview",
+    "dashboard": "Dashboard",
     "appointments": "Appointments",
     "messages": "Messages",
-    "blog": "Blog",
-    "testimonials": "Testimonials"
+    "blog": "Blog Posts",
+    "testimonials": "Testimonials",
+    "Hero Slides": "Hero Slides",
+    "Services": "Services",
+    "Techniques": "Techniques",
+    "media": "Media Library",
+    "newsletter": "Newsletter",
+    "patients": "Patients Management",
+    "working_hours": "Working Hours",
+    "settings": "General Settings",
+    "logout": "Logout"
   }
 }

@@ -458,9 +458,19 @@
   },
   "admin": {
     "dashboard_overview": "نظرة عامة للوحة التحكم",
-    "appointments": "المواعيد",
-    "messages": "الرسائل",
-    "blog": "المدونة",
-    "testimonials": "التجارب"
+    "dashboard": "لوحة التحكم",
+    "appointments": "المواعيد والطلبات",
+    "messages": "الرسائل الواردة",
+    "blog": "المدونة الطبية",
+    "testimonials": "آراء المرضى",
+    "Hero Slides": "سلايدر الرئيسية",
+    "Services": "الخدمات الطبية",
+    "Techniques": "التقنيات العلاجية",
+    "media": "مكتبة الوسائط",
+    "newsletter": "النشرة البريدية",
+    "patients": "إدارة المرضى",
+    "working_hours": "أوقات العمل",
+    "settings": "إعدادات المنصة",
+    "logout": "تسجيل الخروج"
   }
 }
