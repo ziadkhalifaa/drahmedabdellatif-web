@@ -1,28 +1,30 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { motion } from 'framer-motion';
-import { Section, SectionHeader, Card, Button, Input, Textarea } from '@/components/ui';
+import { Button, Input, Textarea } from '@/components/ui';
 import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
 import { WhatsAppButton } from '@/components/layout/whatsapp-button';
 import { WHATSAPP_NUMBER, CLINIC_PHONE, CLINIC_EMAIL } from '@dr-ahmed/shared';
-import { Phone, Mail, MapPin, Clock, SendHorizontal } from 'lucide-react';
+import { Phone, Mail, MapPin, Clock, SendHorizontal, MessageCircle, CheckCircle2, AlertCircle } from 'lucide-react';
 import { api } from '@/lib/api';
-import { toast } from 'sonner';
 import { useState } from 'react';
+import { cn } from '@/lib/utils';
 
 export default function ContactPage() {
   const t = useTranslations('contact');
-  const tFooter = useTranslations('footer');
+  const locale = useLocale();
+  const isAr = locale === 'ar';
   const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' });
 
-  const contactInfo = [
-    { icon: Phone, label: t('info.phone'), value: CLINIC_PHONE, href: `tel:${CLINIC_PHONE}` },
-    { icon: Mail, label: t('info.email'), value: CLINIC_EMAIL, href: `mailto:${CLINIC_EMAIL}` },
-    { icon: MapPin, label: t('info.beniSuef'), value: t('info.beniSuefAddress'), href: '#' },
-    { icon: MapPin, label: t('info.october'), value: t('info.octoberAddress'), href: '#' },
+  const contactCards = [
+    { icon: Phone, label: t('info.phone'), value: CLINIC_PHONE, href: `tel:${CLINIC_PHONE}`, color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/20' },
+    { icon: Mail, label: t('info.email'), value: CLINIC_EMAIL, href: `mailto:${CLINIC_EMAIL}`, color: 'text-blue-400', bg: 'bg-blue-500/10 border-blue-500/20' },
+    { icon: MessageCircle, label: 'WhatsApp', value: isAr ? 'تواصل عبر واتساب' : 'Chat on WhatsApp', href: `https://wa.me/${WHATSAPP_NUMBER}`, color: 'text-green-400', bg: 'bg-green-500/10 border-green-500/20' },
+    { icon: MapPin, label: t('info.beniSuef'), value: t('info.beniSuefAddress'), href: '#', color: 'text-orange-400', bg: 'bg-orange-500/10 border-orange-500/20' },
   ];
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -30,10 +32,10 @@ export default function ContactPage() {
     setLoading(true);
     try {
       await api.post('/contact', form);
-      toast.success(t('form.successMessage') || 'Message sent successfully!');
+      setStatus('success');
       setForm({ name: '', email: '', phone: '', message: '' });
-    } catch (err: any) {
-      toast.error(err.message || 'Failed to send message');
+    } catch {
+      setStatus('error');
     } finally {
       setLoading(false);
     }
@@ -42,92 +44,181 @@ export default function ContactPage() {
   return (
     <>
       <Navbar />
-      <main className="min-h-screen pt-24">
-        <Section className="bg-gradient-to-b from-[var(--primary)]/5 to-transparent">
-          <SectionHeader title={t('title')} subtitle={t('subtitle')} />
-          
-          <div className="grid gap-12 lg:grid-cols-2">
-            {/* Contact Form */}
+      <main className="min-h-screen bg-[#050e1a]">
+        {/* Hero Header */}
+        <div className="relative pt-32 pb-20 overflow-hidden">
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-[var(--primary)]/15 rounded-full blur-[150px]" />
+            <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-5" />
+          </div>
+          <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-[var(--accent)] text-xs font-black uppercase tracking-widest mb-6">
+              <MessageCircle size={14} />
+              {isAr ? 'تواصل معنا' : 'Get in Touch'}
+            </div>
+            <h1 className="text-5xl md:text-6xl font-black text-white mb-5 leading-tight">
+              {t('title')}
+            </h1>
+            <p className="text-white/60 text-xl leading-relaxed max-w-2xl mx-auto">
+              {t('subtitle')}
+            </p>
+          </div>
+        </div>
+
+        {/* Contact Cards */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-4 mb-16">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {contactCards.map((card, i) => (
+              <motion.a
+                key={i}
+                href={card.href}
+                target={card.href.startsWith('http') ? '_blank' : undefined}
+                rel={card.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.1 }}
+                className={cn(
+                  "group flex flex-col items-center text-center gap-3 p-6 rounded-2xl border backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl",
+                  card.bg,
+                  isAr ? "text-right" : "text-left"
+                )}
+              >
+                <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0", card.bg)}>
+                  <card.icon size={22} className={card.color} />
+                </div>
+                <div>
+                  <p className="text-xs text-white/40 font-medium mb-1">{card.label}</p>
+                  <p className="text-sm text-white/90 font-bold leading-snug">{card.value}</p>
+                </div>
+              </motion.a>
+            ))}
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
+          <div className="grid lg:grid-cols-2 gap-12">
+
+            {/* Form */}
             <motion.div
-              initial={{ opacity: 0, x: -40 }}
+              initial={{ opacity: 0, x: isAr ? 40 : -40 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
+              transition={{ duration: 0.7 }}
             >
-              <Card className="p-8 space-y-6 shadow-xl border-[var(--border)]">
-                <h3 className="text-2xl font-bold text-[var(--foreground)]">{t('form.title')}</h3>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-[var(--muted)]">{t('form.name')}</label>
-                      <Input placeholder={t('form.namePlaceholder')} value={form.name} onChange={(e) => setForm({...form, name: e.target.value})} required className="bg-[var(--background)]" />
+              <div className="bg-white/5 border border-white/10 backdrop-blur-md rounded-[2rem] p-8">
+                <h3 className={cn("text-2xl font-black text-white mb-2", isAr ? "text-right" : "text-left")}>
+                  {t('form.title')}
+                </h3>
+                <p className={cn("text-white/50 text-sm mb-8", isAr ? "text-right" : "text-left")}>
+                  {isAr ? 'سيتم الرد عليك في أقرب وقت ممكن.' : 'We\'ll get back to you as soon as possible.'}
+                </p>
+
+                {status === 'success' ? (
+                  <div className="flex flex-col items-center justify-center py-12 text-center">
+                    <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mb-4">
+                      <CheckCircle2 size={32} className="text-green-400" />
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-[var(--muted)]">{t('form.phone')}</label>
-                      <Input placeholder={t('form.phonePlaceholder')} value={form.phone} onChange={(e) => setForm({...form, phone: e.target.value})} required className="bg-[var(--background)]" />
+                    <h4 className="text-xl font-black text-white mb-2">{isAr ? 'تم الإرسال!' : 'Sent!'}</h4>
+                    <p className="text-white/60 text-sm">{isAr ? 'سنتواصل معك قريباً.' : 'We\'ll contact you soon.'}</p>
+                    <button onClick={() => setStatus('idle')} className="mt-6 text-[var(--accent)] text-sm font-bold underline">
+                      {isAr ? 'إرسال رسالة أخرى' : 'Send another message'}
+                    </button>
+                  </div>
+                ) : (
+                  <form onSubmit={handleSubmit} className="space-y-4">
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <Input
+                        id="contact-name"
+                        label={t('form.name')}
+                        placeholder={t('form.namePlaceholder')}
+                        value={form.name}
+                        onChange={(e) => setForm({ ...form, name: e.target.value })}
+                        required
+                        className="rounded-xl bg-white/5 border-white/10 text-white placeholder:text-white/30"
+                      />
+                      <Input
+                        id="contact-phone"
+                        label={t('form.phone')}
+                        placeholder={t('form.phonePlaceholder')}
+                        value={form.phone}
+                        onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                        required
+                        className="rounded-xl bg-white/5 border-white/10 text-white placeholder:text-white/30"
+                      />
                     </div>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-[var(--muted)]">{t('form.email')}</label>
-                    <Input type="email" placeholder={t('form.emailPlaceholder')} value={form.email} onChange={(e) => setForm({...form, email: e.target.value})} required className="bg-[var(--background)]" />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-[var(--muted)]">{t('form.message')}</label>
-                    <Textarea placeholder={t('form.messagePlaceholder')} value={form.message} onChange={(e) => setForm({...form, message: e.target.value})} required className="min-h-[150px] bg-[var(--background)]" />
-                  </div>
-                  <Button type="submit" disabled={loading} className="w-full gap-2 py-6 text-lg font-bold rounded-xl shadow-lg shadow-[var(--primary)]/20">
-                    <SendHorizontal size={18} />
-                    {loading ? '...' : t('form.submit')}
-                  </Button>
-                </form>
-              </Card>
+                    <Input
+                      id="contact-email"
+                      label={t('form.email')}
+                      type="email"
+                      placeholder={t('form.emailPlaceholder')}
+                      value={form.email}
+                      onChange={(e) => setForm({ ...form, email: e.target.value })}
+                      required
+                      className="rounded-xl bg-white/5 border-white/10 text-white placeholder:text-white/30"
+                    />
+                    <Textarea
+                      id="contact-message"
+                      label={t('form.message')}
+                      placeholder={t('form.messagePlaceholder')}
+                      value={form.message}
+                      onChange={(e) => setForm({ ...form, message: e.target.value })}
+                      required
+                      className="rounded-xl bg-white/5 border-white/10 text-white placeholder:text-white/30 min-h-[130px] resize-none"
+                    />
+
+                    {status === 'error' && (
+                      <div className="flex items-center gap-2 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+                        <AlertCircle size={16} />
+                        {isAr ? 'حدث خطأ، حاول مرة أخرى' : 'Something went wrong, try again'}
+                      </div>
+                    )}
+
+                    <Button
+                      type="submit"
+                      disabled={loading}
+                      className="w-full h-14 text-base bg-[var(--primary)] hover:bg-[var(--primary-dark)] text-white font-black rounded-xl gap-3 transition-all hover:-translate-y-0.5 shadow-lg shadow-[var(--primary)]/20"
+                    >
+                      <SendHorizontal size={18} />
+                      {loading ? '...' : t('form.submit')}
+                    </Button>
+                  </form>
+                )}
+              </div>
             </motion.div>
 
-            {/* Contact Info & Map */}
+            {/* Map & Hours */}
             <motion.div
-              initial={{ opacity: 0, x: 40 }}
+              initial={{ opacity: 0, x: isAr ? -40 : 40 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="space-y-8"
+              transition={{ duration: 0.7, delay: 0.2 }}
+              className="space-y-6"
             >
-              <div className="grid gap-6 sm:grid-cols-2">
-                {contactInfo.map((info) => (
-                  <Card key={info.label} className="p-6 flex items-start gap-4 hover:border-[var(--primary)] transition-all">
-                    <div className="h-10 w-10 rounded-full bg-[var(--primary)]/10 flex items-center justify-center text-[var(--primary)] shrink-0">
-                      <info.icon size={20} />
+              {/* Working Hours */}
+              <div className="bg-white/5 border border-white/10 backdrop-blur-md rounded-[2rem] p-7">
+                <div className={cn("flex items-center gap-3 mb-6", isAr ? "flex-row-reverse" : "")}>
+                  <div className="w-10 h-10 rounded-xl bg-[var(--accent)]/20 flex items-center justify-center">
+                    <Clock size={18} className="text-[var(--accent)]" />
+                  </div>
+                  <h4 className="font-black text-white text-lg">{t('hours.title')}</h4>
+                </div>
+                <div className="space-y-3">
+                  {[
+                    { location: t('hours.beniSuef'), hours: t('hours.beniSuefHours') },
+                    { location: t('hours.october'), hours: t('hours.octoberHours') },
+                  ].map((row, i) => (
+                    <div key={i} className={cn(
+                      "flex justify-between items-center p-3 rounded-xl bg-white/5",
+                      isAr ? "flex-row-reverse" : ""
+                    )}>
+                      <span className="text-sm text-white/60 font-medium">{row.location}</span>
+                      <span className="text-sm text-[var(--accent)] font-black">{row.hours}</span>
                     </div>
-                    <div>
-                      <p className="text-xs font-semibold uppercase tracking-wider text-[var(--muted)]">{info.label}</p>
-                      {info.href !== '#' ? (
-                        <a href={info.href} className="text-sm font-bold text-[var(--foreground)] hover:text-[var(--primary)]">
-                          {info.value}
-                        </a>
-                      ) : (
-                        <p className="text-sm font-bold text-[var(--foreground)]">{info.value}</p>
-                      )}
-                    </div>
-                  </Card>
-                ))}
+                  ))}
+                </div>
               </div>
 
-              <Card className="p-6 space-y-4 bg-gradient-to-br from-[var(--primary)]/5 to-transparent border-dashed">
-                <div className="flex items-center gap-3 text-[var(--primary)]">
-                  <Clock size={20} />
-                  <h4 className="font-bold">{t('hours.title')}</h4>
-                </div>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between items-center pb-2 border-b border-[var(--border)]">
-                    <span className="text-[var(--muted)]">{t('hours.beniSuef')}</span>
-                    <span className="font-semibold">{t('hours.beniSuefHours')}</span>
-                  </div>
-                  <div className="flex justify-between items-center pb-2 border-b border-[var(--border)]">
-                    <span className="text-[var(--muted)]">{t('hours.october')}</span>
-                    <span className="font-semibold">{t('hours.octoberHours')}</span>
-                  </div>
-                </div>
-              </Card>
-
-              {/* Google Maps */}
-              <div className="aspect-video rounded-3xl overflow-hidden border border-[var(--border)] shadow-inner">
+              {/* Google Map */}
+              <div className="rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl aspect-video">
                 <iframe
                   src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3528.5!2d31.0919!3d29.0744!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjnCsDA0JzI4LjAiTiAzMcKwMDUnMzAuOCJF!5e0!3m2!1sar!2seg!4v1700000000000"
                   width="100%"
@@ -136,13 +227,13 @@ export default function ContactPage() {
                   allowFullScreen
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
-                  title="Clinic Location - Beni Suef"
+                  title="Clinic Location"
                 />
               </div>
             </motion.div>
-          </div>
-        </Section>
 
+          </div>
+        </div>
       </main>
       <Footer />
       <WhatsAppButton />
