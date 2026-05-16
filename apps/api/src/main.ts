@@ -41,10 +41,15 @@ async function bootstrap() {
 
     cachedApp.enableCors({
       origin: (origin, cb) => {
-        if (!origin) return cb(null, true); // Allow server-to-server
-        const allowed = allowedOrigins.some(o => 
-          origin === o || origin.endsWith(`.${new URL(o).hostname}`)
-        );
+        if (!origin) return cb(null, true);
+        const allowed = allowedOrigins.some(o => {
+          if (o === '*' || origin === o) return true;
+          try {
+            return origin.endsWith(`.${new URL(o).hostname}`);
+          } catch (e) {
+            return false;
+          }
+        });
         allowed ? cb(null, true) : cb(new Error('Not allowed by CORS'));
       },
       credentials: true,
