@@ -14,7 +14,7 @@ export class StorageService {
 
   async saveImage(file: Express.Multer.File): Promise<string> {
     const filename = `${randomUUID()}.webp`;
-    const buffer = await sharp(file.buffer).webp({ quality: 90 }).toBuffer();
+    const buffer = await sharp(file.buffer).webp({ quality: 80 }).toBuffer();
     const { error } = await this.supabase.storage
       .from(this.bucket)
       .upload(`images/${filename}`, buffer, { contentType: 'image/webp', upsert: false });

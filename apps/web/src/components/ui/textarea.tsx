@@ -3,15 +3,16 @@ import { forwardRef, type TextareaHTMLAttributes } from 'react';
 
 interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   label?: string;
+  labelClassName?: string;
   error?: string;
 }
 
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
-  ({ className, label, error, id, ...props }, ref) => {
+  ({ className, label, labelClassName, error, id, ...props }, ref) => {
     return (
       <div className="space-y-1">
         {label && (
-          <label htmlFor={id} className="block text-sm font-medium text-[var(--foreground)]">
+          <label htmlFor={id} className={cn("block text-sm font-medium text-[var(--foreground)]", labelClassName)}>
             {label}
           </label>
         )}

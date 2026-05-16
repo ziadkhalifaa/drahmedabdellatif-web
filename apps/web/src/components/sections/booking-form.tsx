@@ -82,14 +82,14 @@ export function BookingForm() {
     >
       {/* Header */}
       <div className={cn("mb-10", isAr ? "text-right" : "text-left")}>
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--primary)]/10 text-[var(--primary)] text-xs font-black uppercase tracking-widest mb-4">
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--primary)]/20 text-[var(--primary)] text-xs font-black uppercase tracking-widest mb-4 border border-[var(--primary)]/30">
           <Calendar size={14} />
           {isAr ? 'احجز موعدك' : 'Book Your Visit'}
         </div>
-        <h3 className="text-3xl font-black text-[var(--foreground)] mb-2">
+        <h3 className="text-3xl font-black text-white mb-2">
           {isAr ? 'هل تريد حجز موعد؟' : 'Ready to Book?'}
         </h3>
-        <p className="text-[var(--muted)] text-sm">
+        <p className="text-white/60 text-sm">
           {isAr ? 'أكمل البيانات وسنتواصل معك لتأكيد الموعد' : 'Fill in your details and we\'ll confirm your appointment.'}
         </p>
       </div>
@@ -104,10 +104,12 @@ export function BookingForm() {
             <Input
               id="patientName"
               label={t('name')}
+              placeholder={isAr ? 'الاسم بالكامل' : 'Full Name'}
               value={form.patientName}
               onChange={(e) => setForm({ ...form, patientName: e.target.value })}
               required
-              className={cn("rounded-xl border-[var(--border)] bg-[var(--card)] focus:border-[var(--primary)] transition-colors", isAr ? "pr-10" : "pl-10")}
+              labelClassName="text-white font-bold mb-2 block"
+              className={cn("rounded-xl border-white/10 bg-white/5 text-white focus:border-[var(--primary)] transition-colors placeholder:text-white/20", isAr ? "pr-10" : "pl-10")}
             />
           </div>
 
@@ -119,11 +121,13 @@ export function BookingForm() {
             <Input
               id="patientPhone"
               label={t('phone')}
+              placeholder={isAr ? 'رقم الهاتف' : 'Phone Number'}
               type="tel"
               value={form.patientPhone}
               onChange={(e) => setForm({ ...form, patientPhone: e.target.value })}
               required
-              className={cn("rounded-xl border-[var(--border)] bg-[var(--card)] focus:border-[var(--primary)] transition-colors", isAr ? "pr-10" : "pl-10")}
+              labelClassName="text-white font-bold mb-2 block"
+              className={cn("rounded-xl border-white/10 bg-white/5 text-white focus:border-[var(--primary)] transition-colors placeholder:text-white/20", isAr ? "pr-10" : "pl-10")}
             />
           </div>
         </div>
@@ -136,11 +140,13 @@ export function BookingForm() {
           <Input
             id="patientEmail"
             label={t('email')}
+            placeholder={isAr ? 'البريد الإلكتروني' : 'Email Address'}
             type="email"
             value={form.patientEmail}
             onChange={(e) => setForm({ ...form, patientEmail: e.target.value })}
             required
-            className={cn("rounded-xl border-[var(--border)] bg-[var(--card)] focus:border-[var(--primary)] transition-colors", isAr ? "pr-10" : "pl-10")}
+            labelClassName="text-white font-bold mb-2 block"
+            className={cn("rounded-xl border-white/10 bg-white/5 text-white focus:border-[var(--primary)] transition-colors placeholder:text-white/20", isAr ? "pr-10" : "pl-10")}
           />
         </div>
 
@@ -158,13 +164,14 @@ export function BookingForm() {
               onChange={(e) => setForm({ ...form, date: e.target.value })}
               required
               min={new Date().toISOString().split('T')[0]}
-              className={cn("rounded-xl border-[var(--border)] bg-[var(--card)] focus:border-[var(--primary)] transition-colors", isAr ? "pr-10" : "pl-10")}
+              labelClassName="text-white font-bold mb-2 block"
+              className={cn("rounded-xl border-white/10 bg-white/5 text-white focus:border-[var(--primary)] transition-colors [color-scheme:dark]", isAr ? "pr-10" : "pl-10")}
             />
           </div>
 
           {/* Time Slot */}
           <div className="space-y-1">
-            <label className={cn("block text-sm font-bold text-[var(--foreground)]", isAr ? "text-right" : "text-left")}>
+            <label className={cn("block text-sm font-bold text-white", isAr ? "text-right" : "text-left")}>
               {t('time')}
             </label>
             <div className="relative">
@@ -176,13 +183,13 @@ export function BookingForm() {
                 onChange={(e) => setForm({ ...form, timeSlot: e.target.value })}
                 required
                 className={cn(
-                  "w-full rounded-xl border border-[var(--border)] bg-[var(--card)] py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)] text-[var(--foreground)] transition-colors appearance-none",
+                  "w-full rounded-xl border border-white/10 bg-white/5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)] text-white transition-colors appearance-none",
                   isAr ? "pr-10 pl-4 text-right" : "pl-10 pr-4 text-left"
                 )}
               >
-                <option value="">{isAr ? 'اختر وقتاً' : 'Select a time'}</option>
+                <option value="" className="bg-[#050e1a]">{isAr ? 'اختر وقتاً' : 'Select a time'}</option>
                 {TIME_SLOTS.map((slot) => (
-                  <option key={slot} value={slot}>{slot}</option>
+                  <option key={slot} value={slot} className="bg-[#050e1a]">{slot}</option>
                 ))}
               </select>
             </div>
@@ -197,9 +204,11 @@ export function BookingForm() {
           <Textarea
             id="notes"
             label={t('notes')}
+            placeholder={isAr ? 'أضف أي ملاحظات إضافية هنا...' : 'Add any additional notes here...'}
             value={form.notes}
             onChange={(e) => setForm({ ...form, notes: e.target.value })}
-            className={cn("rounded-xl border-[var(--border)] bg-[var(--card)] focus:border-[var(--primary)] transition-colors resize-none", isAr ? "pr-10" : "pl-10")}
+            labelClassName="text-white font-bold mb-2 block"
+            className={cn("rounded-xl border-white/10 bg-white/5 text-white focus:border-[var(--primary)] transition-colors resize-none placeholder:text-white/20", isAr ? "pr-10" : "pl-10")}
           />
         </div>
 

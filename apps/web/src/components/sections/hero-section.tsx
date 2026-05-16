@@ -132,10 +132,10 @@ export function HeroSection() {
           <div className={cn(
             "absolute inset-0 z-10",
             locale === 'ar'
-              ? "bg-gradient-to-r from-black/70 via-black/30 to-transparent"
-              : "bg-gradient-to-l from-black/70 via-black/30 to-transparent"
+              ? "bg-gradient-to-r from-black/85 via-black/50 to-transparent"
+              : "bg-gradient-to-l from-black/85 via-black/50 to-transparent"
           )} />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent z-10" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent z-10" />
 
           {slides[currentSlide].isPortrait ? (
             <div className="absolute inset-0 w-full h-full">
@@ -172,7 +172,7 @@ export function HeroSection() {
             <img
               src={getMediaUrl(slides[currentSlide].image)}
               alt="Hero Background"
-              className="w-full h-full object-cover object-center lg:object-[center_25%]"
+              className="w-full h-full object-cover"
             />
           )}
         </motion.div>

@@ -61,8 +61,13 @@ export function MediaPickerModal({ isOpen, onClose, onSelect }: MediaPickerModal
 
     setUploading(true);
     try {
+      let uploadFile: Blob | File = file;
+      if (file.type.startsWith('image/')) {
+        uploadFile = await compressImage(file);
+      }
+
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append('file', uploadFile, file.name.split('.')[0] + '.webp');
 
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'}/media/upload`, {
         method: 'POST',
@@ -128,10 +133,10 @@ export function MediaPickerModal({ isOpen, onClose, onSelect }: MediaPickerModal
                 <div
                   key={item.id}
                   onClick={() => { onSelect(item.url); onClose(); }}
-                  className="aspect-square rounded-2xl overflow-hidden cursor-pointer border-2 border-transparent hover:border-blue-500 hover:scale-95 transition-all shadow-md group relative bg-gray-100 dark:bg-white/5"
+                  className="aspect-square rounded-2xl overflow-hidden cursor-pointer border-2 border-transparent hover:border-blue-500 hover:scale-95 transition-all shadow-md group relative"
                 >
-                  <img src={getMediaUrl(item.url)} className="w-full h-full object-contain p-2" alt="" />
-                  <div className="absolute inset-0 bg-blue-600/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <img src={getMediaUrl(item.url)} className="w-full h-full object-cover" alt="" />
+                  <div className="absolute inset-0 bg-blue-600/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                     <Check className="text-white" size={32} />
                   </div>
                 </div>
