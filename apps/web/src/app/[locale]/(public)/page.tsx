@@ -99,16 +99,26 @@ export default async function HomePage() {
                   {isAr ? 'فريقنا الطبي المتخصص جاهز للإجابة على استفساراتك وحجز موعدك في أقرب وقت ممكن.' : 'Our specialized medical team is ready to answer your inquiries and schedule your appointment as soon as possible.'}
                 </p>
 
-                <div className="space-y-6">
+                <div className="space-y-12">
                   {bookingFeatures.map((item, i) => (
                     <div 
                       key={i} 
-                      className="flex items-center gap-4 group"
+                      className="group relative flex items-start gap-6 transition-all duration-500"
                     >
-                      <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-[var(--accent)] flex-shrink-0 group-hover:bg-[var(--primary)]/20 group-hover:border-[var(--primary)]/30 transition-all duration-300">
-                        <item.icon size={22} className="group-hover:scale-110 transition-transform duration-300" />
+                      {/* Artistic Indicator */}
+                      <div className="relative flex-shrink-0 mt-1">
+                        <div className="w-[2px] h-full absolute left-1/2 -translate-x-1/2 bg-white/5 group-hover:bg-[var(--primary)]/20 transition-colors duration-500" />
+                        <div className="w-10 h-10 rounded-full bg-[#0a192f] border border-white/10 flex items-center justify-center relative z-10 group-hover:border-[var(--primary)]/50 group-hover:shadow-[0_0_15px_rgba(var(--primary-rgb),0.3)] transition-all duration-500">
+                          <item.icon size={18} className="text-white/40 group-hover:text-[var(--primary)] transition-colors duration-500" />
+                        </div>
                       </div>
-                      <span className="text-white/80 text-base font-bold group-hover:text-white transition-colors duration-300">{item.text}</span>
+
+                      <div className="flex-1">
+                        <h4 className="text-xl font-black text-white/90 group-hover:text-white transition-colors duration-300 mb-2">
+                          {item.text}
+                        </h4>
+                        <div className="w-0 group-hover:w-12 h-[2px] bg-[var(--primary)] transition-all duration-500 rounded-full" />
+                      </div>
                     </div>
                   ))}
                 </div>
