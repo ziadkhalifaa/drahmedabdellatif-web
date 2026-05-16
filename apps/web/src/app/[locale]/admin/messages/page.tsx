@@ -12,9 +12,17 @@ import { cn } from '@/lib/utils';
 export default function AdminMessagesPage() {
   const { token } = useAuth();
   const [messages, setMessages] = useState<ContactMessage[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   const fetchMessages = () => {
-    if (token) api.get<ContactMessage[]>('/contact', token).then(setMessages).catch(() => {});
+    if (!token) return;
+    setLoading(true);
+    setError(false);
+    api.get<any>('/contact', token)
+      .then(res => setMessages(Array.isArray(res) ? res : (res?.data || [])))
+      .catch(() => setError(true))
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => { fetchMessages(); }, [token]);
@@ -74,6 +82,17 @@ export default function AdminMessagesPage() {
         </div>
       </div>
 
+      {loading ? (
+        <div className="flex flex-col items-center justify-center py-20 text-[var(--muted)]">
+          <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4" />
+          <p className="font-bold">Loading messages...</p>
+        </div>
+      ) : error ? (
+        <div className="flex flex-col items-center justify-center py-20 text-red-500 bg-red-50 dark:bg-red-900/10 rounded-2xl border border-red-100 dark:border-red-900/30">
+          <p className="font-bold">Failed to load data</p>
+          <Button variant="outline" onClick={fetchMessages} className="mt-4">Retry Now</Button>
+        </div>
+      ) : (
       <div className="grid gap-4">
         {messages.map((msg) => (
           <Card key={msg.id} className={cn(
@@ -127,6 +146,7 @@ export default function AdminMessagesPage() {
           </Card>
         )}
       </div>
+      )}
     </div>
   );
 }

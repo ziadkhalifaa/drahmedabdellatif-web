@@ -28,17 +28,22 @@ export default function NewsletterPage() {
   const [campaignData, setCampaignData] = useState({ subject: '', content: '' });
   const [sending, setSending] = useState(false);
 
-  useEffect(() => {
-    if (!token) return;
+  const [error, setError] = useState(false);
 
-    api.get<Subscriber[]>('/newsletter', token)
-      .then(res => setSubscribers(res))
+  const fetchSubscribers = () => {
+    if (!token) return;
+    setLoading(true);
+    setError(false);
+    api.get<any>('/newsletter', token)
+      .then(res => setSubscribers(Array.isArray(res) ? res : (res?.data || [])))
       .catch(err => {
         toast.error('Failed to load subscribers');
-        console.error(err);
+        setError(true);
       })
       .finally(() => setLoading(false));
-  }, [token]);
+  };
+
+  useEffect(() => { fetchSubscribers(); }, [token]);
 
   const filteredSubscribers = subscribers.filter(s =>
     s.email.toLowerCase().includes(searchTerm.toLowerCase())
@@ -88,7 +93,22 @@ export default function NewsletterPage() {
     return (
       <div className="p-8 space-y-6">
         <h1 className="text-3xl font-black">{t('title', { fallback: 'Newsletter Management' })}</h1>
-        <div className="h-96 animate-pulse bg-[var(--card)] rounded-3xl" />
+        <div className="flex flex-col items-center justify-center py-20 text-[var(--muted)]">
+          <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4" />
+          <p className="font-bold">Loading subscribers...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-8 space-y-6">
+        <h1 className="text-3xl font-black">{t('title', { fallback: 'Newsletter Management' })}</h1>
+        <div className="flex flex-col items-center justify-center py-20 text-red-500 bg-red-50 dark:bg-red-900/10 rounded-2xl border border-red-100 dark:border-red-900/30">
+          <p className="font-bold">Failed to load data</p>
+          <Button variant="outline" onClick={fetchSubscribers} className="mt-4">Retry Now</Button>
+        </div>
       </div>
     );
   }

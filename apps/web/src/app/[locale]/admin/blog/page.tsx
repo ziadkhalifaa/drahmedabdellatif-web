@@ -17,6 +17,8 @@ import { MediaPickerModal } from '@/components/media-picker';
 export default function AdminBlogPage() {
   const { token } = useAuth();
   const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [editing, setEditing] = useState<BlogPost | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [activeLang, setActiveLang] = useState<'ar' | 'en'>('ar');
@@ -38,7 +40,13 @@ export default function AdminBlogPage() {
   });
 
   const fetchPosts = () => {
-    if (token) api.get<BlogPost[]>('/blog', token).then(setPosts).catch(() => {});
+    if (!token) return;
+    setLoading(true);
+    setError(false);
+    api.get<any>('/blog', token)
+      .then(res => setPosts(Array.isArray(res) ? res : (res?.data || [])))
+      .catch(() => setError(true))
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => { fetchPosts(); }, [token]);
@@ -406,7 +414,17 @@ export default function AdminBlogPage() {
         </Button>
       </div>
 
-      {/* List Card */}
+      {loading ? (
+        <div className="flex flex-col items-center justify-center py-20 text-[var(--muted)]">
+          <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4" />
+          <p className="font-bold">Loading articles...</p>
+        </div>
+      ) : error ? (
+        <div className="flex flex-col items-center justify-center py-20 text-red-500 bg-red-50 dark:bg-red-900/10 rounded-2xl border border-red-100 dark:border-red-900/30">
+          <p className="font-bold">Failed to load data</p>
+          <Button variant="outline" onClick={fetchPosts} className="mt-4">Retry Now</Button>
+        </div>
+      ) : (
       <Card className="overflow-hidden border-none shadow-2xl bg-white/50 backdrop-blur-xl">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
@@ -482,6 +500,7 @@ export default function AdminBlogPage() {
           </table>
         </div>
       </Card>
+      )}
     </div>
   );
 }

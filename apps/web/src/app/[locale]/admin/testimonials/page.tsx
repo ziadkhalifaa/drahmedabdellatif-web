@@ -12,10 +12,18 @@ type Tab = 'all' | 'pending' | 'success-stories';
 export default function AdminTestimonialsPage() {
   const { token } = useAuth();
   const [testimonials, setTestimonials] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>('all');
 
   const fetchTestimonials = () => {
-    if (token) api.get<any[]>('/testimonials/all', token).then(setTestimonials).catch(() => {});
+    if (!token) return;
+    setLoading(true);
+    setError(false);
+    api.get<any>('/testimonials/all', token)
+      .then(res => setTestimonials(Array.isArray(res) ? res : (res?.data || [])))
+      .catch(() => setError(true))
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => { fetchTestimonials(); }, [token]);
@@ -65,6 +73,18 @@ export default function AdminTestimonialsPage() {
         <p className="text-sm text-[var(--muted)]">إدارة تعليقات المرضى وقصص النجاح.</p>
       </div>
 
+      {loading ? (
+        <div className="flex flex-col items-center justify-center py-20 text-[var(--muted)]">
+          <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4" />
+          <p className="font-bold">Loading testimonials...</p>
+        </div>
+      ) : error ? (
+        <div className="flex flex-col items-center justify-center py-20 text-red-500 bg-red-50 dark:bg-red-900/10 rounded-2xl border border-red-100 dark:border-red-900/30">
+          <p className="font-bold">Failed to load data</p>
+          <Button variant="outline" onClick={fetchTestimonials} className="mt-4">Retry Now</Button>
+        </div>
+      ) : (
+      <>
       {/* Tabs */}
       <div className="flex gap-2 border-b border-[var(--border)] pb-0">
         {tabs.map(tab => (
@@ -188,6 +208,8 @@ export default function AdminTestimonialsPage() {
           </div>
         )}
       </div>
+      </>
+      )}
     </div>
   );
 }
