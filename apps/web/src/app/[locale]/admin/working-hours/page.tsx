@@ -102,46 +102,51 @@ export default function WorkingHoursPage() {
               </div>
 
               {/* Right side: Times and Duration */}
-              <div className={cn("flex flex-wrap md:flex-nowrap items-end gap-4 w-full md:w-auto", !hour.isActive && "pointer-events-none opacity-50")}>
-                <div className="flex-1 md:w-32">
-                  <label className="text-xs font-bold uppercase tracking-widest text-[var(--muted)] mb-2 block">{t('startTime', { fallback: 'Start Time' })}</label>
+              <div className={cn("grid grid-cols-2 md:grid-cols-4 items-end gap-4 w-full md:flex-1 max-w-3xl", !hour.isActive && "pointer-events-none opacity-50")}>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-wider text-[var(--muted)] block px-1">{t('startTime', { fallback: 'Start Time' })}</label>
                   <Input 
                     type="time" 
                     value={hour.startTime} 
                     onChange={(e) => setHours(prev => prev.map(h => h.id === hour.id ? { ...h, startTime: e.target.value } : h))}
-                    className="font-bold text-lg"
+                    className="font-bold text-base h-12 bg-[var(--background)] border-[var(--border)] rounded-xl"
                   />
                 </div>
-                <div className="flex-1 md:w-32">
-                  <label className="text-xs font-bold uppercase tracking-widest text-[var(--muted)] mb-2 block">{t('endTime', { fallback: 'End Time' })}</label>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-wider text-[var(--muted)] block px-1">{t('endTime', { fallback: 'End Time' })}</label>
                   <Input 
                     type="time" 
                     value={hour.endTime} 
                     onChange={(e) => setHours(prev => prev.map(h => h.id === hour.id ? { ...h, endTime: e.target.value } : h))}
-                    className="font-bold text-lg"
+                    className="font-bold text-base h-12 bg-[var(--background)] border-[var(--border)] rounded-xl"
                   />
                 </div>
-                <div className="flex-1 md:w-32">
-                  <label className="text-xs font-bold uppercase tracking-widest text-[var(--muted)] mb-2 block">{t('slotDuration', { fallback: 'Duration (min)' })}</label>
-                  <Input 
-                    type="number" 
-                    min="10"
-                    step="5"
-                    value={hour.slotDuration} 
-                    onChange={(e) => setHours(prev => prev.map(h => h.id === hour.id ? { ...h, slotDuration: parseInt(e.target.value) } : h))}
-                    className="font-bold text-lg text-center"
-                  />
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-wider text-[var(--muted)] block px-1 truncate">{t('slotDuration', { fallback: 'Duration' })}</label>
+                  <div className="relative">
+                    <Input 
+                      type="number" 
+                      min="10"
+                      step="5"
+                      value={hour.slotDuration} 
+                      onChange={(e) => setHours(prev => prev.map(h => h.id === hour.id ? { ...h, slotDuration: parseInt(e.target.value) } : h))}
+                      className="font-bold text-base h-12 bg-[var(--background)] border-[var(--border)] rounded-xl pl-4 pr-10"
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-[var(--muted)] pointer-events-none">min</span>
+                  </div>
                 </div>
                 
-                <Button 
-                  onClick={() => handleUpdate(hour.id, { startTime: hour.startTime, endTime: hour.endTime, slotDuration: hour.slotDuration })}
-                  disabled={savingId === hour.id || !hour.isActive}
-                  variant="outline"
-                  className="w-full md:w-auto border-[var(--primary)] text-[var(--primary)] hover:bg-[var(--primary)] hover:text-white h-12 px-6"
-                >
-                  <Save size={18} className="mr-2" />
-                  {savingId === hour.id ? tCommon('loading', { fallback: 'Saving...' }) : tCommon('save', { fallback: 'Save' })}
-                </Button>
+                <div className="col-span-2 md:col-span-1">
+                  <Button 
+                    onClick={() => handleUpdate(hour.id, { startTime: hour.startTime, endTime: hour.endTime, slotDuration: hour.slotDuration })}
+                    disabled={savingId === hour.id || !hour.isActive}
+                    variant="outline"
+                    className="w-full border-[var(--primary)] text-[var(--primary)] hover:bg-[var(--primary)] hover:text-white h-12 px-6 rounded-xl font-bold"
+                  >
+                    <Save size={18} className="mr-2" />
+                    {savingId === hour.id ? tCommon('loading', { fallback: 'Saving...' }) : tCommon('save', { fallback: 'Save' })}
+                  </Button>
+                </div>
               </div>
 
             </div>
@@ -149,7 +154,7 @@ export default function WorkingHoursPage() {
             {!hour.isActive && (
                <div className="mt-4 p-3 rounded-xl bg-orange-500/10 border border-orange-500/20 text-orange-500 text-sm flex items-center gap-2 font-medium">
                   <AlertCircle size={16} />
-                  Clinic is closed on this day.
+                  {t('closed', { fallback: 'Clinic is closed on this day.' })}
                </div>
             )}
           </Card>

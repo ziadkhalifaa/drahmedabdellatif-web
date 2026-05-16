@@ -320,7 +320,15 @@
     "settings": "Settings",
     "email": "Email",
     "password": "Password",
-    "loginBtn": "Login"
+    "loginBtn": "Login",
+    "workingHours": {
+      "title": "Working Hours Management",
+      "subtitle": "Configure clinic working days, times, and consultation durations.",
+      "startTime": "Start Time",
+      "endTime": "End Time",
+      "slotDuration": "Slot Duration",
+      "closed": "Clinic is closed on this day."
+    }
   },
   "auth": {
     "login": {
