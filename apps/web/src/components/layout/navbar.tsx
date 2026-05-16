@@ -46,7 +46,7 @@ export function Navbar() {
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [services, setServices] = useState<Service[]>([]);
   const [mounted, setMounted] = useState(false);
-  const { user, token, logout } = useAuth();
+  const { user, token, isLoading: isAuthLoading, logout } = useAuth();
   const isLoggedIn = !!token;
 
   const headerRef = useRef<HTMLElement>(null);
@@ -189,19 +189,29 @@ export function Navbar() {
 
             <div className="w-[1px] h-4 bg-border mx-1" />
 
-            {isLoggedIn ? (
-              <Link href="/dashboard">
-                <Button variant="ghost" size="sm" className="h-8 rounded-full font-bold text-[10px] px-3 gap-2">
-                  <User size={12} />
-                  {isRTL ? 'ملفي' : 'Account'}
-                </Button>
-              </Link>
-            ) : (
-              <Link href="/auth/login">
-                <Button variant="ghost" size="sm" className="h-8 rounded-full font-bold text-[10px] px-3">
-                  {tAuth('login.submit')}
-                </Button>
-              </Link>
+            {!isAuthLoading && (
+              isLoggedIn ? (
+                <Link href="/dashboard">
+                  <Button variant="ghost" size="sm" className="h-8 rounded-full font-bold text-[10px] px-3 gap-2">
+                    <User size={12} />
+                    {isRTL ? 'ملفي' : 'Account'}
+                  </Button>
+                </Link>
+              ) : (
+                <div className="flex items-center">
+                  <Link href="/auth/login">
+                    <Button variant="ghost" size="sm" className="h-8 rounded-full font-bold text-[10px] px-3">
+                      {tAuth('login.submit')}
+                    </Button>
+                  </Link>
+                  <div className="w-[1px] h-3 bg-border mx-0.5" />
+                  <Link href="/auth/register">
+                    <Button variant="ghost" size="sm" className="h-8 rounded-full font-bold text-[10px] px-3">
+                      {tAuth('register.submit')}
+                    </Button>
+                  </Link>
+                </div>
+              )
             )}
           </div>
 
@@ -377,19 +387,28 @@ export function Navbar() {
                    </button>
                 </div>
 
-                {isLoggedIn ? (
-                  <Link href="/dashboard" onClick={() => setMobileOpen(false)}>
-                    <Button className="w-full rounded-2xl py-6 font-black gap-2">
-                      <User size={18} />
-                      {isRTL ? 'لوحة التحكم' : 'Dashboard'}
-                    </Button>
-                  </Link>
-                ) : (
-                  <Link href="/auth/login" onClick={() => setMobileOpen(false)}>
-                    <Button variant="outline" className="w-full rounded-2xl py-6 font-black">
-                      {tAuth('login.submit')}
-                    </Button>
-                  </Link>
+                {!isAuthLoading && (
+                  isLoggedIn ? (
+                    <Link href="/dashboard" onClick={() => setMobileOpen(false)}>
+                      <Button className="w-full rounded-2xl py-6 font-black gap-2">
+                        <User size={18} />
+                        {isRTL ? 'ملفي' : 'Account'}
+                      </Button>
+                    </Link>
+                  ) : (
+                    <div className="grid grid-cols-2 gap-3">
+                      <Link href="/auth/login" onClick={() => setMobileOpen(false)} className="w-full">
+                        <Button variant="outline" className="w-full rounded-2xl py-6 font-black">
+                          {tAuth('login.submit')}
+                        </Button>
+                      </Link>
+                      <Link href="/auth/register" onClick={() => setMobileOpen(false)} className="w-full">
+                        <Button className="w-full rounded-2xl py-6 font-black">
+                          {tAuth('register.submit')}
+                        </Button>
+                      </Link>
+                    </div>
+                  )
                 )}
               </div>
 
