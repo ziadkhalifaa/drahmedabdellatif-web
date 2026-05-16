@@ -66,51 +66,58 @@ export function AdminSidebar({ open, onClose }: { open: boolean; onClose: () => 
 
   const sidebarContent = (
     <div className="flex flex-col h-full bg-[#072a44] dark:bg-slate-950 text-white relative overflow-hidden">
-      {/* Abstract Background Element */}
-      <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none" />
+      {/* Abstract Background Element - Creative Glows */}
+      <div className="absolute top-0 right-0 w-80 h-80 bg-primary/20 rounded-full blur-[120px] -mr-40 -mt-40 pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/10 rounded-full blur-[100px] -ml-32 -mb-32 pointer-events-none" />
 
       {/* Brand Header */}
-      <div className="relative flex items-center justify-between px-6 py-8 border-b border-white/5">
-        <Link href="/admin" className="flex items-center gap-3 group">
-          <div className="w-10 h-10 bg-gradient-gold rounded-xl flex items-center justify-center shadow-lg shadow-primary/20 transition-transform group-hover:scale-110">
-            <ShieldCheck className="text-white" size={24} />
+      <div className="relative flex items-center justify-between px-6 py-10 border-b border-white/5">
+        <Link href="/admin" className="flex items-center gap-4 group">
+          <div className="w-12 h-12 bg-gradient-to-br from-amber-400 via-gold to-primary rounded-2xl flex items-center justify-center shadow-2xl shadow-primary/40 transition-all duration-500 group-hover:scale-110 group-hover:rotate-6">
+            <ShieldCheck className="text-white" size={28} />
           </div>
           <div>
-            <h2 className="text-sm font-black tracking-tight uppercase">{isRTL ? 'د. أحمد عبد اللطيف' : 'Dr. Ahmed'}</h2>
-            <p className="text-[9px] text-white/40 uppercase tracking-[0.2em] font-black">{isRTL ? 'لوحة تحكم الإدارة' : 'Admin Console'}</p>
+            <h2 className="text-sm font-black tracking-tight uppercase leading-tight">{isRTL ? 'د. أحمد عبد اللطيف' : 'Dr. Ahmed'}</h2>
+            <p className="text-[10px] text-white/40 uppercase tracking-[0.2em] font-black mt-1">{isRTL ? 'لوحة تحكم الإدارة' : 'Admin Console'}</p>
           </div>
         </Link>
-        <button onClick={onClose} className="lg:hidden text-white/60 hover:text-white transition-colors">
+        <button onClick={onClose} className="lg:hidden p-2 rounded-xl bg-white/5 text-white/60 hover:text-white transition-all">
           <X size={20} />
         </button>
       </div>
 
       {/* Navigation */}
-      <nav className="relative flex-1 px-4 py-6 space-y-8 overflow-y-auto custom-scrollbar scrollbar-hide">
+      <nav className="relative flex-1 px-4 py-8 space-y-10 overflow-y-auto custom-scrollbar scrollbar-hide">
         {navSections.map((section, idx) => (
-          <div key={idx} className="space-y-2">
-            <h3 className="px-4 text-[9px] font-black uppercase tracking-[0.25em] text-white/25">
-               {isRTL ? (idx === 0 ? 'الرئيسية' : idx === 1 ? 'المحتوى' : idx === 2 ? 'التفاعل' : 'النظام') : section.title}
-            </h3>
-            <div className="space-y-1">
+          <div key={idx} className="space-y-4">
+            <div className="px-4 flex items-center gap-3">
+              <div className="h-[1px] flex-1 bg-white/10" />
+              <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 whitespace-nowrap">
+                 {isRTL ? (idx === 0 ? 'الرئيسية' : idx === 1 ? 'المحتوى' : idx === 2 ? 'التفاعل' : 'النظام') : section.title}
+              </h3>
+              <div className="h-[1px] flex-1 bg-white/10" />
+            </div>
+            <div className="space-y-1.5">
               {section.items.map((item: any) => (
                 <Link
                   key={item.href}
                   href={item.href as any}
                   className={cn(
-                    "group flex items-center justify-between px-4 py-3 rounded-xl text-xs font-bold transition-all duration-300",
+                    "group flex items-center justify-between px-4 py-3.5 rounded-2xl text-xs font-bold transition-all duration-500",
                     isActive(item.href) 
-                      ? "bg-gradient-to-r from-primary/40 to-primary/20 text-white shadow-xl border border-white/10" 
-                      : "text-white/50 hover:bg-white/5 hover:text-white"
+                      ? "bg-gradient-to-r from-primary/30 to-primary/10 text-white shadow-2xl shadow-black/20 border border-white/10" 
+                      : "text-white/40 hover:bg-white/5 hover:text-white"
                   )}
                   onClick={() => { if (window.innerWidth < 1024) onClose(); }}
                 >
-                  <div className="flex items-center gap-3">
-                    <item.icon size={18} className={cn(
-                      "transition-all duration-300",
-                      isActive(item.href) ? "text-primary-light scale-110" : "text-white/30 group-hover:text-white/60"
-                    )} />
-                    <span>{item.labelKey === 'live_editor'
+                  <div className="flex items-center gap-4">
+                    <div className={cn(
+                      "w-8 h-8 rounded-xl flex items-center justify-center transition-all duration-500",
+                      isActive(item.href) ? "bg-primary text-white scale-110 shadow-lg shadow-primary/30" : "bg-white/5 text-white/20 group-hover:bg-white/10 group-hover:text-white/60"
+                    )}>
+                      <item.icon size={16} />
+                    </div>
+                    <span className="tracking-wide">{item.labelKey === 'live_editor'
                       ? (isRTL ? 'محرر الموقع' : 'Live Editor')
                       : item.labelKey === 'clinics'
                       ? (isRTL ? 'العيادات' : 'Clinics')
@@ -121,7 +128,7 @@ export function AdminSidebar({ open, onClose }: { open: boolean; onClose: () => 
                   {isActive(item.href) && (
                     <motion.div 
                       layoutId="active-indicator" 
-                      className="w-1.5 h-1.5 rounded-full bg-primary-light shadow-[0_0_8px_var(--primary-light)]" 
+                      className="w-1.5 h-1.5 rounded-full bg-primary-light shadow-[0_0_10px_var(--primary-light)]" 
                     />
                   )}
                 </Link>
@@ -132,22 +139,23 @@ export function AdminSidebar({ open, onClose }: { open: boolean; onClose: () => 
       </nav>
 
       {/* User Footer */}
-      <div className="relative p-4 mt-auto border-t border-white/5 bg-black/20 backdrop-blur-xl">
-        <div className="flex items-center gap-3 px-3 py-3 mb-2 rounded-2xl bg-white/5 border border-white/5">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-light/30 to-primary/30 flex items-center justify-center text-sm font-black border border-white/10">
+      <div className="relative p-6 mt-auto border-t border-white/5 bg-black/40 backdrop-blur-3xl">
+        <div className="flex items-center gap-4 px-4 py-4 mb-4 rounded-[2rem] bg-white/5 border border-white/10 group transition-all hover:bg-white/10 cursor-pointer">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary/40 to-blue-500/40 flex items-center justify-center text-base font-black border border-white/10 shadow-lg group-hover:scale-105 transition-transform">
             {user?.name?.charAt(0) || 'A'}
           </div>
           <div className="flex-1 overflow-hidden">
-            <p className="text-xs font-black truncate text-white">{user?.name}</p>
-            <p className="text-[9px] text-white/40 truncate font-bold uppercase tracking-wider">{user?.role || 'Admin'}</p>
+            <p className="text-xs font-black truncate text-white tracking-tight">{user?.name}</p>
+            <p className="text-[10px] text-white/40 truncate font-black uppercase tracking-widest mt-0.5">{user?.role || 'Administrator'}</p>
           </div>
+          <ChevronRight size={14} className="text-white/20 group-hover:text-white transition-colors" />
         </div>
         <button 
           onClick={logout} 
-          className="group flex w-full items-center gap-3 rounded-xl px-4 py-3 text-xs text-red-400 font-black transition-all hover:bg-red-500/10 hover:text-red-300 border border-transparent hover:border-red-500/10"
+          className="group flex w-full items-center justify-center gap-3 rounded-2xl px-4 py-4 text-xs text-red-400 font-black transition-all hover:bg-red-500/10 hover:text-red-300 border border-red-500/5 hover:border-red-500/20"
         >
           <LogOut size={16} className="transition-transform group-hover:-translate-x-1" /> 
-          <span>{t('logout')}</span>
+          <span className="uppercase tracking-widest">{t('logout')}</span>
         </button>
       </div>
     </div>
