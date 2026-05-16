@@ -14,6 +14,8 @@ import { TestimonialsSection } from '@/components/sections/testimonials-section'
 import { BookingCTASection } from '@/components/sections/booking-cta-section';
 import { BookingForm } from '@/components/sections/booking-form';
 
+import { Stethoscope, Zap, ShieldCheck, Headphones } from 'lucide-react';
+
 export async function generateMetadata({
   params,
 }: {
@@ -38,6 +40,18 @@ export async function generateMetadata({
 export default async function HomePage() {
   const locale = await getLocale();
   const isAr = locale === 'ar';
+
+  const bookingFeatures = isAr ? [
+    { icon: Stethoscope, text: 'كشف وتشخيص دقيق بأحدث الأجهزة' },
+    { icon: Zap, text: 'تقنيات ليزر متقدمة بدون جراحة تقليدية' },
+    { icon: ShieldCheck, text: 'خبرة +15 سنة في جراحة المسالك البولية' },
+    { icon: Headphones, text: 'متابعة ما بعد العلاج حتى الشفاء الكامل' },
+  ] : [
+    { icon: Stethoscope, text: 'Accurate examination and diagnosis with modern equipment' },
+    { icon: Zap, text: 'Advanced laser techniques without traditional surgery' },
+    { icon: ShieldCheck, text: '+15 years experience in urological surgeries' },
+    { icon: Headphones, text: 'Post-treatment follow-up until complete recovery' },
+  ];
 
   return (
     <>
@@ -85,23 +99,16 @@ export default async function HomePage() {
                   {isAr ? 'فريقنا الطبي المتخصص جاهز للإجابة على استفساراتك وحجز موعدك في أقرب وقت ممكن.' : 'Our specialized medical team is ready to answer your inquiries and schedule your appointment as soon as possible.'}
                 </p>
 
-                <div className="space-y-5">
-                  {(isAr ? [
-                    { icon: '🩺', text: 'كشف وتشخيص دقيق بأحدث الأجهزة' },
-                    { icon: '⚡', text: 'تقنيات ليزر متقدمة بدون جراحة تقليدية' },
-                    { icon: '🌟', text: 'خبرة +15 سنة في جراحة المسالك البولية' },
-                    { icon: '📞', text: 'متابعة ما بعد العلاج حتى الشفاء الكامل' },
-                  ] : [
-                    { icon: '🩺', text: 'Accurate examination and diagnosis with modern equipment' },
-                    { icon: '⚡', text: 'Advanced laser techniques without traditional surgery' },
-                    { icon: '🌟', text: '+15 years experience in urological surgeries' },
-                    { icon: '📞', text: 'Post-treatment follow-up until complete recovery' },
-                  ]).map((item, i) => (
-                    <div key={i} className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-lg flex-shrink-0">
-                        {item.icon}
+                <div className="space-y-6">
+                  {bookingFeatures.map((item, i) => (
+                    <div 
+                      key={i} 
+                      className="flex items-center gap-4 group"
+                    >
+                      <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-[var(--accent)] flex-shrink-0 group-hover:bg-[var(--primary)]/20 group-hover:border-[var(--primary)]/30 transition-all duration-300">
+                        <item.icon size={22} className="group-hover:scale-110 transition-transform duration-300" />
                       </div>
-                      <span className="text-white/70 text-sm font-medium">{item.text}</span>
+                      <span className="text-white/80 text-base font-bold group-hover:text-white transition-colors duration-300">{item.text}</span>
                     </div>
                   ))}
                 </div>
