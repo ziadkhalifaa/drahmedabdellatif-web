@@ -26,6 +26,8 @@ export default function AdminHeroSlidesPage() {
   const { token } = useAuth();
   const locale = useLocale();
   const [slides, setSlides] = useState<HeroSlide[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<HeroSlide | null>(null);
   const [showPicker, setShowPicker] = useState(false);
@@ -37,7 +39,13 @@ export default function AdminHeroSlidesPage() {
   });
 
   const fetchSlides = () => {
-    if (token) api.get<HeroSlide[]>('/hero-slides/admin', token).then(setSlides).catch(() => {});
+    if (!token) return;
+    setLoading(true);
+    setError(false);
+    api.get<HeroSlide[]>('/hero-slides/admin', token)
+      .then(setSlides)
+      .catch(() => setError(true))
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => { fetchSlides(); }, [token]);
@@ -199,6 +207,17 @@ export default function AdminHeroSlidesPage() {
         }}
       />
 
+      {loading ? (
+        <div className="flex flex-col items-center justify-center py-20 text-[var(--muted)]">
+          <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4" />
+          <p className="font-bold">Loading slides...</p>
+        </div>
+      ) : error ? (
+        <div className="flex flex-col items-center justify-center py-20 text-red-500 bg-red-50 dark:bg-red-900/10 rounded-2xl border border-red-100 dark:border-red-900/30">
+          <p className="font-bold">Failed to load data</p>
+          <Button variant="outline" onClick={fetchSlides} className="mt-4">Retry Now</Button>
+        </div>
+      ) : (
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {slides.map((slide) => (
           <Card key={slide.id} className={cn("overflow-hidden border-2 transition-all group", slide.isActive ? "border-transparent" : "border-red-100 opacity-75")}>
@@ -236,6 +255,7 @@ export default function AdminHeroSlidesPage() {
           </Card>
         ))}
       </div>
+      )}
     </div>
   );
 }

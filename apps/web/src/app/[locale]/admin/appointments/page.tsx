@@ -14,9 +14,17 @@ export default function AdminAppointmentsPage() {
   const { token } = useAuth();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [dateFilter, setDateFilter] = useState<string>('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   const fetchAppointments = () => {
-    if (token) api.get<Appointment[]>('/appointments', token).then(setAppointments).catch(() => {});
+    if (!token) return;
+    setLoading(true);
+    setError(false);
+    api.get<Appointment[]>('/appointments', token)
+      .then(setAppointments)
+      .catch(() => setError(true))
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => { fetchAppointments(); }, [token]);
@@ -83,6 +91,17 @@ export default function AdminAppointmentsPage() {
         </div>
       </div>
 
+      {loading ? (
+        <div className="flex flex-col items-center justify-center py-20 text-[var(--muted)]">
+          <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4" />
+          <p className="font-bold">Loading appointments...</p>
+        </div>
+      ) : error ? (
+        <div className="flex flex-col items-center justify-center py-20 text-red-500 bg-red-50 dark:bg-red-900/10 rounded-2xl border border-red-100 dark:border-red-900/30">
+          <p className="font-bold">Failed to load data</p>
+          <Button variant="outline" onClick={fetchAppointments} className="mt-4">Retry Now</Button>
+        </div>
+      ) : (
       <Card>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -141,6 +160,7 @@ export default function AdminAppointmentsPage() {
           </table>
         </div>
       </Card>
+      )}
     </div>
   );
 }

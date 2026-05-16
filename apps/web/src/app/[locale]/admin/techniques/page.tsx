@@ -31,6 +31,8 @@ export default function AdminTechniquesPage() {
   const { token } = useAuth();
   const locale = useLocale();
   const [techniques, setTechniques] = useState<Technique[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<Technique | null>(null);
   const [showPicker, setShowPicker] = useState(false);
@@ -45,7 +47,13 @@ export default function AdminTechniquesPage() {
   });
 
   const fetchTechniques = () => {
-    if (token) api.get<Technique[]>('/techniques/admin', token).then(setTechniques).catch(() => {});
+    if (!token) return;
+    setLoading(true);
+    setError(false);
+    api.get<Technique[]>('/techniques/admin', token)
+      .then(setTechniques)
+      .catch(() => setError(true))
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => { fetchTechniques(); }, [token]);
@@ -235,6 +243,17 @@ export default function AdminTechniquesPage() {
         }}
       />
 
+      {loading ? (
+        <div className="flex flex-col items-center justify-center py-20 text-[var(--muted)]">
+          <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4" />
+          <p className="font-bold">Loading techniques...</p>
+        </div>
+      ) : error ? (
+        <div className="flex flex-col items-center justify-center py-20 text-red-500 bg-red-50 dark:bg-red-900/10 rounded-2xl border border-red-100 dark:border-red-900/30">
+          <p className="font-bold">Failed to load data</p>
+          <Button variant="outline" onClick={fetchTechniques} className="mt-4">Retry Now</Button>
+        </div>
+      ) : (
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {techniques.map((technique) => (
           <Card key={technique.id} className={cn("p-5 relative transition-all group", technique.isActive ? "" : "opacity-60 bg-gray-50 dark:bg-gray-900")}>
@@ -266,6 +285,7 @@ export default function AdminTechniquesPage() {
           </Card>
         ))}
       </div>
+      )}
     </div>
   );
 }

@@ -15,6 +15,8 @@ export default function AdminServicesPage() {
   const { token } = useAuth();
   const locale = useLocale();
   const [services, setServices] = useState<Service[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<Service | null>(null);
   const [showPicker, setShowPicker] = useState(false);
@@ -28,7 +30,13 @@ export default function AdminServicesPage() {
 
 
   const fetchServices = () => {
-    if (token) api.get<Service[]>('/services/all', token).then(setServices).catch(() => {});
+    if (!token) return;
+    setLoading(true);
+    setError(false);
+    api.get<Service[]>('/services/all', token)
+      .then(setServices)
+      .catch(() => setError(true))
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => { fetchServices(); }, [token]);
@@ -191,6 +199,17 @@ export default function AdminServicesPage() {
         }}
       />
 
+      {loading ? (
+        <div className="flex flex-col items-center justify-center py-20 text-[var(--muted)]">
+          <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4" />
+          <p className="font-bold">Loading services...</p>
+        </div>
+      ) : error ? (
+        <div className="flex flex-col items-center justify-center py-20 text-red-500 bg-red-50 dark:bg-red-900/10 rounded-2xl border border-red-100 dark:border-red-900/30">
+          <p className="font-bold">Failed to load data</p>
+          <Button variant="outline" onClick={fetchServices} className="mt-4">Retry Now</Button>
+        </div>
+      ) : (
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {services.map((service) => (
           <Card key={service.id} className="p-0 overflow-hidden group hover:border-[var(--primary)] transition-all">
@@ -233,6 +252,7 @@ export default function AdminServicesPage() {
           </Card>
         ))}
       </div>
+      )}
     </div>
   );
 }

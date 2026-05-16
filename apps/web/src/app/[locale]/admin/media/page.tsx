@@ -14,6 +14,8 @@ import { cn } from '@/lib/utils';
 export default function AdminMediaPage() {
   const { token } = useAuth();
   const [items, setItems] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<any | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -26,7 +28,13 @@ export default function AdminMediaPage() {
   });
 
   const fetchItems = () => {
-    if (token) api.get<any[]>('/media/all', token).then(setItems).catch(() => {});
+    if (!token) return;
+    setLoading(true);
+    setError(false);
+    api.get<any[]>('/media/all', token)
+      .then(setItems)
+      .catch(() => setError(true))
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => { fetchItems(); }, [token]);
@@ -237,6 +245,17 @@ export default function AdminMediaPage() {
         </Card>
       )}
 
+      {loading ? (
+        <div className="flex flex-col items-center justify-center py-20 text-[var(--muted)]">
+          <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4" />
+          <p className="font-bold">Loading media items...</p>
+        </div>
+      ) : error ? (
+        <div className="flex flex-col items-center justify-center py-20 text-red-500 bg-red-50 dark:bg-red-900/10 rounded-2xl border border-red-100 dark:border-red-900/30">
+          <p className="font-bold">Failed to load data</p>
+          <Button variant="outline" onClick={fetchItems} className="mt-4">Retry Now</Button>
+        </div>
+      ) : (
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {items.map((item) => (
           <Card key={item.id} className="p-0 group overflow-hidden border-none shadow-lg hover:shadow-2xl transition-all duration-500 bg-white dark:bg-[#0f172a]">
@@ -285,9 +304,10 @@ export default function AdminMediaPage() {
                 <p className="font-bold text-lg text-[var(--muted)]">No media assets found</p>
                 <p className="text-sm text-[var(--muted)] opacity-60">Start by uploading your first image or video.</p>
               </div>
-           </div>
-        )}
+            </div>
+         )}
       </div>
+      )}
     </div>
   );
 }
