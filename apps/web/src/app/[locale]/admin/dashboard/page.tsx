@@ -61,7 +61,7 @@ export default function AdminDashboardPage() {
       icon: CalendarDays, 
       label: t('appointments'), 
       value: stats?.overview?.appointments?.total ?? 0, 
-      sub: `${stats?.overview?.appointments?.pending ?? 0} pending`, 
+      sub: `${stats?.overview?.appointments?.pending ?? 0} ${t('pending')}`, 
       color: 'text-blue-500',
       bg: 'bg-blue-500/10'
     },
@@ -69,7 +69,7 @@ export default function AdminDashboardPage() {
       icon: MessageSquare, 
       label: t('messages'), 
       value: stats?.overview?.messages?.total ?? 0, 
-      sub: `${stats?.overview?.messages?.unread ?? 0} unread`, 
+      sub: `${stats?.overview?.messages?.unread ?? 0} ${t('unread')}`, 
       color: 'text-purple-500',
       bg: 'bg-purple-500/10'
     },
@@ -77,7 +77,7 @@ export default function AdminDashboardPage() {
       icon: FileText, 
       label: t('blog'), 
       value: stats?.overview?.blog?.total ?? 0, 
-      sub: `${stats?.overview?.blog?.published ?? 0} published`, 
+      sub: `${stats?.overview?.blog?.published ?? 0} ${t('published')}`, 
       color: 'text-emerald-500',
       bg: 'bg-emerald-500/10'
     },
@@ -85,7 +85,7 @@ export default function AdminDashboardPage() {
       icon: Star, 
       label: t('testimonials'), 
       value: stats?.overview?.testimonials?.total ?? 0, 
-      sub: `${stats?.overview?.testimonials?.approved ?? 0} approved`, 
+      sub: `${stats?.overview?.testimonials?.approved ?? 0} ${t('approved')}`, 
       color: 'text-amber-500',
       bg: 'bg-amber-500/10'
     },
@@ -119,7 +119,7 @@ export default function AdminDashboardPage() {
           <div className="flex items-center gap-2 mt-2">
             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             <p className="text-xs font-bold text-[var(--muted)] uppercase tracking-widest opacity-70">
-              System Live & Healthy
+              {t('system_status')}
             </p>
           </div>
         </div>
@@ -131,7 +131,7 @@ export default function AdminDashboardPage() {
           )}
           <Button variant="outline" size="sm" onClick={handleExport} className="gap-2 h-11 px-5 rounded-xl bg-white/50 dark:bg-white/5 backdrop-blur-md border-white/20 hover:bg-primary hover:text-white hover:border-primary transition-all duration-300 group" disabled={loading || error}>
             <Download size={16} className="group-hover:scale-110 transition-transform" /> 
-            <span className="text-[10px] font-black uppercase tracking-widest">Export Summary</span>
+            <span className="text-[10px] font-black uppercase tracking-widest">{t('export_summary')}</span>
           </Button>
         </div>
       </div>
@@ -196,9 +196,9 @@ export default function AdminDashboardPage() {
                     <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
                       <TrendingUp size={20} />
                     </div>
-                    Appointment Trends
+                    {t('appointment_trends')}
                   </h3>
-                  <p className="text-xs font-bold text-[var(--muted)] mt-1 ml-13">Monthly consultation performance</p>
+                  <p className="text-xs font-bold text-[var(--muted)] mt-1 ml-13">{t('monthly_performance')}</p>
                 </div>
                 <div className="flex gap-2 bg-black/5 dark:bg-white/5 p-1 rounded-xl">
                    {['Week', 'Month', 'Year'].map((period) => (
@@ -265,17 +265,17 @@ export default function AdminDashboardPage() {
                   <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-500">
                     <Clock size={20} />
                   </div>
-                  Incoming Queue
+                  {t('incoming_queue')}
                 </h3>
-                <Button variant="ghost" size="sm" className="text-[10px] font-black uppercase tracking-[0.2em] hover:bg-primary/10 hover:text-primary transition-all">Explore All</Button>
+                <Button variant="ghost" size="sm" className="text-[10px] font-black uppercase tracking-[0.2em] hover:bg-primary/10 hover:text-primary transition-all">{t('explore_all')}</Button>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-left">
                   <thead>
                     <tr className="text-[10px] font-black uppercase tracking-[0.25em] text-[var(--muted)] bg-white/20 dark:bg-white/5">
-                      <th className="px-8 py-5">Patient Identity</th>
-                      <th className="px-8 py-5">Schedule</th>
-                      <th className="px-8 py-5 text-right">Verification</th>
+                      <th className="px-8 py-5">{t('patient_identity')}</th>
+                      <th className="px-8 py-5">{t('schedule')}</th>
+                      <th className="px-8 py-5 text-right">{t('verification')}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/10">
@@ -321,7 +321,7 @@ export default function AdminDashboardPage() {
            <Card className="p-8 bg-white/60 dark:bg-white/5 backdrop-blur-xl border-white/20 rounded-[2.5rem] shadow-2xl shadow-black/5">
               <h3 className="font-black text-sm flex items-center gap-2 mb-8 uppercase tracking-widest">
                 <Activity size={16} className="text-emerald-500" />
-                Live Pulse
+                {t('live_pulse')}
               </h3>
               <div className="h-48 w-full">
                 <ResponsiveContainer width="100%" height="100%">
@@ -332,7 +332,7 @@ export default function AdminDashboardPage() {
                 </ResponsiveContainer>
               </div>
               <div className="mt-6 pt-6 border-t border-white/10">
-                 <p className="text-[10px] font-black text-[var(--muted)] uppercase tracking-[0.2em] mb-2 text-center">System Reliability</p>
+                 <p className="text-[10px] font-black text-[var(--muted)] uppercase tracking-[0.2em] mb-2 text-center">{t('system_reliability')}</p>
                  <div className="w-full h-1.5 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
                     <motion.div 
                       initial={{ width: 0 }}
@@ -349,7 +349,7 @@ export default function AdminDashboardPage() {
               <div className="flex items-center justify-between mb-8">
                 <h3 className="font-black text-sm uppercase tracking-widest flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-primary animate-ping" />
-                  Realtime Log
+                  {t('realtime_log')}
                 </h3>
               </div>
               <div className="space-y-8">

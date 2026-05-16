@@ -471,6 +471,22 @@
     "patients": "Patients Management",
     "working_hours": "Working Hours",
     "settings": "General Settings",
-    "logout": "Logout"
+    "logout": "Logout",
+    "system_status": "System Live & Healthy",
+    "pending": "Pending",
+    "unread": "Unread",
+    "published": "Published",
+    "approved": "Approved",
+    "appointment_trends": "Appointment Trends",
+    "monthly_performance": "Monthly consultation performance",
+    "incoming_queue": "Incoming Queue",
+    "explore_all": "Explore All",
+    "export_summary": "Export Summary",
+    "live_pulse": "Live Pulse",
+    "system_reliability": "System Reliability",
+    "realtime_log": "Realtime Log",
+    "patient_identity": "Patient Identity",
+    "schedule": "Schedule",
+    "verification": "Verification"
   }
 }

@@ -471,6 +471,22 @@
     "patients": "إدارة المرضى",
     "working_hours": "أوقات العمل",
     "settings": "إعدادات المنصة",
-    "logout": "تسجيل الخروج"
+    "logout": "تسجيل الخروج",
+    "system_status": "النظام نشط ومستقر",
+    "pending": "قيد الانتظار",
+    "unread": "غير مقروءة",
+    "published": "منشور",
+    "approved": "مقبول",
+    "appointment_trends": "مؤشرات المواعيد والزيارات",
+    "monthly_performance": "تحليل الأداء الشهري للاستشارات",
+    "incoming_queue": "المواعيد الواردة للعيادات",
+    "explore_all": "عرض الكل",
+    "export_summary": "تصدير التقرير",
+    "live_pulse": "مؤشر النشاط المباشر",
+    "system_reliability": "اعتمادية وثبات النظام",
+    "realtime_log": "سجل الأحداث الفوري",
+    "patient_identity": "هوية المريض",
+    "schedule": "التوقيت والجدولة",
+    "verification": "الحالة والتوثيق"
   }
 }
