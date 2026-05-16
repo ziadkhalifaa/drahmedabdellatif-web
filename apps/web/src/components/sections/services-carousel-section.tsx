@@ -4,16 +4,16 @@ import { motion } from 'framer-motion';
 import useEmblaCarousel from 'embla-carousel-react';
 import Autoplay from 'embla-carousel-autoplay';
 import { useCallback, useEffect, useState } from 'react';
-import { ChevronRight, ChevronLeft } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Sparkles } from 'lucide-react';
 import { Link } from '@/i18n/routing';
-
 import useSWR from 'swr';
 import { api, getMediaUrl } from '@/lib/api';
-import { useLocale, useTranslations } from 'next-intl';
-import { EditableText } from '@/components/editor/editable-components';
+import { useLocale } from 'next-intl';
+import { cn } from '@/lib/utils';
 
 interface Service {
   id: string;
+  slug?: string;
   titleAr: string;
   titleEn: string;
   descriptionAr: string;
@@ -22,25 +22,31 @@ interface Service {
 }
 
 export function ServicesCarouselSection() {
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, direction: 'rtl', align: 'start' }, [Autoplay({ delay: 4000 })]);
-  const [canScrollPrev, setCanScrollPrev] = useState(false);
-  const [canScrollNext, setCanScrollNext] = useState(false);
   const locale = useLocale();
+  const isAr = locale === 'ar';
+
+  const [emblaRef, emblaApi] = useEmblaCarousel(
+    { loop: true, direction: isAr ? 'rtl' : 'ltr', align: 'start' },
+    [Autoplay({ delay: 4500, stopOnInteraction: false })]
+  );
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [scrollSnaps, setScrollSnaps] = useState<number[]>([]);
 
   const { data: servicesData, isLoading } = useSWR<Service[]>('/services', api.get);
   const services = servicesData && servicesData.length > 0 ? servicesData : [];
 
-  const scrollPrev = useCallback(() => emblaApi && emblaApi.scrollPrev(), [emblaApi]);
-  const scrollNext = useCallback(() => emblaApi && emblaApi.scrollNext(), [emblaApi]);
+  const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
+  const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
+  const scrollTo = useCallback((i: number) => emblaApi?.scrollTo(i), [emblaApi]);
 
   const onSelect = useCallback(() => {
     if (!emblaApi) return;
-    setCanScrollPrev(emblaApi.canScrollPrev());
-    setCanScrollNext(emblaApi.canScrollNext());
+    setSelectedIndex(emblaApi.selectedScrollSnap());
   }, [emblaApi]);
 
   useEffect(() => {
     if (!emblaApi) return;
+    setScrollSnaps(emblaApi.scrollSnapList());
     onSelect();
     emblaApi.on('select', onSelect);
     emblaApi.on('reInit', onSelect);
@@ -53,98 +59,151 @@ export function ServicesCarouselSection() {
   if (services.length === 0) return null;
 
   return (
-    <section className="py-24 bg-white dark:bg-[#0a0a0a] overflow-hidden">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-        
-        <div className="flex flex-col md:flex-row justify-between items-end mb-12">
+    <section className="relative py-28 bg-white dark:bg-[#0a0a0a] overflow-hidden">
+      {/* Subtle background glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-[var(--primary)]/5 rounded-full blur-[120px] pointer-events-none" />
+
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl relative z-10">
+
+        {/* Header row */}
+        <div className={cn(
+          "flex flex-col md:flex-row justify-between items-start md:items-end gap-8 mb-14",
+          isAr ? "text-right" : "text-left"
+        )}>
           <div className="max-w-2xl">
-            <motion.h2 
-              initial={{ opacity: 0, x: 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="text-4xl lg:text-5xl font-extrabold text-[var(--primary-dark)] dark:text-white mb-4"
-            >
-              <EditableText contentKey="home.services.title" defaultAr="الخدمات الطبية المتميزة" defaultEn="Premium Medical Services" />
-            </motion.h2>
-            <motion.div 
-              initial={{ opacity: 0, w: 0 }}
-              whileInView={{ opacity: 1, w: 96 }}
-              viewport={{ once: true }}
-              className="w-24 h-1 bg-[var(--accent)] rounded-full mb-6" 
-            />
-            <div className="text-gray-600 dark:text-gray-300 text-lg">
-              <EditableText 
-                contentKey="home.services.desc" 
-                defaultAr="نقدم مجموعة متكاملة من أحدث الخدمات الطبية المتخصصة في جراحة المسالك البولية للبالغين والأطفال، معتمدين على تقنيات غير جراحية لتحقيق أعلى معدلات النجاح." 
-                defaultEn="We offer a comprehensive range of the latest specialized medical services in urology for adults and children, relying on non-surgical techniques to achieve the highest success rates." 
-              />
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--primary)]/10 text-[var(--primary)] text-xs font-black uppercase tracking-widest mb-5">
+              <Sparkles size={14} />
+              {isAr ? 'تخصصاتنا الطبية' : 'Our Medical Specialties'}
             </div>
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-4xl lg:text-5xl font-black text-[var(--foreground)] mb-4 leading-tight"
+            >
+              {isAr ? 'خدماتنا الطبية المتخصصة' : 'Our Specialized Medical Services'}
+            </motion.h2>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="text-[var(--muted)] text-base leading-relaxed"
+            >
+              {isAr
+                ? 'نقدم مجموعة متكاملة من أحدث الخدمات الطبية المتخصصة في جراحة المسالك البولية للبالغين والأطفال.'
+                : 'We offer a comprehensive range of the latest specialized medical services in urology for adults and children.'}
+            </motion.p>
           </div>
-          
-          <div className="hidden md:flex gap-3 mt-6 md:mt-0">
-            <button 
+
+          {/* Desktop arrows */}
+          <div className="hidden md:flex items-center gap-3 flex-shrink-0">
+            <button
               onClick={scrollPrev}
-              className="w-12 h-12 rounded-full border-2 border-gray-200 dark:border-gray-800 flex items-center justify-center text-gray-500 hover:text-[var(--primary)] hover:border-[var(--primary)] transition-all"
+              className="w-12 h-12 rounded-xl border border-[var(--border)] flex items-center justify-center text-[var(--muted)] hover:text-[var(--primary)] hover:border-[var(--primary)] transition-all duration-200"
             >
-              <ChevronRight size={24} />
+              {isAr ? <ChevronRight size={22} /> : <ChevronLeft size={22} />}
             </button>
-            <button 
+            <button
               onClick={scrollNext}
-              className="w-12 h-12 rounded-full border-2 border-[var(--primary)] bg-[var(--primary)] flex items-center justify-center text-white hover:bg-[var(--primary-dark)] transition-all shadow-md"
+              className="w-12 h-12 rounded-xl bg-[var(--primary)] flex items-center justify-center text-white hover:bg-[var(--primary-dark)] transition-all duration-200 shadow-lg shadow-[var(--primary)]/20"
             >
-              <ChevronLeft size={24} />
+              {isAr ? <ChevronLeft size={22} /> : <ChevronRight size={22} />}
             </button>
           </div>
         </div>
 
-        <motion.div 
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="embla overflow-hidden" 
-          ref={emblaRef}
-        >
-          <div className="embla__container flex -ml-4 rtl:-ml-0 rtl:-mr-4">
-            {services.map((service) => (
-              <div className="embla__slide flex-[0_0_100%] sm:flex-[0_0_50%] lg:flex-[0_0_33.333%] min-w-0 pl-4 rtl:pl-0 rtl:pr-4" key={service.id}>
-                <Link href={`/services/${service.slug || service.id}`} className="block relative group rounded-3xl overflow-hidden h-[400px] shadow-lg bg-gray-100 dark:bg-gray-800">
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent z-10 transition-opacity duration-300 group-hover:from-black/95" />
+        {/* Carousel */}
+        <div className="embla overflow-hidden" ref={emblaRef}>
+          <div className={cn(
+            "embla__container flex",
+            isAr ? "-mr-5" : "-ml-5"
+          )}>
+            {services.map((service, index) => (
+              <div
+                key={service.id}
+                className={cn(
+                  "embla__slide flex-[0_0_100%] sm:flex-[0_0_50%] lg:flex-[0_0_33.333%] min-w-0",
+                  isAr ? "pr-5" : "pl-5"
+                )}
+              >
+                <Link
+                  href={`/services/${service.slug || service.id}`}
+                  className="group block relative rounded-[1.75rem] overflow-hidden h-[420px] shadow-xl border border-[var(--border)] hover:shadow-2xl hover:shadow-[var(--primary)]/10 transition-all duration-500 hover:-translate-y-2"
+                >
+                  {/* Background */}
+                  <div className="absolute inset-0 bg-[var(--card)]" />
                   {service.image && (
-                    <img 
-                      src={getMediaUrl(service.image)} 
-                      alt={locale === 'ar' ? service.titleAr : service.titleEn}
-                      className="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-110"
+                    <img
+                      src={getMediaUrl(service.image)}
+                      alt={isAr ? service.titleAr : service.titleEn}
+                      className="absolute inset-0 w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-110 opacity-60 group-hover:opacity-75"
                     />
                   )}
-                  <div className="absolute inset-0 z-20 flex flex-col justify-end p-8 translate-y-8 group-hover:translate-y-0 transition-transform duration-300">
-                    <h3 className="text-2xl font-bold text-white mb-3">
-                      {locale === 'ar' ? service.titleAr : service.titleEn}
+
+                  {/* Gradient overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-black/10 z-10" />
+
+                  {/* Number */}
+                  <div className="absolute top-5 left-5 z-20 w-9 h-9 rounded-xl bg-[var(--primary)] text-white text-xs font-black flex items-center justify-center shadow-lg">
+                    0{index + 1}
+                  </div>
+
+                  {/* Content */}
+                  <div className={cn(
+                    "absolute inset-0 z-20 flex flex-col justify-end p-7 transition-transform duration-300",
+                    "translate-y-6 group-hover:translate-y-0"
+                  )}>
+                    <h3 className="text-2xl font-black text-white mb-3 leading-tight">
+                      {isAr ? service.titleAr : service.titleEn}
                     </h3>
-                    <p className="text-gray-300 text-sm mb-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100 line-clamp-2">
-                      {locale === 'ar' ? service.descriptionAr : service.descriptionEn}
+                    <p className="text-gray-300 text-sm mb-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-75 line-clamp-2 leading-relaxed">
+                      {isAr ? service.descriptionAr : service.descriptionEn}
                     </p>
-                    <div className="inline-flex items-center text-[var(--accent)] font-semibold group-hover:text-white transition-colors opacity-0 group-hover:opacity-100 duration-300 delay-200">
-                      تفاصيل الخدمة
-                      <ChevronLeft size={16} className="ml-1" />
+                    <div className={cn(
+                      "inline-flex items-center gap-2 text-[var(--accent)] font-black text-sm opacity-0 group-hover:opacity-100 transition-all duration-300 delay-150",
+                      isAr ? "flex-row-reverse" : ""
+                    )}>
+                      {isAr ? 'تفاصيل الخدمة' : 'View Details'}
+                      {isAr ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
                     </div>
+                  </div>
+
+                  {/* Bottom progress bar */}
+                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/10 z-20">
+                    <div className="h-full w-0 group-hover:w-full bg-[var(--accent)] transition-all duration-500" />
                   </div>
                 </Link>
               </div>
             ))}
           </div>
-        </motion.div>
-        
-        {/* Mobile Controls */}
-        <div className="flex md:hidden justify-center gap-4 mt-10">
-          <button onClick={scrollPrev} className="w-12 h-12 rounded-full border-2 border-gray-200 dark:border-gray-800 flex items-center justify-center text-gray-500">
-            <ChevronRight size={24} />
-          </button>
-          <button onClick={scrollNext} className="w-12 h-12 rounded-full border-2 border-[var(--primary)] bg-[var(--primary)] flex items-center justify-center text-white shadow-md">
-            <ChevronLeft size={24} />
-          </button>
         </div>
 
+        {/* Dots + Mobile arrows */}
+        <div className="flex items-center justify-center gap-6 mt-10">
+          <button onClick={scrollPrev} className="md:hidden w-10 h-10 rounded-xl border border-[var(--border)] flex items-center justify-center text-[var(--muted)]">
+            {isAr ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
+          </button>
+
+          <div className="flex gap-2">
+            {scrollSnaps.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => scrollTo(i)}
+                className={cn(
+                  "h-2 rounded-full transition-all duration-300",
+                  i === selectedIndex
+                    ? "w-8 bg-[var(--primary)]"
+                    : "w-2 bg-[var(--border)]"
+                )}
+              />
+            ))}
+          </div>
+
+          <button onClick={scrollNext} className="md:hidden w-10 h-10 rounded-xl bg-[var(--primary)] flex items-center justify-center text-white">
+            {isAr ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
+          </button>
+        </div>
       </div>
     </section>
   );
