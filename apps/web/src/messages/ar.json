@@ -455,5 +455,12 @@
     "draft": "مسودة",
     "published": "منشور",
     "contactUs": "تواصل معنا"
+  },
+  "admin": {
+    "dashboard_overview": "نظرة عامة للوحة التحكم",
+    "appointments": "المواعيد",
+    "messages": "الرسائل",
+    "blog": "المدونة",
+    "testimonials": "التجارب"
   }
 }

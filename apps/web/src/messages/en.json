@@ -455,5 +455,12 @@
     "draft": "Draft",
     "published": "Published",
     "contactUs": "Contact Us"
+  },
+  "admin": {
+    "dashboard_overview": "Dashboard Overview",
+    "appointments": "Appointments",
+    "messages": "Messages",
+    "blog": "Blog",
+    "testimonials": "Testimonials"
   }
 }
