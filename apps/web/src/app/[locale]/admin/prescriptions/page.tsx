@@ -63,7 +63,7 @@ export default function PrescriptionsPage() {
           </p>
         </div>
         
-        <Link href="/admin/prescriptions/new">
+        <Link href="/admin/appointments">
           <Button className="h-12 px-8 rounded-2xl bg-primary hover:bg-primary/90 text-white shadow-xl shadow-primary/20 gap-3 group transition-all duration-500 hover:-translate-y-1">
             <Plus size={20} className="group-hover:rotate-90 transition-transform duration-500" />
             <span className="font-black uppercase tracking-widest text-xs">إضافة روشتة جديدة</span>
