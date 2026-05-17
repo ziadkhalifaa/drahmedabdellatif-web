@@ -29,8 +29,16 @@ export class AuthController {
   }
 
   @Post('verify-email')
-  async verifyEmail(@Body() body: { email: string; code: string }) {
-    return this.authService.verifyEmail(body.email, body.code);
+  async verifyEmail(@Body() body: { email: string; code: string }, @Res({ passthrough: true }) res: Response) {
+    const data = await this.authService.verifyEmail(body.email, body.code);
+    res.cookie('refreshToken', data.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'none',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      path: '/',
+    });
+    return { accessToken: data.accessToken, user: data.user };
   }
 
   @Post('resend-code')
