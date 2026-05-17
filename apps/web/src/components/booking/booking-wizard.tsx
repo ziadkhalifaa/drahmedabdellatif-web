@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useLocale } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
-import { clinicsApi, appointmentsApi, siteSettingsApi } from '@/lib/api';
+import { clinicsApi, appointmentsApi, siteSettingsApi, api } from '@/lib/api';
 import {
   Calendar, Clock, User, Phone, Mail, Building2,
   Video, ChevronRight, ChevronLeft, CreditCard,
@@ -12,6 +12,8 @@ import {
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { AppointmentType } from '@dr-ahmed/shared';
+import { useAuth } from '@/context/auth-context';
+import { useRouter } from '@/i18n/routing';
 
 const steps = [
   { id: 1, nameAr: 'نوع الحجز', nameEn: 'Type' },
@@ -24,6 +26,8 @@ const steps = [
 export default function BookingWizard() {
   const locale = useLocale();
   const isRTL = locale === 'ar';
+  const { user, token, isLoading } = useAuth();
+  const router = useRouter();
   
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -36,6 +40,10 @@ export default function BookingWizard() {
   const [date, setDate] = useState<string>('');
   const [timeSlot, setTimeSlot] = useState<string>('');
   const [patient, setPatient] = useState({ name: '', phone: '', email: '' });
+  const [gender, setGender] = useState<string>('');
+  const [birthDate, setBirthDate] = useState<string>('');
+  const [address, setAddress] = useState<string>('');
+  
   const [paymentMethod, setPaymentMethod] = useState<'VODAFONE_CASH' | 'INSTAPAY' | 'CASH'>('CASH');
   const [senderPhone, setSenderPhone] = useState('');
   const [proofFile, setProofFile] = useState<File | null>(null);
@@ -43,6 +51,7 @@ export default function BookingWizard() {
   // Available Slots
   const [availableSlots, setAvailableSlots] = useState<string[]>([]);
   const [slotsLoading, setSlotsLoading] = useState(false);
+  const [profileLoading, setProfileLoading] = useState(false);
   
   useEffect(() => {
     // Load clinics and settings
@@ -59,6 +68,24 @@ export default function BookingWizard() {
       setPaymentSettings(settings);
     }).catch(console.error);
   }, []);
+
+  useEffect(() => {
+    if (!token) return;
+    setProfileLoading(true);
+    api.get<any>('/auth/profile', token)
+      .then(data => {
+        setPatient({
+          name: data.name || user?.name || '',
+          phone: data.phone || '',
+          email: data.email || user?.email || '',
+        });
+        setGender(data.gender || '');
+        setBirthDate(data.dateOfBirth ? new Date(data.dateOfBirth).toISOString().split('T')[0] : '');
+        setAddress(data.address || '');
+      })
+      .catch(console.error)
+      .finally(() => setProfileLoading(false));
+  }, [token, user]);
   
   useEffect(() => {
     if (!date || !type) return;
@@ -86,6 +113,8 @@ export default function BookingWizard() {
     }
     if (currentStep === 3) {
       if (!patient.name || !patient.phone) return toast.error(isRTL ? 'أدخل الاسم ورقم الهاتف' : 'Enter name and phone');
+      if (!gender) return toast.error(isRTL ? 'الرجاء اختيار النوع' : 'Please select gender');
+      if (!birthDate) return toast.error(isRTL ? 'الرجاء إدخال تاريخ الميلاد' : 'Please enter date of birth');
     }
     if (currentStep === 4) {
       if (paymentMethod !== 'CASH') {
@@ -101,7 +130,18 @@ export default function BookingWizard() {
   const submitBooking = async () => {
     setLoading(true);
     try {
-      // 1. Create Appointment
+      // 1. Sync data to patient profile
+      if (token) {
+        await api.post('/auth/profile', {
+          name: patient.name,
+          phone: patient.phone,
+          gender,
+          dateOfBirth: birthDate,
+          address,
+        }, token);
+      }
+
+      // 2. Create Appointment
       const apt = await appointmentsApi.create({
         type,
         clinicId: type === AppointmentType.IN_CLINIC ? clinicId : undefined,
@@ -110,11 +150,12 @@ export default function BookingWizard() {
         guestName: patient.name,
         guestPhone: patient.phone,
         guestEmail: patient.email || undefined,
+        patientId: user?.id,
         paymentMethod,
         paymentSenderNum: senderPhone || undefined,
       });
       
-      // 2. Upload Proof if manual
+      // 3. Upload Proof if manual
       if (proofFile && paymentMethod !== 'CASH') {
         await appointmentsApi.uploadPaymentProof(apt.id, proofFile, senderPhone);
       }
@@ -132,6 +173,54 @@ export default function BookingWizard() {
   };
 
   const getPrice = () => paymentSettings['payment.price']?.amount || 400;
+
+  if (isLoading) {
+    return (
+      <div className="max-w-3xl mx-auto p-12 bg-[#0b1329] border border-white/15 rounded-3xl backdrop-blur-md text-center text-white space-y-4">
+        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
+        <p className="text-white/60">{isRTL ? 'جاري التحميل...' : 'Loading...'}</p>
+      </div>
+    );
+  }
+
+  if (!token || !user) {
+    return (
+      <div className="max-w-xl mx-auto p-8 sm:p-10 bg-[#0b1329] border border-white/15 rounded-3xl backdrop-blur-md shadow-[0_20px_50px_rgba(0,0,0,0.3)] relative overflow-hidden text-white text-center space-y-8">
+        <div className="absolute top-0 right-0 w-48 h-48 bg-primary/10 blur-[80px] rounded-full pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-blue-500/10 blur-[80px] rounded-full pointer-events-none" />
+        
+        <div className="w-20 h-20 bg-primary/10 border border-primary/20 rounded-full flex items-center justify-center mx-auto shadow-lg shadow-primary/15">
+          <User size={36} className="text-primary" />
+        </div>
+
+        <div className="space-y-3">
+          <h2 className="text-2xl font-black">
+            {isRTL ? 'تسجيل الدخول مطلوب لحجز موعد' : 'Login Required to Book'}
+          </h2>
+          <p className="text-white/60 text-sm leading-relaxed max-w-sm mx-auto">
+            {isRTL 
+              ? 'يرجى تسجيل الدخول أولاً لتتمكن من حجز موعد. تسجيل الدخول يضمن ربط تاريخك الطبي وتسهيل تواصل العيادة معك.' 
+              : 'Please log in first to book an appointment. Logging in ensures your medical history is linked and facilitates clinic communication.'}
+          </p>
+        </div>
+
+        <div className="flex flex-col sm:flex-row gap-4 justify-center pt-2">
+          <button
+            onClick={() => router.push(`/auth/login?redirect=booking`)}
+            className="px-8 py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary-dark transition-all hover:scale-105 shadow-md shadow-primary/20"
+          >
+            {isRTL ? 'تسجيل الدخول' : 'Sign In'}
+          </button>
+          <button
+            onClick={() => router.push(`/auth/register?redirect=booking`)}
+            className="px-8 py-3 bg-white/5 border border-white/10 hover:bg-white/10 text-white rounded-xl font-bold transition-all hover:scale-105"
+          >
+            {isRTL ? 'إنشاء حساب جديد' : 'Register'}
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-3xl mx-auto p-4 sm:p-6 lg:p-8 bg-[#0b1329] border border-white/15 rounded-3xl backdrop-blur-md shadow-[0_20px_50px_rgba(0,0,0,0.3)] relative overflow-hidden text-white">
@@ -324,50 +413,96 @@ export default function BookingWizard() {
               <h2 className="text-2xl font-black text-white text-center">
                 {isRTL ? 'بيانات المريض' : 'Patient Details'}
               </h2>
-              <div className="space-y-4">
-                <div className="space-y-1.5">
-                  <label className="text-sm font-bold text-white/80">{isRTL ? 'الاسم بالكامل *' : 'Full Name *'}</label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-3 text-white/40" size={18} />
+              {profileLoading ? (
+                <div className="py-8 text-center text-white/60 space-y-2">
+                  <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
+                  <p className="text-sm">{isRTL ? 'جاري تحميل بيانات الملف الشخصي...' : 'Loading profile details...'}</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-bold text-white/80">{isRTL ? 'الاسم بالكامل *' : 'Full Name *'}</label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-3 text-white/40" size={18} />
+                      <input
+                        type="text"
+                        value={patient.name}
+                        onChange={e => setPatient({ ...patient, name: e.target.value })}
+                        placeholder={isRTL ? 'اسم المريض الثلاثي' : 'Patient Full Name'}
+                        className="w-full bg-black/40 border border-white/20 rounded-xl pl-10 pr-4 py-2.5 text-white focus:border-primary transition-colors outline-none"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-bold text-white/80">{isRTL ? 'رقم الهاتف (واتساب) *' : 'Phone Number (WhatsApp) *'}</label>
+                    <div className="relative">
+                      <Phone className="absolute left-3 top-3 text-white/40" size={18} />
+                      <input
+                        type="tel"
+                        dir="ltr"
+                        value={patient.phone}
+                        onChange={e => setPatient({ ...patient, phone: e.target.value })}
+                        placeholder="010XXXXXXXX"
+                        className="w-full bg-black/40 border border-white/20 rounded-xl pl-10 pr-4 py-2.5 text-white focus:border-primary transition-colors outline-none text-left"
+                      />
+                    </div>
+                    <p className="text-xs text-primary/80 px-1">{isRTL ? 'سيتم إرسال تأكيد الحجز على الواتساب' : 'Confirmation will be sent via WhatsApp'}</p>
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-bold text-white/80">{isRTL ? 'البريد الإلكتروني (اختياري)' : 'Email (Optional)'}</label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-3 text-white/40" size={18} />
+                      <input
+                        type="email"
+                        dir="ltr"
+                        value={patient.email}
+                        onChange={e => setPatient({ ...patient, email: e.target.value })}
+                        placeholder="email@example.com"
+                        className="w-full bg-black/40 border border-white/20 rounded-xl pl-10 pr-4 py-2.5 text-white focus:border-primary transition-colors outline-none text-left"
+                      />
+                    </div>
+                  </div>
+                  
+                  {/* Gender dropdown */}
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-bold text-white/80">{isRTL ? 'النوع *' : 'Gender *'}</label>
+                    <select
+                      value={gender}
+                      onChange={e => setGender(e.target.value)}
+                      required
+                      className="w-full bg-black/40 border border-white/20 rounded-xl px-4 py-2.5 text-white focus:border-primary transition-colors outline-none appearance-none cursor-pointer"
+                    >
+                      <option value="" className="bg-[#0b1329]">{isRTL ? 'اختر النوع' : 'Select Gender'}</option>
+                      <option value="male" className="bg-[#0b1329]">{isRTL ? 'ذكر' : 'Male'}</option>
+                      <option value="female" className="bg-[#0b1329]">{isRTL ? 'أنثى' : 'Female'}</option>
+                    </select>
+                  </div>
+
+                  {/* Date of Birth input */}
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-bold text-white/80">{isRTL ? 'تاريخ الميلاد *' : 'Date of Birth *'}</label>
+                    <input
+                      type="date"
+                      value={birthDate}
+                      onChange={e => setBirthDate(e.target.value)}
+                      required
+                      className="w-full bg-black/40 border border-white/20 rounded-xl px-4 py-2.5 text-white focus:border-primary transition-colors outline-none [color-scheme:dark]"
+                    />
+                  </div>
+
+                  {/* Address input */}
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-bold text-white/80">{isRTL ? 'العنوان الحالي (اختياري)' : 'Current Address (Optional)'}</label>
                     <input
                       type="text"
-                      value={patient.name}
-                      onChange={e => setPatient({ ...patient, name: e.target.value })}
-                      placeholder={isRTL ? 'اسم المريض الثلاثي' : 'Patient Full Name'}
-                      className="w-full bg-black/40 border border-white/20 rounded-xl pl-10 pr-4 py-2.5 text-white focus:border-primary transition-colors outline-none"
+                      value={address}
+                      onChange={e => setAddress(e.target.value)}
+                      placeholder={isRTL ? 'العنوان بالتفصيل' : 'Detailed Address'}
+                      className="w-full bg-black/40 border border-white/20 rounded-xl px-4 py-2.5 text-white focus:border-primary transition-colors outline-none"
                     />
                   </div>
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-sm font-bold text-white/80">{isRTL ? 'رقم الهاتف (واتساب) *' : 'Phone Number (WhatsApp) *'}</label>
-                  <div className="relative">
-                    <Phone className="absolute left-3 top-3 text-white/40" size={18} />
-                    <input
-                      type="tel"
-                      dir="ltr"
-                      value={patient.phone}
-                      onChange={e => setPatient({ ...patient, phone: e.target.value })}
-                      placeholder="010XXXXXXXX"
-                      className="w-full bg-black/40 border border-white/20 rounded-xl pl-10 pr-4 py-2.5 text-white focus:border-primary transition-colors outline-none text-left"
-                    />
-                  </div>
-                  <p className="text-xs text-primary/80 px-1">{isRTL ? 'سيتم إرسال تأكيد الحجز على الواتساب' : 'Confirmation will be sent via WhatsApp'}</p>
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-sm font-bold text-white/80">{isRTL ? 'البريد الإلكتروني (اختياري)' : 'Email (Optional)'}</label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-3 text-white/40" size={18} />
-                    <input
-                      type="email"
-                      dir="ltr"
-                      value={patient.email}
-                      onChange={e => setPatient({ ...patient, email: e.target.value })}
-                      placeholder="email@example.com"
-                      className="w-full bg-black/40 border border-white/20 rounded-xl pl-10 pr-4 py-2.5 text-white focus:border-primary transition-colors outline-none text-left"
-                    />
-                  </div>
-                </div>
-              </div>
+              )}
             </div>
           )}
 

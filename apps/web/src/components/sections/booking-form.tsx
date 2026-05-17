@@ -9,11 +9,16 @@ import { Calendar, CheckCircle2, AlertCircle, Clock, Phone, Mail, User, FileText
 import { clinicsApi } from '@/lib/api';
 import { TIME_SLOTS } from '@dr-ahmed/shared';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/context/auth-context';
+import { useRouter } from '@/i18n/routing';
+import { toast } from 'sonner';
 
 export function BookingForm() {
   const t = useTranslations('booking.form');
   const locale = useLocale();
   const isAr = locale === 'ar';
+  const { user, token, isLoading } = useAuth();
+  const router = useRouter();
 
   const [form, setForm] = useState({
     patientName: '',
@@ -25,14 +30,34 @@ export function BookingForm() {
     timeSlot: '',
     notes: '',
   });
+  const [gender, setGender] = useState('');
   const [clinics, setClinics] = useState<any[]>([]);
   const [availableSlots, setAvailableSlots] = useState<string[]>([]);
   const [slotsLoading, setSlotsLoading] = useState(false);
+  const [profileLoading, setProfileLoading] = useState(false);
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error' | 'conflict'>('idle');
 
   useEffect(() => {
     clinicsApi.getAll().then(setClinics).catch(console.error);
   }, []);
+
+  useEffect(() => {
+    if (!token) return;
+    setProfileLoading(true);
+    api.get<any>('/auth/profile', token)
+      .then(data => {
+        setForm(prev => ({
+          ...prev,
+          patientName: data.name || user?.name || '',
+          patientPhone: data.phone || '',
+          patientEmail: data.email || user?.email || '',
+          birthDate: data.dateOfBirth ? new Date(data.dateOfBirth).toISOString().split('T')[0] : '',
+        }));
+        setGender(data.gender || '');
+      })
+      .catch(console.error)
+      .finally(() => setProfileLoading(false));
+  }, [token, user]);
 
   useEffect(() => {
     if (!form.date || !form.clinicId) {
@@ -48,14 +73,39 @@ export function BookingForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!token) {
+      toast.error(isAr ? 'الرجاء تسجيل الدخول أولاً' : 'Please log in first');
+      return;
+    }
+    if (!gender) {
+      toast.error(isAr ? 'الرجاء اختيار النوع' : 'Please select gender');
+      return;
+    }
+    if (!form.birthDate) {
+      toast.error(isAr ? 'الرجاء إدخال تاريخ الميلاد' : 'Please enter date of birth');
+      return;
+    }
+
     setStatus('loading');
     try {
+      // 1. Update patient profile in DB
+      await api.post('/auth/profile', {
+        name: form.patientName,
+        phone: form.patientPhone,
+        gender,
+        dateOfBirth: form.birthDate,
+      }, token);
+
+      // 2. Create Appointment
       await api.post('/appointments', {
         ...form,
+        patientId: user?.id,
         type: 'IN_CLINIC' // This simple form is for clinic visits
-      });
+      }, token);
+
       setStatus('success');
       setForm({ patientName: '', patientPhone: '', patientEmail: '', birthDate: '', clinicId: '', date: '', timeSlot: '', notes: '' });
+      setGender('');
     } catch (err: any) {
       if (err.message?.includes('already booked')) setStatus('conflict');
       else setStatus('error');
@@ -106,6 +156,61 @@ export function BookingForm() {
       </div>
     </div>
   );
+
+  if (isLoading) {
+    return (
+      <div className="mx-auto max-w-2xl py-16 text-center text-white space-y-4">
+        <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
+        <p className="text-white/60">{isAr ? 'جاري التحميل...' : 'Loading...'}</p>
+      </div>
+    );
+  }
+
+  if (!token || !user) {
+    return (
+      <motion.div
+        id="booking-form"
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.7 }}
+        className="mx-auto max-w-xl text-center space-y-6 bg-white/5 border border-white/10 rounded-3xl p-8 backdrop-blur-md relative overflow-hidden"
+      >
+        <div className="absolute top-0 right-0 w-48 h-48 bg-primary/10 blur-[80px] rounded-full pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-blue-500/10 blur-[80px] rounded-full pointer-events-none" />
+        
+        <div className="w-16 h-16 bg-primary/10 border border-primary/20 rounded-full flex items-center justify-center mx-auto shadow-lg shadow-primary/15">
+          <User size={28} className="text-primary-light" />
+        </div>
+
+        <div className="space-y-2">
+          <h3 className="text-2xl font-black text-white">
+            {isAr ? 'احجز موعدك الآن' : 'Book Your Appointment Now'}
+          </h3>
+          <p className="text-white/60 text-sm leading-relaxed max-w-sm mx-auto">
+            {isAr 
+              ? 'يرجى تسجيل الدخول أولاً لتتمكن من حجز موعد في العيادة. تسجيل الدخول يضمن حفظ بياناتك الطبية وتأكيد موعدك بأمان.' 
+              : 'Please sign in first to book an appointment at our clinic. Logging in keeps your medical files safe and confirms your booking.'}
+          </p>
+        </div>
+
+        <div className="flex flex-col sm:flex-row gap-4 justify-center pt-2">
+          <button
+            onClick={() => router.push(`/auth/login?redirect=/`)}
+            className="px-8 py-2.5 bg-primary text-white rounded-xl font-bold hover:bg-primary-dark transition-all hover:scale-105 shadow-md shadow-primary/20"
+          >
+            {isAr ? 'تسجيل الدخول' : 'Sign In'}
+          </button>
+          <button
+            onClick={() => router.push(`/auth/register?redirect=/`)}
+            className="px-8 py-2.5 bg-white/5 border border-white/10 hover:bg-white/10 text-white rounded-xl font-bold transition-all hover:scale-105"
+          >
+            {isAr ? 'إنشاء حساب جديد' : 'Register'}
+          </button>
+        </div>
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div
@@ -198,6 +303,27 @@ export function BookingForm() {
             </select>
           )}
 
+          {/* Gender */}
+          {renderField(
+            <User size={16} />,
+            isAr ? 'النوع' : 'Gender',
+            <select
+              value={gender}
+              onChange={(e) => setGender(e.target.value)}
+              required
+              className={cn(
+                "w-full h-12 rounded-xl border border-white/10 bg-white/5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)] text-white transition-colors appearance-none cursor-pointer",
+                isAr ? "pr-11 pl-4 text-right" : "pl-11 pr-4 text-left"
+              )}
+            >
+              <option value="" className="bg-[#050e1a]">{isAr ? 'اختر النوع' : 'Select Gender'}</option>
+              <option value="male" className="bg-[#050e1a]">{isAr ? 'ذكر' : 'Male'}</option>
+              <option value="female" className="bg-[#050e1a]">{isAr ? 'أنثى' : 'Female'}</option>
+            </select>
+          )}
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           {/* Birth Date */}
           {renderField(
             <BabyIcon size={16} />,
@@ -211,6 +337,9 @@ export function BookingForm() {
               className={cn("rounded-xl border-white/10 bg-white/5 text-white focus:border-[var(--primary)] transition-colors [color-scheme:dark] h-12", isAr ? "pr-11" : "pl-11")}
             />
           )}
+          
+          {/* Spacer */}
+          <div className="hidden sm:block"></div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
