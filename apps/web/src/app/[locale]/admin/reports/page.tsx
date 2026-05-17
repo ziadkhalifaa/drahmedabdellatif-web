@@ -126,12 +126,12 @@ export default function AdminReportsPage() {
         <div className="p-6 border-b border-[var(--border)] flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[var(--background)]/50">
           <h2 className="text-lg font-bold flex items-center gap-2">
             <User size={20} className="text-[var(--muted)]" />
-            {t('patientsList', { fallback: 'Patients List' })} ({patients.length})
+            {t('patientsList')} ({patients.length})
           </h2>
           <div className="relative w-full sm:w-80">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted)]" size={16} />
             <Input 
-              placeholder="Search by name, email, or phone..." 
+              placeholder={t('searchPlaceholder')} 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10 rounded-xl bg-[var(--background)]"
@@ -143,9 +143,9 @@ export default function AdminReportsPage() {
           <table className="w-full text-left text-sm whitespace-nowrap">
             <thead className="bg-[var(--background)] border-b border-[var(--border)] uppercase text-[10px] font-black tracking-wider text-[var(--muted)]">
               <tr>
-                <th className="px-6 py-4">Patient Name</th>
-                <th className="px-6 py-4">Contact Info</th>
-                <th className="px-6 py-4 text-right">Actions</th>
+                <th className="px-6 py-4">{t('patientName')}</th>
+                <th className="px-6 py-4">{t('contactInfo')}</th>
+                <th className="px-6 py-4 text-right">{t('actions')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[var(--border)]">
@@ -157,13 +157,13 @@ export default function AdminReportsPage() {
                         <div className="h-10 w-10 rounded-full bg-[var(--primary)]/10 text-[var(--primary)] font-bold flex items-center justify-center">
                           {patient.name?.[0]?.toUpperCase() || 'P'}
                         </div>
-                        <span className="font-bold text-base">{patient.name || 'Unnamed Patient'}</span>
+                        <span className="font-bold text-base">{patient.name || t('unnamedPatient')}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex flex-col">
                         <span className="text-sm font-medium">{patient.email}</span>
-                        <span className="text-xs text-[var(--muted)]">{patient.phone || 'No phone'}</span>
+                        <span className="text-xs text-[var(--muted)]">{patient.phone || t('noPhone')}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4 text-right">
@@ -172,7 +172,7 @@ export default function AdminReportsPage() {
                         className="rounded-xl font-bold bg-gradient-to-r from-[var(--primary)] to-[var(--primary-light)] gap-2 shadow-lg shadow-[var(--primary)]/20 px-6 py-5 text-xs h-auto"
                       >
                         <FileUp size={16} />
-                        Upload Report
+                        {t('uploadReport')}
                       </Button>
                     </td>
                   </tr>
@@ -180,7 +180,7 @@ export default function AdminReportsPage() {
               ) : (
                 <tr>
                   <td colSpan={3} className="px-6 py-16 text-center text-[var(--muted)] text-base font-medium">
-                    No patients found matching &quot;{searchTerm}&quot;
+                    {t('noPatientsFound')} &quot;{searchTerm}&quot;
                   </td>
                 </tr>
               )}
@@ -198,7 +198,7 @@ export default function AdminReportsPage() {
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-2xl font-black flex items-center gap-2">
                     <FileUp className="text-[var(--primary)]" />
-                    Upload Medical Report
+                    {t('uploadMedicalReport')}
                   </h2>
                   <button onClick={() => setIsUploadModalOpen(false)} className="text-[var(--muted)] hover:text-[var(--foreground)]">
                     <X size={24} />
@@ -210,7 +210,7 @@ export default function AdminReportsPage() {
                     {selectedPatient?.name?.[0]?.toUpperCase() || 'P'}
                   </div>
                   <div>
-                    <div className="text-xs text-[var(--muted)] uppercase tracking-widest font-bold">Patient</div>
+                    <div className="text-xs text-[var(--muted)] uppercase tracking-widest font-bold">{t('patient')}</div>
                     <div className="font-bold text-sm leading-tight">{selectedPatient?.name}</div>
                   </div>
                 </div>
@@ -218,28 +218,28 @@ export default function AdminReportsPage() {
               
               <form onSubmit={handleUploadSubmit} className="space-y-5">
                 <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-widest text-[var(--muted)] ml-1">Report Title</label>
+                  <label className="text-xs font-bold uppercase tracking-widest text-[var(--muted)] ml-1">{t('reportTitle')}</label>
                   <Input 
                     required
                     value={uploadData.title}
                     onChange={(e) => setUploadData({ ...uploadData, title: e.target.value })}
-                    placeholder="e.g. Prostate Biopsy Results"
+                    placeholder={t('reportTitlePlaceholder')}
                     className="py-6 rounded-xl font-medium"
                   />
                 </div>
                 
                 <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-widest text-[var(--muted)] ml-1">Description (Optional)</label>
+                  <label className="text-xs font-bold uppercase tracking-widest text-[var(--muted)] ml-1">{t('descriptionOptional')}</label>
                   <textarea 
                     value={uploadData.description}
                     onChange={(e) => setUploadData({ ...uploadData, description: e.target.value })}
-                    placeholder="Additional notes about this report..."
+                    placeholder={t('descriptionPlaceholder')}
                     className="w-full min-h-[100px] p-4 rounded-xl border border-[var(--border)] bg-[var(--background)]/50 focus:ring-2 focus:ring-[var(--primary)]/20 focus:border-[var(--primary)] transition-all resize-y text-sm font-medium outline-none"
                   />
                 </div>
                 
                 <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-widest text-[var(--muted)] ml-1">Select File</label>
+                  <label className="text-xs font-bold uppercase tracking-widest text-[var(--muted)] ml-1">{t('selectFile')}</label>
                   
                   <div className="relative border-2 border-dashed border-[var(--border)] hover:border-[var(--primary)]/50 rounded-2xl p-8 text-center transition-all bg-[var(--background)]/30 group">
                     <input 
@@ -262,8 +262,8 @@ export default function AdminReportsPage() {
                         <div className="p-4 bg-[var(--primary)]/5 text-[var(--primary)] rounded-full group-hover:scale-110 transition-transform">
                           <Upload size={24} />
                         </div>
-                        <div className="font-bold text-sm">Click or drag file to upload</div>
-                        <div className="text-xs text-[var(--muted)]">PDF, JPG, PNG up to 10MB</div>
+                        <div className="font-bold text-sm">{t('clickOrDrag')}</div>
+                        <div className="text-xs text-[var(--muted)]">{t('fileTypesLimit')}</div>
                       </div>
                     )}
                   </div>
@@ -274,7 +274,7 @@ export default function AdminReportsPage() {
                     {tCommon('cancel', { fallback: 'Cancel' })}
                   </Button>
                   <Button type="submit" disabled={uploading || !uploadData.title || !file} className="rounded-xl font-bold px-8 h-12 bg-gradient-to-r from-[var(--primary)] to-[var(--primary-light)] shadow-lg shadow-[var(--primary)]/20">
-                    {uploading ? tCommon('loading', { fallback: 'Uploading...' }) : 'Upload Report'}
+                    {uploading ? tCommon('loading', { fallback: 'Uploading...' }) : t('uploadReport')}
                   </Button>
                 </div>
               </form>
