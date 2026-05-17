@@ -346,7 +346,9 @@
     },
     "verifyEmail": {
       "title": "Verify Your Email",
+      "titleWhatsApp": "Verify Your WhatsApp",
       "subtitle": "We've sent a 6-digit code to your email at {email}",
+      "subtitleWhatsApp": "We've sent a 6-digit code to your WhatsApp at {phone}",
       "submit": "Verify Code",
       "resend": "Resend Code",
       "resendSuccess": "Verification code resent successfully",
@@ -454,7 +456,8 @@
     "rejected": "Rejected",
     "draft": "Draft",
     "published": "Published",
-    "contactUs": "Contact Us"
+    "contactUs": "Contact Us",
+    "verifyWhatsApp": "We sent a verification code to your WhatsApp number"
   },
   "admin": {
     "dashboard_overview": "Dashboard Overview",

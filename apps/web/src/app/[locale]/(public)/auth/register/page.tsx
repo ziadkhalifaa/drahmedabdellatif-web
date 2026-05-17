@@ -228,14 +228,21 @@ export default function RegisterPage() {
               </>
             ) : (
               <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="text-center">
-                <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--primary)]/10 text-[var(--primary)] mb-6">
-                  <Mail size={32} />
+                <div className={cn(
+                  "inline-flex h-16 w-16 items-center justify-center rounded-2xl mb-6", 
+                  method === 'email' 
+                    ? "bg-[var(--primary)]/10 text-[var(--primary)]" 
+                    : "bg-[#25D366]/10 text-[#25D366]"
+                )}>
+                  {method === 'email' ? <Mail size={32} /> : <MessageCircle size={32} />}
                 </div>
-                <h2 className="text-3xl font-black mb-4">{tVerify('title')}</h2>
+                <h2 className="text-3xl font-black mb-4">
+                  {method === 'email' ? tVerify('title') : tVerify('titleWhatsApp')}
+                </h2>
                 <p className="text-[var(--muted)] mb-8 text-sm">
                   {method === 'email' 
                     ? tVerify('subtitle', { email: formData.email })
-                    : (tCommon('verifyWhatsApp') || 'We sent a verification code to your WhatsApp number') + ': ' + formData.phone
+                    : tVerify('subtitleWhatsApp', { phone: formData.phone })
                   }
                 </p>
 
