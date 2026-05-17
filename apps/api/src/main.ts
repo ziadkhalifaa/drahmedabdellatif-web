@@ -14,74 +14,77 @@ import { winstonConfig } from './common/logger/winston.config';
 import { AppModule } from './app.module';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 
-let cachedApp: NestExpressApplication;
+let bootstrapPromise: Promise<any> | null = null;
 
 async function bootstrap() {
-  if (!cachedApp) {
-    cachedApp = await NestFactory.create<NestExpressApplication>(AppModule, {
-      logger: WinstonModule.createLogger(winstonConfig),
-      bufferLogs: true,
-    });
+  if (!bootstrapPromise) {
+    bootstrapPromise = (async () => {
+      const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+        logger: WinstonModule.createLogger(winstonConfig),
+        bufferLogs: true,
+      });
 
-    // Security & Middleware
-    cachedApp.use(helmet({
-      crossOriginResourcePolicy: { policy: "cross-origin" },
-      crossOriginEmbedderPolicy: false,
-    }));
-    
-    cachedApp.setGlobalPrefix('api', {
-      exclude: ['uploads/(.*)'],
-    });
+      // Security & Middleware
+      app.use(helmet({
+        crossOriginResourcePolicy: { policy: "cross-origin" },
+        crossOriginEmbedderPolicy: false,
+      }));
+      
+      app.setGlobalPrefix('api', {
+        exclude: ['uploads/(.*)'],
+      });
 
-    cachedApp.use(cookieParser());
+      app.use(cookieParser());
 
-    const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:3000')
-      .split(',')
-      .map(o => o.trim());
+      const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:3000')
+        .split(',')
+        .map(o => o.trim());
 
-    cachedApp.enableCors({
-      origin: (origin, cb) => {
-        if (!origin) return cb(null, true);
-        const allowed = allowedOrigins.some(o => {
-          if (o === '*' || origin === o) return true;
-          try {
-            return origin.endsWith(`.${new URL(o).hostname}`);
-          } catch (e) {
-            return false;
-          }
-        });
-        allowed ? cb(null, true) : cb(new Error('Not allowed by CORS'));
-      },
-      credentials: true,
-      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-      allowedHeaders: ['Content-Type', 'Authorization', 'x-cron-secret'],
-    });
+      app.enableCors({
+        origin: (origin, cb) => {
+          if (!origin) return cb(null, true);
+          const allowed = allowedOrigins.some(o => {
+            if (o === '*' || origin === o) return true;
+            try {
+              return origin.endsWith(`.${new URL(o).hostname}`);
+            } catch (e) {
+              return false;
+            }
+          });
+          allowed ? cb(null, true) : cb(new Error('Not allowed by CORS'));
+        },
+        credentials: true,
+        methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+        allowedHeaders: ['Content-Type', 'Authorization', 'x-cron-secret'],
+      });
 
-    cachedApp.useGlobalPipes(
-      new ValidationPipe({
-        whitelist: true,
-        forbidNonWhitelisted: true,
-        transform: true,
-      }),
-    );
+      app.useGlobalPipes(
+        new ValidationPipe({
+          whitelist: true,
+          forbidNonWhitelisted: true,
+          transform: true,
+        }),
+      );
 
-    cachedApp.useGlobalFilters(new GlobalExceptionFilter());
+      app.useGlobalFilters(new GlobalExceptionFilter());
 
-    if (process.env.NODE_ENV !== 'production') {
-      const config = new DocumentBuilder()
-        .setTitle('Dr. Ahmed Abdellatif API')
-        .setDescription('API for Dr. Ahmed Abdellatif Medical Platform')
-        .setVersion('1.0')
-        .addBearerAuth()
-        .build();
+      if (process.env.NODE_ENV !== 'production') {
+        const config = new DocumentBuilder()
+          .setTitle('Dr. Ahmed Abdellatif API')
+          .setDescription('API for Dr. Ahmed Abdellatif Medical Platform')
+          .setVersion('1.0')
+          .addBearerAuth()
+          .build();
 
-      const document = SwaggerModule.createDocument(cachedApp, config);
-      SwaggerModule.setup('api/docs', cachedApp, document);
-    }
+        const document = SwaggerModule.createDocument(app, config);
+        SwaggerModule.setup('api/docs', app, document);
+      }
 
-    await cachedApp.init();
+      await app.init();
+      return app.getHttpAdapter().getInstance();
+    })();
   }
-  return cachedApp.getHttpAdapter().getInstance();
+  return bootstrapPromise;
 }
 
 export default async (req: any, res: any) => {
