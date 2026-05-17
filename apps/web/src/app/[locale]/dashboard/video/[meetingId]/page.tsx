@@ -6,30 +6,102 @@ import { Card, Button } from '@/components/ui';
 import { Navbar } from '@/components/layout/navbar';
 import { api } from '@/lib/api';
 import { useAuth } from '@/context/auth-context';
-import { Link } from '@/i18n/routing';
+import { Link, useRouter } from '@/i18n/routing';
 import { Video, Shield, PhoneOff, Play } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export default function VideoRoomPage() {
   const { meetingId } = useParams();
   const t = useTranslations('dashboard.video');
+  const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const { user, token, isLoading } = useAuth();
+  
   const [meetingUrl, setMeetingUrl] = useState<string>(`https://meet.jit.si/${meetingId}`);
+  const [appointment, setAppointment] = useState<any>(null);
+  const [appointmentLoading, setAppointmentLoading] = useState(true);
+  const [endingSession, setEndingSession] = useState(false);
 
   useEffect(() => {
     setMounted(true);
     
     if (token) {
-      api.get<{meetingUrl: string, patient: any}>(`/appointments/by-meeting/${meetingId}`, token)
+      api.get<any>(`/appointments/by-meeting/${meetingId}`, token)
         .then(appt => {
+          setAppointment(appt);
           if (appt.meetingUrl) setMeetingUrl(appt.meetingUrl);
+          setAppointmentLoading(false);
         })
-        .catch(console.error);
+        .catch(err => {
+          console.error(err);
+          setAppointmentLoading(false);
+        });
     }
   }, [meetingId, token]);
 
+  // Polling effect for patients to check if doctor ended the session
+  useEffect(() => {
+    if (!token || !meetingId || user?.role === 'admin' || user?.role === 'editor') return;
+
+    const interval = setInterval(() => {
+      api.get<any>(`/appointments/by-meeting/${meetingId}`, token)
+        .then(appt => {
+          if (appt.status === 'completed') {
+            clearInterval(interval);
+            router.push(`/dashboard?rateAppointmentId=${appt.id}`);
+          }
+        })
+        .catch(console.error);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [meetingId, token, user, router]);
+
   if (!mounted) return null;
+
+  if (appointmentLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-black">
+        <div className="relative w-20 h-20">
+          <div className="absolute inset-0 border-4 border-[var(--primary)]/20 rounded-full" />
+          <div className="absolute inset-0 border-4 border-[var(--primary)] border-t-transparent rounded-full animate-spin" />
+        </div>
+      </div>
+    );
+  }
+
+  if (appointment?.status === 'completed' || appointment?.status === 'cancelled') {
+    return (
+      <>
+        <Navbar />
+        <main className="min-h-screen pt-32 flex items-center justify-center bg-black overflow-hidden relative">
+          <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-20">
+            <div className="absolute top-1/4 left-1/4 w-[50vw] h-[50vw] bg-[var(--primary)]/10 rounded-full blur-[120px]" />
+          </div>
+          
+          <Card className="max-w-md w-full p-10 bg-zinc-900/60 backdrop-blur-2xl border-white/5 rounded-[2.5rem] text-center relative z-10 shadow-2xl">
+            <div className="w-20 h-20 bg-green-500/10 text-green-500 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-inner">
+              <Shield size={40} className="animate-pulse" />
+            </div>
+            
+            <h2 className="text-2xl font-black text-white mb-3">
+              انتهت الجلسة الاستشارية
+            </h2>
+            
+            <p className="text-zinc-400 text-sm mb-8 leading-relaxed font-bold">
+              شكراً لك على ثقتك بنا. لقد تم إنهاء هذه الاستشارة الطبية بنجاح من قبل الطبيب. يمكنك العودة للوحة التحكم الآن.
+            </p>
+            
+            <Link href="/dashboard" className="block w-full">
+              <Button className="w-full h-14 bg-gradient-to-r from-[var(--primary)] to-blue-600 rounded-2xl text-sm font-black shadow-lg shadow-[var(--primary)]/20 hover:-translate-y-0.5 transition-transform text-white">
+                العودة إلى لوحة التحكم
+              </Button>
+            </Link>
+          </Card>
+        </main>
+      </>
+    );
+  }
 
   return (
     <>
@@ -50,12 +122,36 @@ export default function VideoRoomPage() {
              </div>
           </div>
           
-          <Link href="/dashboard">
-            <Button variant="outline" className="border-white/10 text-white hover:bg-white/5 rounded-xl gap-2 bg-transparent">
-               <PhoneOff size={18} className="text-red-500" />
-               {t('leaveRoom')}
-            </Button>
-          </Link>
+          <div className="flex items-center gap-3">
+            {(user?.role === 'admin' || user?.role === 'editor') && (
+              <Button 
+                onClick={async () => {
+                  if (!appointment?.id) return;
+                  setEndingSession(true);
+                  try {
+                    await api.patch(`/appointments/${appointment.id}/status`, { status: 'completed' }, token);
+                    router.push('/dashboard');
+                  } catch (err: any) {
+                    console.error(err);
+                  } finally {
+                    setEndingSession(false);
+                  }
+                }}
+                disabled={endingSession}
+                className="bg-red-600 hover:bg-red-700 text-white rounded-xl gap-2 font-bold h-11 px-4 shadow-lg shadow-red-500/10 active:scale-95 transition-all text-sm border-none"
+              >
+                <PhoneOff size={18} />
+                {endingSession ? 'جاري الإنهاء...' : 'إنهاء الجلسة الاستشارية'}
+              </Button>
+            )}
+            
+            <Link href="/dashboard">
+              <Button variant="outline" className="border-white/10 text-white hover:bg-white/5 rounded-xl gap-2 bg-transparent h-11 px-4 text-sm">
+                 <PhoneOff size={18} className="text-red-500" />
+                 {t('leaveRoom')}
+              </Button>
+            </Link>
+          </div>
         </div>
 
         {/* Video Area + Sidebar Wrapper */}

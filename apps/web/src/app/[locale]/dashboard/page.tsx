@@ -8,18 +8,21 @@ import { Footer } from '@/components/layout/footer';
 import { Link } from '@/i18n/routing';
 import { 
   Calendar, FileText, User as UserIcon, LogOut, Video,
-  Clock, Pill, History, LayoutDashboard, HeartPulse, Activity
+  Clock, Pill, History, LayoutDashboard, HeartPulse, Activity, Star
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
 import { useRouter } from '@/i18n/routing';
+import { useSearchParams } from 'next/navigation';
+import { toast } from 'sonner';
 import { MedicalTimeline } from '@/components/dashboard/medical-timeline';
 import { useAuth } from '@/context/auth-context';
 
 export default function DashboardPage() {
   const t = useTranslations('dashboard');
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user, token, logout, isLoading } = useAuth();
   
   const [appointments, setAppointments] = useState<any[]>([]);
@@ -27,6 +30,19 @@ export default function DashboardPage() {
   const [prescriptions, setPrescriptions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'overview' | 'timeline'>('overview');
+
+  // Rating Modal States
+  const rateAppointmentId = searchParams.get('rateAppointmentId');
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewComment, setReviewComment] = useState('');
+  const [submittingReview, setSubmittingReview] = useState(false);
+
+  useEffect(() => {
+    if (rateAppointmentId) {
+      setShowReviewModal(true);
+    }
+  }, [rateAppointmentId]);
 
   useEffect(() => {
     if (isLoading) return;
@@ -54,6 +70,10 @@ export default function DashboardPage() {
 
     fetchData();
   }, [token, user, isLoading, router]);
+
+  const activeAppointments = appointments.filter((a: any) => 
+    a.status === 'approved' || a.status === 'pending'
+  );
 
   const timelineItems = [
     ...appointments.map(a => ({ id: a.id, type: 'appointment' as const, title: a.service?.titleAr || a.service?.titleEn || t('medicalConsultation'), date: new Date(a.date), status: a.status })),
@@ -200,7 +220,7 @@ export default function DashboardPage() {
                       icon={<Calendar />} 
                       color="blue"
                       label={t('upcoming')} 
-                      value={appointments.filter((a: any) => a?.date && new Date(a.date) >= new Date()).length.toString()} 
+                      value={activeAppointments.length.toString()} 
                     />
                     <StatCard 
                       icon={<FileText />} 
@@ -224,42 +244,54 @@ export default function DashboardPage() {
                       </div>
                       {t('upcomingAppointment')}
                     </h2>
-                    {appointments && appointments.length > 0 ? (
+                    {activeAppointments && activeAppointments.length > 0 ? (
                       <Card className="p-8 bg-white/60 dark:bg-white/5 backdrop-blur-xl border-white/20 rounded-[2.5rem] shadow-xl shadow-black/5 hover:border-[var(--primary)]/30 transition-all duration-500 overflow-hidden relative group">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-[var(--primary)]/5 rounded-full blur-3xl group-hover:bg-[var(--primary)]/10 transition-colors duration-700" />
                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 relative z-10">
                           <div className="flex items-center gap-6">
                             <div className="h-20 w-20 rounded-2xl bg-gradient-to-br from-[var(--primary)]/10 to-[var(--primary)]/5 border border-[var(--primary)]/10 flex flex-col items-center justify-center text-[var(--primary)] shadow-inner">
                               <span className="text-[10px] font-black uppercase tracking-widest">
-                                {appointments[0]?.date ? new Date(appointments[0].date).toLocaleString('en', { month: 'short' }) : '---'}
+                                {activeAppointments[0]?.date ? new Date(activeAppointments[0].date).toLocaleString('en', { month: 'short' }) : '---'}
                               </span>
                               <span className="text-3xl font-black mt-1">
-                                {appointments[0]?.date ? new Date(appointments[0].date).getDate() : '--'}
+                                {activeAppointments[0]?.date ? new Date(activeAppointments[0].date).getDate() : '--'}
                               </span>
                             </div>
                             <div>
                               <h4 className="text-xl font-black text-[var(--foreground)] mb-1">
-                                {appointments[0]?.service?.titleAr || appointments[0]?.service?.titleEn || t('medicalConsultation')}
+                                {activeAppointments[0]?.service?.titleAr || activeAppointments[0]?.service?.titleEn || t('medicalConsultation')}
                               </h4>
                               <p className="text-sm font-bold text-[var(--muted)] flex items-center gap-2">
                                 <Clock size={14} className="text-[var(--primary)]" /> 
-                                {appointments[0]?.time || '--:--'}
+                                {activeAppointments[0]?.timeSlot || activeAppointments[0]?.time || '--:--'}
                                 <span className="mx-2 opacity-30">•</span>
-                                <span className={appointments[0]?.type === 'ONLINE' ? 'text-blue-500' : 'text-emerald-500'}>
-                                  {appointments[0]?.type === 'ONLINE' ? 'Online Video' : 'Clinic Visit'}
+                                <span className={activeAppointments[0]?.type === 'ONLINE' ? 'text-blue-500' : 'text-emerald-500'}>
+                                  {activeAppointments[0]?.type === 'ONLINE' ? 'Online Video' : 'Clinic Visit'}
                                 </span>
                               </p>
                             </div>
                           </div>
                           
                           <div className="flex items-center gap-4">
-                            {appointments[0]?.type === 'ONLINE' && (
-                              <Link href={`/dashboard/video/${appointments[0]?.meetingId || 'room'}`}>
-                                <Button className="h-12 px-6 rounded-xl bg-blue-500 hover:bg-blue-600 text-white gap-2 font-bold shadow-lg shadow-blue-500/20 transition-transform hover:-translate-y-1">
-                                  <Video size={18} />
-                                  {t('joinMeeting')}
-                                </Button>
-                              </Link>
+                            {activeAppointments[0]?.type === 'ONLINE' && (
+                              activeAppointments[0]?.status === 'approved' ? (
+                                <Link href={`/dashboard/video/${activeAppointments[0]?.meetingId || 'room'}`}>
+                                  <Button className="h-12 px-6 rounded-xl bg-blue-500 hover:bg-blue-600 text-white gap-2 font-bold shadow-lg shadow-blue-500/20 transition-transform hover:-translate-y-1">
+                                    <Video size={18} />
+                                    {t('joinMeeting')}
+                                  </Button>
+                                </Link>
+                              ) : (
+                                <div className="px-5 py-3 bg-orange-500/10 text-orange-500 border border-orange-500/20 rounded-2xl text-sm font-black flex items-center gap-2">
+                                  <div className="h-2 w-2 bg-orange-500 rounded-full animate-pulse" />
+                                  {t('appointments.pending') || 'بانتظار تأكيد الدفع'}
+                                </div>
+                              )
+                            )}
+                            {activeAppointments[0]?.type === 'IN_CLINIC' && (
+                              <div className="px-5 py-3 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 rounded-2xl text-sm font-black">
+                                {activeAppointments[0]?.status === 'approved' ? 'موعد عيادة مؤكد' : 'عيادة - بانتظار التأكيد'}
+                              </div>
                             )}
                           </div>
                         </div>
@@ -374,6 +406,116 @@ export default function DashboardPage() {
           </div>
         </div>
       </main>
+
+      {/* Review & Rating Modal */}
+      <AnimatePresence>
+        {showReviewModal && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md"
+          >
+            <motion.div 
+              initial={{ scale: 0.95, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 20 }}
+              className="w-full max-w-lg bg-white dark:bg-zinc-900 border border-white/20 dark:border-white/5 rounded-[2.5rem] shadow-2xl p-8 md:p-10 relative overflow-hidden text-center"
+            >
+              <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[var(--primary)] to-blue-500" />
+              
+              <div className="w-16 h-16 rounded-2xl bg-[var(--primary)]/10 text-[var(--primary)] flex items-center justify-center mx-auto mb-6">
+                <Star size={32} className="fill-current animate-pulse" />
+              </div>
+              
+              <h3 className="text-2xl font-black text-[var(--foreground)] mb-2">
+                كيف كانت استشارتك الطبية؟
+              </h3>
+              <p className="text-[var(--muted)] text-sm mb-6 leading-relaxed">
+                يسعدنا سماع رأيك وتقييمك لمساعدتنا في تقديم أفضل رعاية طبية مستمرة.
+              </p>
+              
+              {/* Stars Selection */}
+              <div className="flex justify-center gap-2 mb-8">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    onClick={() => setReviewRating(star)}
+                    className="text-amber-400 transition-transform active:scale-95 hover:scale-110"
+                  >
+                    <Star 
+                      size={40} 
+                      className={cn(
+                        "transition-colors",
+                        star <= reviewRating ? "fill-amber-400 text-amber-400" : "text-zinc-300 dark:text-zinc-700"
+                      )} 
+                    />
+                  </button>
+                ))}
+              </div>
+              
+              {/* Feedback Input */}
+              <div className="space-y-2 text-right mb-8">
+                <label className="text-xs font-black uppercase tracking-widest text-[var(--muted)] ml-1 block text-right">
+                  اكتب تعليقك (اختياري)
+                </label>
+                <textarea
+                  rows={4}
+                  value={reviewComment}
+                  onChange={(e) => setReviewComment(e.target.value)}
+                  placeholder="اكتب تجربتك مع الدكتور أحمد..."
+                  className="w-full p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)] outline-none transition-all resize-none text-sm font-bold text-[var(--foreground)]"
+                />
+              </div>
+              
+              {/* Action Buttons */}
+              <div className="flex gap-4">
+                <Button 
+                  onClick={async () => {
+                    setSubmittingReview(true);
+                    try {
+                      await api.post(`/appointments/${rateAppointmentId}/review`, {
+                        rating: reviewRating,
+                        comment: reviewComment || undefined
+                      }, token);
+                      toast.success('شكراً لتقييمك! تم إرسال رأيك بنجاح وبانتظار موافقة الإدارة للنشر.');
+                      setShowReviewModal(false);
+                      // Clear search query param cleanly
+                      const url = new URL(window.location.href);
+                      url.searchParams.delete('rateAppointmentId');
+                      window.history.replaceState({}, '', url.pathname + url.search);
+                    } catch (e: any) {
+                      toast.error(e.message || 'فشل إرسال التقييم');
+                    } finally {
+                      setSubmittingReview(false);
+                    }
+                  }}
+                  disabled={submittingReview}
+                  className="flex-1 py-6 text-sm font-black rounded-2xl bg-gradient-to-r from-[var(--primary)] to-blue-600 shadow-lg shadow-[var(--primary)]/25 text-white"
+                >
+                  {submittingReview ? 'جاري الإرسال...' : 'إرسال التقييم'}
+                </Button>
+                
+                <Button 
+                  variant="outline"
+                  onClick={() => {
+                    setShowReviewModal(false);
+                    const url = new URL(window.location.href);
+                    url.searchParams.delete('rateAppointmentId');
+                    window.history.replaceState({}, '', url.pathname + url.search);
+                  }}
+                  disabled={submittingReview}
+                  className="py-6 text-sm font-black rounded-2xl border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-[var(--foreground)] bg-transparent"
+                >
+                  تخطي
+                </Button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <Footer />
     </>
   );

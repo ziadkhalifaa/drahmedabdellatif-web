@@ -132,4 +132,14 @@ export class AppointmentsController {
   async cancel(@Param('id') id: string, @Req() req: any) {
     return this.appointmentsService.updateStatus(id, AppointmentStatus.CANCELLED);
   }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Post(':id/review')
+  async createReview(
+    @Param('id') id: string,
+    @Body() body: { rating: number; comment?: string },
+    @Req() req: any
+  ) {
+    return this.appointmentsService.createReview(id, req.user.id, body.rating, body.comment);
+  }
 }

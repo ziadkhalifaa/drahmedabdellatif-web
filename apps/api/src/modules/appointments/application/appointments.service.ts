@@ -360,4 +360,45 @@ export class AppointmentsService {
     ]);
     return { total, pending, approved, completed };
   }
+
+  async createReview(appointmentId: string, patientId: string, rating: number, comment?: string) {
+    const appointment = await this.prisma.appointment.findFirst({
+      where: { id: appointmentId, patientId },
+      include: { patient: true }
+    });
+    
+    if (!appointment) {
+      throw new NotFoundException('Appointment not found or unauthorized');
+    }
+
+    const existingReview = await this.prisma.appointmentReview.findUnique({
+      where: { appointmentId }
+    });
+    if (existingReview) {
+      throw new BadRequestException('This appointment has already been reviewed');
+    }
+
+    const review = await this.prisma.appointmentReview.create({
+      data: {
+        appointmentId,
+        rating,
+        comment,
+        isPublic: false,
+      },
+    });
+
+    await this.prisma.testimonial.create({
+      data: {
+        patientName: appointment.patient?.name || 'مريض',
+        patientAvatar: null,
+        content: comment || `تقييم بـ ${rating} نجوم`,
+        rating,
+        isApproved: false,
+        isVisible: false,
+        isSuccessStory: false,
+      },
+    });
+
+    return review;
+  }
 }
