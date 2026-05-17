@@ -45,6 +45,9 @@
     @apply bg-[var(--background)] text-[var(--foreground)] selection:bg-[var(--primary)] selection:text-white;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
+  a, button, select, input[type="button"], input[type="submit"], [role="button"], .cursor-pointer {
+    cursor: pointer !important;
+  }
 }
 
 @layer utilities {
