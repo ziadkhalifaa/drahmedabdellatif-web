@@ -55,7 +55,7 @@ export function ServicesContent({ services: initialServices, locale }: Props) {
               <SectionHeader 
                 title={<EditableText contentKey="services.hero.title" defaultAr={t('title')} defaultEn={t('title')} />} 
                 subtitle={<EditableText contentKey="services.hero.desc" defaultAr={t('subtitle')} defaultEn={t('subtitle')} />} 
-                className="text-right"
+                className={locale === 'ar' ? "text-right" : "text-left"}
               />
             </div>
             <motion.div

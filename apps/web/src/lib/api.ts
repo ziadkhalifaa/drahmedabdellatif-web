@@ -41,14 +41,14 @@ async function getNewToken(): Promise<string | null> {
           credentials: 'include',
           body: JSON.stringify({ refreshToken: localRefreshToken || undefined }),
         });
-        
+
         if (refreshRes.ok) {
           const { accessToken, refreshToken } = await refreshRes.json();
-          
+
           if (refreshToken && typeof window !== 'undefined') {
             localStorage.setItem('refreshToken', refreshToken);
           }
-          
+
           // Notify application of the new token
           if (typeof window !== 'undefined') {
             window.dispatchEvent(new CustomEvent('token-refreshed', { detail: accessToken }));
@@ -68,11 +68,11 @@ async function getNewToken(): Promise<string | null> {
 
 async function fetchWithRefresh(url: string, options: RequestInit, token?: string): Promise<Response> {
   const res = await fetch(url, options);
-  
+
   if (res.status === 401 && token) {
     // Try to refresh token via shared /api/auth/refresh promise
     const newAccessToken = await getNewToken();
-    
+
     if (newAccessToken) {
       // Update the options with the new token
       const newOptions = {
@@ -82,7 +82,7 @@ async function fetchWithRefresh(url: string, options: RequestInit, token?: strin
           Authorization: `Bearer ${newAccessToken}`,
         },
       };
-      
+
       // Retry original request with new token
       return fetch(url, newOptions);
     }
@@ -97,7 +97,7 @@ export const api = {
       credentials: 'include',
       cache: 'no-store',
     }, token);
-    
+
     const data = await getResponseData(res);
     if (!res.ok) {
       throw new ApiError(data?.message || `API GET ${path} failed: ${res.status}`, res.status);
@@ -115,7 +115,7 @@ export const api = {
       credentials: 'include',
       body: JSON.stringify(body),
     }, token);
-    
+
     const data = await getResponseData(res);
     if (!res.ok) {
       throw new ApiError(data?.message || `API POST ${path} failed: ${res.status}`, res.status);
@@ -133,7 +133,7 @@ export const api = {
       credentials: 'include',
       body: JSON.stringify(body),
     }, token);
-    
+
     const data = await getResponseData(res);
     if (!res.ok) {
       throw new ApiError(data?.message || `API PATCH ${path} failed: ${res.status}`, res.status);
@@ -147,7 +147,7 @@ export const api = {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
       credentials: 'include',
     }, token);
-    
+
     const data = await getResponseData(res);
     if (!res.ok) {
       throw new ApiError(data?.message || `API DELETE ${path} failed: ${res.status}`, res.status);
@@ -165,7 +165,7 @@ export const api = {
       credentials: 'include',
       body: JSON.stringify(body),
     }, token);
-    
+
     const data = await getResponseData(res);
     if (!res.ok) {
       throw new ApiError(data?.message || `API PUT ${path} failed: ${res.status}`, res.status);
@@ -180,7 +180,7 @@ export const api = {
       credentials: 'include',
       body: formData,
     }, token);
-    
+
     const data = await getResponseData(res);
     if (!res.ok) {
       throw new ApiError(data?.message || `API POST FormData ${path} failed: ${res.status}`, res.status);
@@ -191,7 +191,7 @@ export const api = {
 
 export function getMediaUrl(url: string): string {
   if (!url) return '';
-  
+
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://dkqmympallxpdfypwxlr.supabase.co';
 
   // If it's a placeholder URL from a misconfigured API, fix it
@@ -201,10 +201,10 @@ export function getMediaUrl(url: string): string {
 
   // Already absolute URL (Supabase, external, or data URI)
   if (url.startsWith('http') || url.startsWith('https') || url.startsWith('data:')) return url;
-  
+
   // Public folder images (in apps/web/public/)
   if (url.startsWith('/images/')) return url;
-  
+
   // Legacy /uploads/ paths — convert to Supabase Storage URL
   if (url.startsWith('/uploads/')) {
     const filename = url.replace('/uploads/', '');
@@ -273,7 +273,7 @@ export const appointmentsApi = {
 
 export const siteSettingsApi = {
   getAllPublic: () => api.get<any[]>('/settings/public'),
-  updateMultiple: (settings: { key: string; value: string }[], token: string) => 
+  updateMultiple: (settings: { key: string; value: string }[], token: string) =>
     api.put<any>('/settings', { settings }, token),
 };
 

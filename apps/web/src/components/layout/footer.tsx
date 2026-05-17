@@ -89,10 +89,7 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href as any}
-                    className={cn(
-                      "inline-flex items-center gap-2 text-sm text-white/50 hover:text-[var(--accent)] transition-colors duration-200 group",
-                      isAr ? "flex-row-reverse" : ""
-                    )}
+                    className="inline-flex items-center gap-2 text-sm text-white/50 hover:text-[var(--accent)] transition-colors duration-200 group"
                   >
                     {isAr
                       ? <ArrowLeft size={12} className="opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -133,10 +130,7 @@ export function Footer() {
               <li>
                 <a
                   href={`tel:${tContact('phone')}`}
-                  className={cn(
-                    "flex items-start gap-3 text-sm text-white/50 hover:text-white transition-colors group",
-                    isAr ? "flex-row-reverse" : ""
-                  )}
+                  className="flex items-start gap-3 text-sm text-white/50 hover:text-white transition-colors group"
                 >
                   <div className="w-8 h-8 rounded-lg bg-[var(--primary)]/20 flex items-center justify-center text-[var(--accent)] flex-shrink-0 group-hover:bg-[var(--primary)]/30 transition-colors">
                     <Phone size={14} />
@@ -147,10 +141,7 @@ export function Footer() {
               <li>
                 <a
                   href={`mailto:${tContact('email')}`}
-                  className={cn(
-                    "flex items-start gap-3 text-sm text-white/50 hover:text-white transition-colors group",
-                    isAr ? "flex-row-reverse" : ""
-                  )}
+                  className="flex items-start gap-3 text-sm text-white/50 hover:text-white transition-colors group"
                 >
                   <div className="w-8 h-8 rounded-lg bg-[var(--primary)]/20 flex items-center justify-center text-[var(--accent)] flex-shrink-0 group-hover:bg-[var(--primary)]/30 transition-colors">
                     <Mail size={14} />
@@ -159,10 +150,7 @@ export function Footer() {
                 </a>
               </li>
               <li>
-                <div className={cn(
-                  "flex items-start gap-3 text-sm text-white/50",
-                  isAr ? "flex-row-reverse" : ""
-                )}>
+                <div className="flex items-start gap-3 text-sm text-white/50">
                   <div className="w-8 h-8 rounded-lg bg-[var(--primary)]/20 flex items-center justify-center text-[var(--accent)] flex-shrink-0">
                     <MapPin size={14} />
                   </div>
@@ -170,10 +158,7 @@ export function Footer() {
                 </div>
               </li>
               <li>
-                <div className={cn(
-                  "flex items-start gap-3 text-sm text-white/50",
-                  isAr ? "flex-row-reverse" : ""
-                )}>
+                <div className="flex items-start gap-3 text-sm text-white/50">
                   <div className="w-8 h-8 rounded-lg bg-[var(--primary)]/20 flex items-center justify-center text-[var(--accent)] flex-shrink-0">
                     <Clock size={14} />
                   </div>
