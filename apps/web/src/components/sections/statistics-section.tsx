@@ -11,32 +11,40 @@ const stats = [
     icon: Activity,
     value: 5000,
     suffix: '+',
-    title: 'عمليات المسالك البولية',
-    description: 'للأطفال والبالغين بأقل تدخل جراحي وأسرع تعافي.'
+    titleAr: 'عمليات المسالك البولية',
+    titleEn: 'Urological Surgeries',
+    descAr: 'للأطفال والبالغين بأقل تدخل جراحي وأسرع تعافي.',
+    descEn: 'For children and adults with minimal surgical intervention and fastest recovery.'
   },
   {
     id: 2,
     icon: BookOpen,
     value: 40,
     suffix: '+',
-    title: 'أبحاث علمية',
-    description: 'منشورة في أرفع المجلات العلمية في تخصص المسالك البولية عالميًا.'
+    titleAr: 'أبحاث علمية',
+    titleEn: 'Scientific Research',
+    descAr: 'منشورة في أرفع المجلات العلمية في تخصص المسالك البولية عالميًا.',
+    descEn: 'Published in the most prestigious scientific journals in urology worldwide.'
   },
   {
     id: 3,
     icon: Award,
     value: 20,
     suffix: '+',
-    title: 'إشراف أكاديمي',
-    description: 'الإشراف على رسائل ماجستير ودكتوراه في مجالات علاج البروستاتا.'
+    titleAr: 'إشراف أكاديمي',
+    titleEn: 'Academic Supervision',
+    descAr: 'الإشراف على رسائل ماجستير ودكتوراه في مجالات علاج البروستاتا.',
+    descEn: 'Supervision of Master and PhD theses in prostate treatment fields.'
   },
   {
     id: 4,
     icon: Users,
     value: 15,
     suffix: '+',
-    title: 'سنوات من الخبرة',
-    description: 'في تقديم أفضل رعاية طبية لمرضى المسالك البولية.'
+    titleAr: 'سنوات من الخبرة',
+    titleEn: 'Years of Experience',
+    descAr: 'في تقديم أفضل رعاية طبية لمرضى المسالك البولية.',
+    descEn: 'In providing the best medical care for urology patients.'
   }
 ];
 
@@ -68,11 +76,11 @@ export function StatisticsSection() {
               </div>
               
               <h3 className="text-xl font-bold text-white mb-3 mt-4">
-                 <EditableText contentKey={`home.stats.${stat.id}.title`} defaultAr={stat.title} defaultEn={stat.title} />
+                 <EditableText contentKey={`home.stats.${stat.id}.title`} defaultAr={stat.titleAr} defaultEn={stat.titleEn} />
                </h3>
                
                <div className="text-gray-300 leading-relaxed text-sm max-w-[250px]">
-                 <EditableText contentKey={`home.stats.${stat.id}.desc`} defaultAr={stat.description} defaultEn={stat.description} />
+                 <EditableText contentKey={`home.stats.${stat.id}.desc`} defaultAr={stat.descAr} defaultEn={stat.descEn} />
                </div>
             </motion.div>
           ))}
