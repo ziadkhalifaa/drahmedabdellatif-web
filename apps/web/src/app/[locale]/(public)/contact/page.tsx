@@ -195,7 +195,7 @@ export default function ContactPage() {
             >
               {/* Working Hours */}
               <div className="bg-[var(--card)] border border-[var(--border)] shadow-sm backdrop-blur-md rounded-[2rem] p-7">
-                <div className={cn("flex items-center gap-3 mb-6", isAr ? "flex-row-reverse" : "")}>
+                <div className="flex items-center gap-3 mb-6">
                   <div className="w-10 h-10 rounded-xl bg-[var(--accent)]/10 dark:bg-[var(--accent)]/20 flex items-center justify-center">
                     <Clock size={18} className="text-[var(--accent)]" />
                   </div>
@@ -206,10 +206,7 @@ export default function ContactPage() {
                     { location: t('hours.beniSuef'), hours: t('hours.beniSuefHours') },
                     { location: t('hours.october'), hours: t('hours.octoberHours') },
                   ].map((row, i) => (
-                    <div key={i} className={cn(
-                      "flex justify-between items-center p-3 rounded-xl bg-[var(--background)] border border-[var(--border)]",
-                      isAr ? "flex-row-reverse" : ""
-                    )}>
+                    <div key={i} className="flex justify-between items-center p-3 rounded-xl bg-[var(--background)] border border-[var(--border)]">
                       <span className="text-sm text-[var(--muted)] font-medium">{row.location}</span>
                       <span className="text-sm text-[var(--accent)] font-black">{row.hours}</span>
                     </div>
