@@ -44,9 +44,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setUser(JSON.parse(storedUser));
         }
 
-        const res = await api.post<{ accessToken: string }>('/auth/refresh', {});
+        const localRefreshToken = localStorage.getItem('refreshToken');
+        const res = await api.post<{ accessToken: string; refreshToken?: string }>('/auth/refresh', {
+          refreshToken: localRefreshToken || undefined
+        });
         if (mounted && res.accessToken) {
           setToken(res.accessToken);
+          if (res.refreshToken) {
+            localStorage.setItem('refreshToken', res.refreshToken);
+          }
         }
       } catch (err: any) {
         // Only clear the session if the backend explicitly rejected the credentials (401 or 403)
@@ -81,16 +87,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
   }, []);
 
-  const login = (newToken: string, newUser: User) => {
+  const login = (newToken: string, newUser: User, newRefreshToken?: string) => {
     setToken(newToken);
     setUser(newUser);
     localStorage.setItem('user', JSON.stringify(newUser));
+    if (newRefreshToken) {
+      localStorage.setItem('refreshToken', newRefreshToken);
+    }
   };
 
   const logout = () => {
     setToken(null);
     setUser(null);
     localStorage.removeItem('user');
+    localStorage.removeItem('refreshToken');
     // Call server to clear cookie (optional but good practice)
     // api.post('/auth/logout', {})
     router.push('/');

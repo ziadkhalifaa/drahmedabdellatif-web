@@ -20,7 +20,7 @@ export class AuthController {
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
       path: '/',
     });
-    return { accessToken: data.accessToken, user: data.user };
+    return { accessToken: data.accessToken, refreshToken: data.refreshToken, user: data.user };
   }
 
   @Post('register')
@@ -38,7 +38,7 @@ export class AuthController {
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
       path: '/',
     });
-    return { accessToken: data.accessToken, user: data.user };
+    return { accessToken: data.accessToken, refreshToken: data.refreshToken, user: data.user };
   }
 
   @Post('resend-code')
@@ -77,8 +77,8 @@ export class AuthController {
   }
 
   @Post('refresh')
-  async refresh(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
-    const refreshToken = req.cookies?.refreshToken;
+  async refresh(@Req() req: Request, @Body() body: { refreshToken?: string }, @Res({ passthrough: true }) res: Response) {
+    const refreshToken = req.cookies?.refreshToken || body.refreshToken;
     if (!refreshToken) {
       throw new UnauthorizedException('No refresh token provided');
     }
@@ -90,7 +90,7 @@ export class AuthController {
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
       path: '/',
     });
-    return { accessToken: data.accessToken };
+    return { accessToken: data.accessToken, refreshToken: data.refreshToken };
   }
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)

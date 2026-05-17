@@ -32,13 +32,22 @@ async function getNewToken(): Promise<string | null> {
   if (!refreshPromise) {
     refreshPromise = (async () => {
       try {
+        const localRefreshToken = typeof window !== 'undefined' ? localStorage.getItem('refreshToken') : null;
         const refreshRes = await fetch(`${API_BASE}/auth/refresh`, {
           method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
           credentials: 'include',
+          body: JSON.stringify({ refreshToken: localRefreshToken || undefined }),
         });
         
         if (refreshRes.ok) {
-          const { accessToken } = await refreshRes.json();
+          const { accessToken, refreshToken } = await refreshRes.json();
+          
+          if (refreshToken && typeof window !== 'undefined') {
+            localStorage.setItem('refreshToken', refreshToken);
+          }
           
           // Notify application of the new token
           if (typeof window !== 'undefined') {
