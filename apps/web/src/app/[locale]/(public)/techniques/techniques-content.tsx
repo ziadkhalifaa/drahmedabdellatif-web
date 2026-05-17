@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import { Section, SectionHeader, Card } from '@/components/ui';
@@ -7,7 +8,7 @@ import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
 import { WhatsAppButton } from '@/components/layout/whatsapp-button';
 import { Link } from '@/i18n/routing';
-import { getMediaUrl } from '@/lib/api';
+import { api, getMediaUrl } from '@/lib/api';
 import { Zap, ChevronRight, Activity, ShieldCheck } from 'lucide-react';
 import { EditableText } from '@/components/editor/editable-components';
 
@@ -16,8 +17,28 @@ interface Props {
   locale: string;
 }
 
-export function TechniquesContent({ techniques, locale }: Props) {
+export function TechniquesContent({ techniques: initialTechniques, locale }: Props) {
   const tNav = useTranslations('nav');
+  const [techniques, setTechniques] = useState<any[]>(initialTechniques);
+  const [loading, setLoading] = useState(initialTechniques.length === 0);
+
+  useEffect(() => {
+    if (initialTechniques.length === 0) {
+      setLoading(true);
+      api.get<any[]>('/techniques')
+        .then(res => {
+          setTechniques(res);
+        })
+        .catch(err => {
+          console.error("Failed to fetch techniques client-side:", err);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    } else {
+      setTechniques(initialTechniques);
+    }
+  }, [initialTechniques]);
 
   return (
     <>
@@ -47,62 +68,83 @@ export function TechniquesContent({ techniques, locale }: Props) {
             </p>
           </div>
 
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {techniques.map((tech, i) => {
-              const title = locale === 'ar' ? tech.titleAr : tech.titleEn;
-              const description = locale === 'ar' ? tech.descriptionAr : tech.descriptionEn;
+          {loading ? (
+            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+              {[1, 2, 3].map((n) => (
+                <div key={n} className="animate-pulse h-full flex flex-col overflow-hidden rounded-[2.5rem] border border-black/5 dark:border-white/10 shadow-xl bg-white/5 backdrop-blur-xl dark:bg-white/5">
+                  <div className="relative aspect-video bg-gray-200 dark:bg-slate-800" />
+                  <div className="p-8 flex-1 flex flex-col space-y-4">
+                    <div className="h-4 bg-gray-200 dark:bg-slate-800 rounded w-full" />
+                    <div className="h-4 bg-gray-200 dark:bg-slate-800 rounded w-5/6" />
+                    <div className="h-4 bg-gray-200 dark:bg-slate-800 rounded w-2/3" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : techniques.length === 0 ? (
+            <div className="text-center py-20 bg-white/5 backdrop-blur-xl rounded-[2.5rem] border border-white/10 shadow-xl">
+              <p className="text-[var(--muted)] text-lg">
+                {locale === 'ar' ? 'لا توجد تقنيات متاحة حالياً.' : 'No techniques available at the moment.'}
+              </p>
+            </div>
+          ) : (
+            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+              {techniques.map((tech, i) => {
+                const title = locale === 'ar' ? tech.titleAr : tech.titleEn;
+                const description = locale === 'ar' ? tech.descriptionAr : tech.descriptionEn;
 
-              return (
-                <motion.div
-                  key={tech.id}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.1 }}
-                >
-                  <Link href={`/techniques/${tech.slug}`} className="block h-full group">
-                    <Card className="h-full flex flex-col overflow-hidden rounded-[2.5rem] border-none shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 bg-white dark:bg-white/5 p-0">
-                      <div className="relative aspect-video overflow-hidden">
-                        {tech.image ? (
-                          <img 
-                            src={getMediaUrl(tech.image)} 
-                            alt={title}
-                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                          />
-                        ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-amber-500/20 to-amber-600/30 flex items-center justify-center">
-                            <Zap size={40} className="text-amber-500/50" />
+                return (
+                  <motion.div
+                    key={tech.id}
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.1 }}
+                  >
+                    <Link href={`/techniques/${tech.slug}`} className="block h-full group">
+                      <Card className="h-full flex flex-col overflow-hidden rounded-[2.5rem] border-none shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 bg-white dark:bg-white/5 p-0">
+                        <div className="relative aspect-video overflow-hidden">
+                          {tech.image ? (
+                            <img 
+                              src={getMediaUrl(tech.image)} 
+                              alt={title}
+                              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-gradient-to-br from-amber-500/20 to-amber-600/30 flex items-center justify-center">
+                              <Zap size={40} className="text-amber-500/50" />
+                            </div>
+                          )}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 group-hover:opacity-40 transition-opacity" />
+                          <div className="absolute bottom-6 left-6 right-6">
+                             <h3 className="text-2xl font-black text-white leading-tight">{title}</h3>
                           </div>
-                        )}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 group-hover:opacity-40 transition-opacity" />
-                        <div className="absolute bottom-6 left-6 right-6">
-                           <h3 className="text-2xl font-black text-white leading-tight">{title}</h3>
                         </div>
-                      </div>
-                      
-                      <div className="p-8 flex-1 flex flex-col">
-                        <p className="text-[var(--muted)] leading-relaxed line-clamp-3 mb-6 font-medium">
-                          {description}
-                        </p>
-                        <div className="mt-auto flex items-center justify-between pt-6 border-t border-gray-50 dark:border-white/5">
-                           <div className="flex items-center gap-3">
-                              <div className="h-8 w-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-500">
-                                <ShieldCheck size={18} />
-                              </div>
-                              <span className="text-[10px] font-black uppercase tracking-widest text-[var(--muted)]">FDA Approved</span>
-                           </div>
-                           <div className="flex items-center gap-2 font-bold text-amber-500 group-hover:gap-3 transition-all">
-                             {locale === 'ar' ? 'التفاصيل' : 'Details'} 
-                             <ChevronRight size={18} className={locale === 'ar' ? 'rotate-180' : ''} />
-                           </div>
+                        
+                        <div className="p-8 flex-1 flex flex-col">
+                          <p className="text-[var(--muted)] leading-relaxed line-clamp-3 mb-6 font-medium">
+                            {description}
+                          </p>
+                          <div className="mt-auto flex items-center justify-between pt-6 border-t border-gray-50 dark:border-white/5">
+                             <div className="flex items-center gap-3">
+                                <div className="h-8 w-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+                                  <ShieldCheck size={18} />
+                                </div>
+                                <span className="text-[10px] font-black uppercase tracking-widest text-[var(--muted)]">FDA Approved</span>
+                             </div>
+                             <div className="flex items-center gap-2 font-bold text-amber-500 group-hover:gap-3 transition-all">
+                               {locale === 'ar' ? 'التفاصيل' : 'Details'} 
+                               <ChevronRight size={18} className={locale === 'ar' ? 'rotate-180' : ''} />
+                             </div>
+                          </div>
                         </div>
-                      </div>
-                    </Card>
-                  </Link>
-                </motion.div>
-              );
-            })}
-          </div>
+                      </Card>
+                    </Link>
+                  </motion.div>
+                );
+              })}
+            </div>
+          )}
         </Section>
 
         {/* CTA */}

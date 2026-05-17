@@ -57,5 +57,5 @@ export default async function TechniqueDetailPage({
   const { locale, slug } = await params;
   const technique = await getTechnique(slug);
 
-  return <TechniqueDetailContent technique={technique} locale={locale} />;
+  return <TechniqueDetailContent technique={technique} locale={locale} slug={slug} />;
 }

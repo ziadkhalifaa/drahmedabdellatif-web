@@ -59,5 +59,5 @@ export default async function ServiceDetailPage({
   const { locale, id } = await params;
   const service = await getService(id);
 
-  return <ServiceDetailContent service={service} locale={locale} />;
+  return <ServiceDetailContent service={service} locale={locale} serviceId={id} />;
 }

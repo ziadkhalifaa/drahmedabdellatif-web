@@ -48,9 +48,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (mounted && res.accessToken) {
           setToken(res.accessToken);
         }
-      } catch (err) {
-        // Refresh failed (no cookie or expired)
-        if (mounted) {
+      } catch (err: any) {
+        // Only clear the session if the backend explicitly rejected the credentials (401 or 403)
+        // If it's a 5xx server error, 502/504 Gateway Timeout, or network failure, we preserve
+        // the local session to avoid logging the user out due to server instabilities.
+        const isAuthError = err && (err.status === 401 || err.status === 403);
+        
+        if (mounted && isAuthError) {
           setUser(null);
           setToken(null);
           localStorage.removeItem('user');

@@ -1,10 +1,11 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
 import { WhatsAppButton } from '@/components/layout/whatsapp-button';
 import { Card } from '@/components/ui';
-import { getMediaUrl } from '@/lib/api';
+import { api, getMediaUrl } from '@/lib/api';
 import type { BlogPost } from '@dr-ahmed/shared';
 import { Calendar, ArrowLeft } from 'lucide-react';
 import { Link } from '@/i18n/routing';
@@ -16,14 +17,63 @@ interface Props {
   slug: string;
 }
 
-export function BlogArticleContent({ post, locale, slug }: Props) {
+export function BlogArticleContent({ post: initialPost, locale, slug }: Props) {
   const t = useTranslations('blog');
+  const [post, setPost] = useState<BlogPost | null>(initialPost);
+  const [loading, setLoading] = useState(initialPost === null);
+
+  useEffect(() => {
+    if (initialPost === null) {
+      setLoading(true);
+      api.get<BlogPost>(`/blog/${slug}`)
+        .then(res => {
+          setPost(res);
+        })
+        .catch(err => {
+          console.error("Failed to fetch blog article client-side:", err);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    } else {
+      setPost(initialPost);
+    }
+  }, [initialPost, slug]);
+
+  if (loading) {
+    return (
+      <>
+        <Navbar />
+        <main className="min-h-screen pt-24 animate-pulse">
+          <article className="mx-auto max-w-3xl px-4 py-12 sm:px-6 space-y-6">
+            <div className="h-4 bg-gray-200 dark:bg-slate-800 rounded w-1/4" />
+            <div className="h-10 bg-gray-200 dark:bg-slate-800 rounded w-3/4" />
+            <div className="h-4 bg-gray-200 dark:bg-slate-800 rounded w-1/3" />
+            <div className="mt-8 aspect-video rounded-[2.5rem] bg-gray-200 dark:bg-slate-800" />
+            <div className="h-4 bg-gray-200 dark:bg-slate-800 rounded w-full" />
+            <div className="h-4 bg-gray-200 dark:bg-slate-800 rounded w-5/6" />
+            <div className="h-4 bg-gray-200 dark:bg-slate-800 rounded w-2/3" />
+          </article>
+        </main>
+        <Footer />
+        <WhatsAppButton />
+      </>
+    );
+  }
 
   if (!post) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <p className="text-[var(--muted)]">Article not found.</p>
-      </div>
+      <>
+        <Navbar />
+        <main className="min-h-screen flex items-center justify-center pt-32">
+          <div className="text-center space-y-4">
+            <p className="text-[var(--muted)] text-xl font-bold">Article not found.</p>
+            <Link href="/#blog"><Button>{locale === 'ar' ? 'العودة للمدونة' : 'Back to Blog'}</Button></Link>
+          </div>
+        </main>
+        <Footer />
+        <WhatsAppButton />
+      </>
     );
   }
 

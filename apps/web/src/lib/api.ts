@@ -1,3 +1,29 @@
+export class ApiError extends Error {
+  status: number;
+  constructor(message: string, status: number) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+  }
+}
+
+async function getResponseData(res: Response): Promise<any> {
+  const contentType = res.headers.get('content-type');
+  if (contentType && contentType.includes('application/json')) {
+    try {
+      return await res.json();
+    } catch {
+      return null;
+    }
+  }
+  try {
+    const text = await res.text();
+    return { message: text };
+  } catch {
+    return null;
+  }
+}
+
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
 
 async function fetchWithRefresh(url: string, options: RequestInit, token?: string): Promise<Response> {
@@ -42,8 +68,11 @@ export const api = {
       cache: 'no-store',
     }, token);
     
-    if (!res.ok) throw new Error(`API GET ${path} failed: ${res.status}`);
-    return res.json();
+    const data = await getResponseData(res);
+    if (!res.ok) {
+      throw new ApiError(data?.message || `API GET ${path} failed: ${res.status}`, res.status);
+    }
+    return data;
   },
 
   async post<T>(path: string, body: unknown, token?: string): Promise<T> {
@@ -57,8 +86,10 @@ export const api = {
       body: JSON.stringify(body),
     }, token);
     
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || `API POST ${path} failed: ${res.status}`);
+    const data = await getResponseData(res);
+    if (!res.ok) {
+      throw new ApiError(data?.message || `API POST ${path} failed: ${res.status}`, res.status);
+    }
     return data;
   },
 
@@ -73,8 +104,10 @@ export const api = {
       body: JSON.stringify(body),
     }, token);
     
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || `API PATCH ${path} failed: ${res.status}`);
+    const data = await getResponseData(res);
+    if (!res.ok) {
+      throw new ApiError(data?.message || `API PATCH ${path} failed: ${res.status}`, res.status);
+    }
     return data;
   },
 
@@ -84,8 +117,12 @@ export const api = {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
       credentials: 'include',
     }, token);
-    if (!res.ok) throw new Error(`API DELETE ${path} failed: ${res.status}`);
-    return res.json();
+    
+    const data = await getResponseData(res);
+    if (!res.ok) {
+      throw new ApiError(data?.message || `API DELETE ${path} failed: ${res.status}`, res.status);
+    }
+    return data;
   },
 
   async put<T>(path: string, body: unknown, token?: string): Promise<T> {
@@ -98,8 +135,11 @@ export const api = {
       credentials: 'include',
       body: JSON.stringify(body),
     }, token);
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || `API PUT ${path} failed: ${res.status}`);
+    
+    const data = await getResponseData(res);
+    if (!res.ok) {
+      throw new ApiError(data?.message || `API PUT ${path} failed: ${res.status}`, res.status);
+    }
     return data;
   },
 
@@ -110,8 +150,11 @@ export const api = {
       credentials: 'include',
       body: formData,
     }, token);
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || `API POST FormData ${path} failed: ${res.status}`);
+    
+    const data = await getResponseData(res);
+    if (!res.ok) {
+      throw new ApiError(data?.message || `API POST FormData ${path} failed: ${res.status}`, res.status);
+    }
     return data;
   },
 };

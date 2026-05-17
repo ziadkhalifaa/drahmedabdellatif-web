@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import { Section, Button } from '@/components/ui';
@@ -8,16 +9,61 @@ import { Footer } from '@/components/layout/footer';
 import { WhatsAppButton } from '@/components/layout/whatsapp-button';
 import { ShieldCheck, Zap, Activity, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Link } from '@/i18n/routing';
-import { getMediaUrl } from '@/lib/api';
+import { api, getMediaUrl } from '@/lib/api';
 import { EditableText } from '@/components/editor/editable-components';
 
 interface Props {
   technique: any | null;
   locale: string;
+  slug: string;
 }
 
-export function TechniqueDetailContent({ technique, locale }: Props) {
+export function TechniqueDetailContent({ technique: initialTechnique, locale, slug }: Props) {
   const tNav = useTranslations('nav');
+  const [technique, setTechnique] = useState<any | null>(initialTechnique);
+  const [loading, setLoading] = useState(initialTechnique === null);
+
+  useEffect(() => {
+    if (initialTechnique === null) {
+      setLoading(true);
+      api.get<any>(`/techniques/${slug}`)
+        .then(res => {
+          setTechnique(res);
+        })
+        .catch(err => {
+          console.error("Failed to fetch technique detail client-side:", err);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    } else {
+      setTechnique(initialTechnique);
+    }
+  }, [initialTechnique, slug]);
+
+  if (loading) {
+    return (
+      <>
+        <Navbar />
+        <main className="min-h-screen pt-32 pb-20 animate-pulse">
+          <Section>
+            <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
+              <div className="space-y-6">
+                <div className="h-6 w-32 rounded-full bg-gray-200 dark:bg-slate-800" />
+                <div className="h-16 bg-gray-200 dark:bg-slate-800 rounded w-3/4" />
+                <div className="h-4 bg-gray-200 dark:bg-slate-800 rounded w-full" />
+                <div className="h-4 bg-gray-200 dark:bg-slate-800 rounded w-5/6" />
+                <div className="h-14 bg-gray-200 dark:bg-slate-800 rounded-2xl w-1/2 pt-4" />
+              </div>
+              <div className="relative aspect-square rounded-[4rem] bg-gray-200 dark:bg-slate-800" />
+            </div>
+          </Section>
+        </main>
+        <Footer />
+        <WhatsAppButton />
+      </>
+    );
+  }
 
   if (!technique) {
     return (
@@ -30,6 +76,7 @@ export function TechniqueDetailContent({ technique, locale }: Props) {
           </div>
         </main>
         <Footer />
+        <WhatsAppButton />
       </>
     );
   }

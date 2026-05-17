@@ -1,11 +1,13 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { motion } from 'framer-motion';
 import { Section, SectionHeader, Card } from '@/components/ui';
 import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
 import { WhatsAppButton } from '@/components/layout/whatsapp-button';
+import { api } from '@/lib/api';
 import type { Service } from '@dr-ahmed/shared';
 import { Activity, Scan, Heart, Stethoscope, Shield, Gem, ChevronRight } from 'lucide-react';
 import { Link } from '@/i18n/routing';
@@ -20,8 +22,28 @@ interface Props {
   locale: string;
 }
 
-export function ServicesContent({ services, locale }: Props) {
+export function ServicesContent({ services: initialServices, locale }: Props) {
   const t = useTranslations('services');
+  const [services, setServices] = useState<Service[]>(initialServices);
+  const [loading, setLoading] = useState(initialServices.length === 0);
+
+  useEffect(() => {
+    if (initialServices.length === 0) {
+      setLoading(true);
+      api.get<Service[]>('/services')
+        .then(res => {
+          setServices(res);
+        })
+        .catch(err => {
+          console.error("Failed to fetch services client-side:", err);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    } else {
+      setServices(initialServices);
+    }
+  }, [initialServices]);
 
   return (
     <>
@@ -50,63 +72,85 @@ export function ServicesContent({ services, locale }: Props) {
             </motion.div>
           </div>
           
-          <div className="grid gap-8 lg:grid-cols-2">
-            {services.map((service, i) => {
-              const title = locale === 'ar' ? service.titleAr : service.titleEn;
-              const description = locale === 'ar' ? service.descriptionAr : service.descriptionEn;
+          {loading ? (
+            <div className="grid gap-8 lg:grid-cols-2">
+              {[1, 2, 3, 4].map((n) => (
+                <div key={n} className="animate-pulse flex flex-col sm:flex-row overflow-hidden rounded-[2rem] border border-black/5 dark:border-white/10 shadow-xl bg-white/5 backdrop-blur-xl dark:bg-white/5 h-[300px]">
+                  <div className="sm:w-2/5 bg-gray-200 dark:bg-slate-800 h-48 sm:h-full" />
+                  <div className="p-8 sm:w-3/5 flex flex-col justify-center space-y-4">
+                    <div className="h-4 bg-gray-200 dark:bg-slate-800 rounded w-1/4" />
+                    <div className="h-8 bg-gray-200 dark:bg-slate-800 rounded w-3/4" />
+                    <div className="h-4 bg-gray-200 dark:bg-slate-800 rounded w-full" />
+                    <div className="h-4 bg-gray-200 dark:bg-slate-800 rounded w-5/6" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : services.length === 0 ? (
+            <div className="text-center py-20 bg-white/5 backdrop-blur-xl rounded-[2rem] border border-white/10 shadow-xl">
+              <p className="text-[var(--muted)] text-lg">
+                {locale === 'ar' ? 'لا توجد خدمات متاحة حالياً.' : 'No services available at the moment.'}
+              </p>
+            </div>
+          ) : (
+            <div className="grid gap-8 lg:grid-cols-2">
+              {services.map((service, i) => {
+                const title = locale === 'ar' ? service.titleAr : service.titleEn;
+                const description = locale === 'ar' ? service.descriptionAr : service.descriptionEn;
 
-              return (
-                <motion.div
-                  key={service.id}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: i * 0.1 }}
-                >
-                  <Link href={`/services/${service.id}`} className="block h-full">
-                    <Card className="group h-full flex flex-col sm:flex-row overflow-hidden rounded-[2rem] border border-white/10 shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 bg-white/5 backdrop-blur-xl dark:bg-white/5">
-                      <div className="relative sm:w-2/5 aspect-video sm:aspect-auto overflow-hidden bg-slate-100 dark:bg-slate-900/50">
-                        <EditableImage 
-                          contentKey={`service:${service.id}:image`}
-                          defaultSrc={service.image || ''}
-                          alt={title}
-                          className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-110"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t sm:bg-gradient-to-r from-black/80 sm:from-black/60 via-black/20 to-transparent opacity-60 group-hover:opacity-40 transition-opacity pointer-events-none" />
-                      </div>
-                      <div className="p-8 sm:w-3/5 flex flex-col justify-center space-y-4">
-                        <div className="inline-flex items-center gap-2 px-3 py-1 w-fit rounded-full bg-[var(--primary)]/10 dark:bg-white/10 border border-[var(--primary)]/20 text-[var(--primary)] dark:text-white text-[10px] font-bold uppercase tracking-wider">
-                           {t('badge')}
+                return (
+                  <motion.div
+                    key={service.id}
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6, delay: i * 0.1 }}
+                  >
+                    <Link href={`/services/${service.id}`} className="block h-full">
+                      <Card className="group h-full flex flex-col sm:flex-row overflow-hidden rounded-[2rem] border border-white/10 shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 bg-white/5 backdrop-blur-xl dark:bg-white/5">
+                        <div className="relative sm:w-2/5 aspect-video sm:aspect-auto overflow-hidden bg-slate-100 dark:bg-slate-900/50">
+                          <EditableImage 
+                            contentKey={`service:${service.id}:image`}
+                            defaultSrc={service.image || ''}
+                            alt={title}
+                            className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-110"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t sm:bg-gradient-to-r from-black/80 sm:from-black/60 via-black/20 to-transparent opacity-60 group-hover:opacity-40 transition-opacity pointer-events-none" />
                         </div>
-                        <h3 className="text-2xl font-black text-gray-900 dark:text-white leading-tight group-hover:text-[var(--primary)] transition-colors">
-                           <EditableText 
-                             contentKey={`service:${service.id}:${locale === 'ar' ? 'titleAr' : 'titleEn'}`}
-                             defaultAr={service.titleAr}
-                             defaultEn={service.titleEn}
-                             className="pointer-events-auto"
-                           />
-                        </h3>
-                        <div className="text-gray-600 dark:text-gray-300 leading-relaxed line-clamp-3 text-sm">
-                           <EditableText 
-                              contentKey={`service:${service.id}:${locale === 'ar' ? 'descriptionAr' : 'descriptionEn'}`}
-                              defaultAr={service.descriptionAr}
-                              defaultEn={service.descriptionEn}
-                              as="p"
-                           />
+                        <div className="p-8 sm:w-3/5 flex flex-col justify-center space-y-4">
+                          <div className="inline-flex items-center gap-2 px-3 py-1 w-fit rounded-full bg-[var(--primary)]/10 dark:bg-white/10 border border-[var(--primary)]/20 text-[var(--primary)] dark:text-white text-[10px] font-bold uppercase tracking-wider">
+                             {t('badge')}
+                          </div>
+                          <h3 className="text-2xl font-black text-gray-900 dark:text-white leading-tight group-hover:text-[var(--primary)] transition-colors">
+                             <EditableText 
+                               contentKey={`service:${service.id}:${locale === 'ar' ? 'titleAr' : 'titleEn'}`}
+                               defaultAr={service.titleAr}
+                               defaultEn={service.titleEn}
+                               className="pointer-events-auto"
+                             />
+                          </h3>
+                          <div className="text-gray-600 dark:text-gray-300 leading-relaxed line-clamp-3 text-sm">
+                             <EditableText 
+                                contentKey={`service:${service.id}:${locale === 'ar' ? 'descriptionAr' : 'descriptionEn'}`}
+                                defaultAr={service.descriptionAr}
+                                defaultEn={service.descriptionEn}
+                                as="p"
+                             />
+                          </div>
+                          <div className="pt-4 mt-auto">
+                             <div className="flex items-center gap-2 font-bold text-[var(--primary)] group-hover:gap-3 transition-all">
+                               {t('details')} 
+                               <ChevronRight size={18} className={locale === 'ar' ? 'rotate-180' : ''} />
+                             </div>
+                          </div>
                         </div>
-                        <div className="pt-4 mt-auto">
-                           <div className="flex items-center gap-2 font-bold text-[var(--primary)] group-hover:gap-3 transition-all">
-                             {t('details')} 
-                             <ChevronRight size={18} className={locale === 'ar' ? 'rotate-180' : ''} />
-                           </div>
-                        </div>
-                      </div>
-                    </Card>
-                  </Link>
-                </motion.div>
-              );
-            })}
-          </div>
+                      </Card>
+                    </Link>
+                  </motion.div>
+                );
+              })}
+            </div>
+          )}
         </Section>
 
         {/* Call to Action */}

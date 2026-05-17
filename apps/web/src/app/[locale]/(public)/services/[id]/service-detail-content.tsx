@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import { Section, Button } from '@/components/ui';
@@ -8,16 +9,64 @@ import { Footer } from '@/components/layout/footer';
 import { WhatsAppButton } from '@/components/layout/whatsapp-button';
 import { CheckCircle2, Stethoscope } from 'lucide-react';
 import { Link } from '@/i18n/routing';
-import { getMediaUrl } from '@/lib/api';
+import { api, getMediaUrl } from '@/lib/api';
 import type { Service } from '@dr-ahmed/shared';
 
 interface Props {
   service: Service | null;
   locale: string;
+  serviceId: string;
 }
 
-export function ServiceDetailContent({ service, locale }: Props) {
+export function ServiceDetailContent({ service: initialService, locale, serviceId }: Props) {
   const tNav = useTranslations('nav');
+  const [service, setService] = useState<Service | null>(initialService);
+  const [loading, setLoading] = useState(initialService === null);
+
+  useEffect(() => {
+    if (initialService === null) {
+      setLoading(true);
+      api.get<Service>(`/services/${serviceId}`)
+        .then(res => {
+          setService(res);
+        })
+        .catch(err => {
+          console.error("Failed to fetch service detail client-side:", err);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    } else {
+      setService(initialService);
+    }
+  }, [initialService, serviceId]);
+
+  if (loading) {
+    return (
+      <>
+        <Navbar />
+        <main className="min-h-screen pt-32 pb-20 animate-pulse">
+          <Section>
+            <div className="max-w-5xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
+              <div className="space-y-6">
+                <div className="h-20 w-20 rounded-[2.5rem] bg-gray-200 dark:bg-slate-800" />
+                <div className="h-12 bg-gray-200 dark:bg-slate-800 rounded w-3/4" />
+                <div className="h-4 bg-gray-200 dark:bg-slate-800 rounded w-full" />
+                <div className="h-4 bg-gray-200 dark:bg-slate-800 rounded w-5/6" />
+                <div className="flex gap-4 pt-6">
+                  <div className="h-14 bg-gray-200 dark:bg-slate-800 rounded-2xl flex-1" />
+                  <div className="h-14 bg-gray-200 dark:bg-slate-800 rounded-2xl flex-1" />
+                </div>
+              </div>
+              <div className="relative aspect-[4/3] rounded-[3rem] bg-gray-200 dark:bg-slate-800" />
+            </div>
+          </Section>
+        </main>
+        <Footer />
+        <WhatsAppButton />
+      </>
+    );
+  }
 
   if (!service) {
     return (
@@ -30,6 +79,7 @@ export function ServiceDetailContent({ service, locale }: Props) {
           </div>
         </main>
         <Footer />
+        <WhatsAppButton />
       </>
     );
   }
