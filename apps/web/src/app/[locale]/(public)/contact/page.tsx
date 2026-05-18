@@ -21,10 +21,34 @@ export default function ContactPage() {
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' });
 
   const contactCards = [
-    { icon: Phone, label: t('info.phone'), value: CLINIC_PHONE, href: `tel:${CLINIC_PHONE}`, color: 'text-emerald-500 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/20' },
-    { icon: Mail, label: t('info.email'), value: CLINIC_EMAIL, href: `mailto:${CLINIC_EMAIL}`, color: 'text-blue-500 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-500/10 border-blue-200 dark:border-blue-500/20' },
-    { icon: MessageCircle, label: 'WhatsApp', value: isAr ? 'تواصل عبر واتساب' : 'Chat on WhatsApp', href: `https://wa.me/${WHATSAPP_NUMBER}`, color: 'text-green-500 dark:text-green-400', bg: 'bg-green-50 dark:bg-green-500/10 border-green-200 dark:border-green-500/20' },
-    { icon: MapPin, label: t('info.beniSuef'), value: t('info.beniSuefAddress'), href: '#', color: 'text-orange-500 dark:text-orange-400', bg: 'bg-orange-50 dark:bg-orange-500/10 border-orange-200 dark:border-orange-500/20' },
+    { 
+      icon: Phone, 
+      label: t('info.phone'), 
+      value: CLINIC_PHONE, 
+      href: `tel:${CLINIC_PHONE}`,
+      actionText: isAr ? 'اتصل الآن' : 'Call Now'
+    },
+    { 
+      icon: Mail, 
+      label: t('info.email'), 
+      value: CLINIC_EMAIL, 
+      href: `mailto:${CLINIC_EMAIL}`,
+      actionText: isAr ? 'راسلنا بالبريد' : 'Send Email'
+    },
+    { 
+      icon: MessageCircle, 
+      label: 'WhatsApp', 
+      value: isAr ? 'تواصل عبر واتساب' : 'Chat on WhatsApp', 
+      href: `https://wa.me/${WHATSAPP_NUMBER}`,
+      actionText: isAr ? 'تحدث معنا' : 'Chat Now'
+    },
+    { 
+      icon: MapPin, 
+      label: t('info.beniSuef'), 
+      value: t('info.beniSuefAddress'), 
+      href: 'https://maps.google.com/?q=Al+Nada+Tower,+Beni+Suef',
+      actionText: isAr ? 'عرض موقعنا' : 'View Location'
+    },
   ];
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -67,28 +91,49 @@ export default function ContactPage() {
 
         {/* Contact Cards */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-4 mb-16">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {contactCards.map((card, i) => (
               <motion.a
                 key={i}
                 href={card.href}
                 target={card.href.startsWith('http') ? '_blank' : undefined}
                 rel={card.href.startsWith('http') ? 'noopener noreferrer' : undefined}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }}
-                className={cn(
-                  "group flex flex-col items-center text-center gap-3 p-6 rounded-2xl border bg-[var(--card)] backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl",
-                  card.bg,
-                  isAr ? "text-right" : "text-left"
-                )}
+                transition={{ delay: i * 0.1, duration: 0.5, ease: 'easeOut' }}
+                className="group relative flex flex-col items-center text-center gap-4 p-8 rounded-2xl border border-slate-200/60 dark:border-slate-800/80 bg-gradient-to-br from-white to-slate-50/50 dark:from-slate-900 dark:to-slate-950/50 backdrop-blur-md transition-all duration-500 hover:-translate-y-1.5 shadow-[0_4px_20px_-4px_rgba(15,76,129,0.05)] dark:shadow-none hover:shadow-[0_20px_40px_-15px_rgba(15,76,129,0.12)] hover:dark:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.4)] overflow-hidden"
               >
-                <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0", card.bg)}>
-                  <card.icon size={22} className={card.color} />
+                {/* Premium Animated Top Border Gradient */}
+                <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-[var(--primary)] to-[var(--accent)] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                
+                {/* Background radial glow */}
+                <div className="absolute -bottom-10 -right-10 w-24 h-24 bg-[var(--primary)]/5 dark:bg-[var(--primary)]/10 rounded-full blur-xl group-hover:scale-150 transition-transform duration-500" />
+
+                {/* Luxury-Grade Icon Badge */}
+                <div className="w-14 h-14 rounded-full bg-gradient-to-tr from-[var(--primary-dark)] to-[var(--primary)] flex items-center justify-center border border-[var(--accent)]/30 group-hover:border-[var(--accent)] transition-all duration-300 shadow-md shadow-[var(--primary)]/10 relative z-10">
+                  <card.icon size={22} className="text-[var(--accent)] group-hover:scale-110 transition-transform duration-300" />
                 </div>
-                <div>
-                  <p className="text-xs text-[var(--muted)] font-medium mb-1">{card.label}</p>
-                  <p className="text-sm text-[var(--foreground)] font-bold leading-snug">{card.value}</p>
+                
+                <div className="flex-1 flex flex-col justify-between items-center relative z-10 w-full">
+                  <div>
+                    <span className="text-[10px] font-black tracking-widest uppercase text-[var(--muted)] group-hover:text-[var(--accent)] transition-colors duration-300 block mb-1">
+                      {card.label}
+                    </span>
+                    <p className="text-base font-black text-[var(--foreground)] tracking-tight leading-snug group-hover:text-[var(--primary)] dark:group-hover:text-white transition-colors duration-300 max-w-[200px] mx-auto break-words">
+                      {card.value}
+                    </p>
+                  </div>
+                  
+                  {/* Call-to-action text indicating direct human interaction */}
+                  <span className="mt-5 inline-flex items-center gap-1.5 text-xs font-black text-[var(--primary)] dark:text-[var(--accent-light)] opacity-70 group-hover:opacity-100 transition-all duration-300">
+                    {card.actionText}
+                    <span className={cn(
+                      "transition-transform duration-300",
+                      isAr ? "group-hover:-translate-x-1" : "group-hover:translate-x-1"
+                    )}>
+                      {isAr ? '←' : '→'}
+                    </span>
+                  </span>
                 </div>
               </motion.a>
             ))}
