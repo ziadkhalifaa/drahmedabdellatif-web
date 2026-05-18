@@ -21,8 +21,7 @@ async function bootstrap() {
     bootstrapPromise = (async () => {
       console.log('[BOOTSTRAP-DEBUG] Creating NestJS application (NestFactory.create)...');
       const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-        logger: WinstonModule.createLogger(winstonConfig),
-        bufferLogs: true,
+        bufferLogs: false,
       });
       console.log('[BOOTSTRAP-DEBUG] NestJS application created successfully.');
 
