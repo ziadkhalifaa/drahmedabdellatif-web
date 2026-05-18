@@ -103,3 +103,16 @@ export default async (req: any, res: any) => {
     res.status(500).json({ message: 'Internal server error during initialization' });
   }
 };
+
+// For standalone Node.js environments (like Hostinger, PM2, local)
+if (!process.env.VERCEL) {
+  bootstrap()
+    .then(() => {
+      Logger.log('🚀 NestJS Bootstrap completed successfully', 'StandaloneBootstrap');
+    })
+    .catch(err => {
+      Logger.error('💥 Failed to bootstrap NestJS server', err, 'StandaloneBootstrap');
+      process.exit(1);
+    });
+}
+
