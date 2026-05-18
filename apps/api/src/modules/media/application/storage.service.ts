@@ -1,5 +1,6 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { createClient } from '@supabase/supabase-js';
+// @ts-ignore
 import WebSocket from 'ws';
 import sharp from 'sharp';
 import { randomUUID } from 'crypto';
