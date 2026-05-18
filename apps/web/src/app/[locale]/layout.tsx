@@ -119,14 +119,20 @@ export default async function LocaleLayout({
     '@context': 'https://schema.org',
     '@type': 'Physician',
     name: locale === 'ar' ? 'أ.د. أحمد عبد اللطيف' : 'Prof. Dr. Ahmed Abdellatif',
-    medicalSpecialty: 'Urology',
+    image: `${baseUrl || 'https://drahmedabdellatif.com'}/images/doctor.png`,
+    medicalSpecialty: 'UrologySpecialty',
     address: {
       '@type': 'PostalAddress',
-      addressLocality: 'Beni Suef',
+      addressLocality: locale === 'ar' ? 'بني سويف' : 'Beni Suef',
       addressCountry: 'EG'
     },
-    telephone: whatsappNumber,
-    url: baseUrl,
+    telephone: whatsappNumber || '+201099688466',
+    url: baseUrl || 'https://drahmedabdellatif.com',
+    logo: `${baseUrl || 'https://drahmedabdellatif.com'}/images/logo.png`,
+    description: locale === 'ar'
+      ? 'استشاري جراحة المسالك البولية والكلى والذكورة والعقم.'
+      : 'Professor & Consultant of Urology, Andrology, and Male Infertility.',
+    priceRange: '$$',
   };
 
   return (

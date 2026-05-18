@@ -8,6 +8,7 @@ import { AuthProvider } from '@/context/auth-context';
 
 import { Toaster } from 'sonner';
 import { ErrorBoundary } from './error-boundary';
+import { SWRConfig } from 'swr';
 
 export function Providers({ 
   children, 
@@ -22,7 +23,12 @@ export function Providers({
 }) {
   return (
     <ErrorBoundary>
-      <CustomThemeProvider>
+      <SWRConfig value={{
+        revalidateOnFocus: false,
+        dedupingInterval: 30000,
+        errorRetryCount: 2,
+      }}>
+        <CustomThemeProvider>
         <NextIntlClientProvider messages={messages} locale={locale} timeZone="Africa/Cairo">
           <EditorProvider initialSettings={initialSettings}>
             <AuthProvider>
@@ -32,6 +38,7 @@ export function Providers({
           </EditorProvider>
         </NextIntlClientProvider>
       </CustomThemeProvider>
+      </SWRConfig>
     </ErrorBoundary>
   );
 }

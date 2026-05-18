@@ -15,16 +15,55 @@ const iconMap: Record<string, React.ElementType> = {
   Stethoscope, Kidney: Activity, Scan, Heart, Shield, Gem,
 };
 
+function ServicesSkeleton() {
+  return (
+    <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
+      {[1, 2, 3].map((n) => (
+        <div key={n} className="animate-pulse h-full flex flex-col overflow-hidden rounded-[2.5rem] bg-slate-100 dark:bg-slate-900 border-none shadow-xl min-h-[450px]">
+          <div className="relative aspect-[3/4] bg-slate-200 dark:bg-slate-800" />
+          <div className="p-8 flex-1 flex flex-col space-y-4">
+            <div className="h-6 w-1/3 bg-slate-200 dark:bg-slate-800 rounded-full" />
+            <div className="h-4 w-full bg-slate-200 dark:bg-slate-800 rounded" />
+            <div className="h-4 w-5/6 bg-slate-200 dark:bg-slate-800 rounded" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ServicesError({ onRetry, locale }: { onRetry: () => void; locale: string }) {
+  const isAr = locale === 'ar';
+  return (
+    <div className="text-center p-12 rounded-[2.5rem] bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/50 max-w-lg mx-auto">
+      <h3 className="text-xl font-bold text-red-600 dark:text-red-400 mb-2">
+        {isAr ? 'عذرًا، حدث خطأ أثناء تحميل الخدمات' : 'Sorry, failed to load services'}
+      </h3>
+      <p className="text-[var(--muted)] text-sm mb-6">
+        {isAr ? 'يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.' : 'Please check your internet connection and try again.'}
+      </p>
+      <Button onClick={onRetry} className="rounded-full px-8 py-4 font-bold bg-red-600 hover:bg-red-700 text-white border-none transition-all">
+        {isAr ? 'إعادة المحاولة' : 'Try Again'}
+      </Button>
+    </div>
+  );
+}
+
 export function ServicesSection() {
   const t = useTranslations('services');
   const locale = useLocale();
-  const { data: servicesData } = useSWR<Service[]>('/services', api.get);
+  const { data: servicesData, error, isLoading, mutate } = useSWR<Service[]>('/services', api.get);
   const services = servicesData || [];
 
   return (
     <Section id="services" className="bg-gradient-to-b from-transparent to-[var(--primary)]/5">
       <SectionHeader title={<EditableText contentKey="services.title" defaultAr={t('title')} defaultEn={t('title')} />} subtitle={<EditableText contentKey="services.subtitle" defaultAr={t('subtitle')} defaultEn={t('subtitle')} />} />
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
+        {error ? (
+          <ServicesError onRetry={() => mutate()} locale={locale} />
+        ) : isLoading ? (
+          <ServicesSkeleton />
+        ) : (
+          <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
           {services.slice(0, 3).map((service, i) => {
             const Icon = iconMap[service.icon] || Activity;
             const title = locale === 'ar' ? service.titleAr : service.titleEn;
@@ -86,7 +125,8 @@ export function ServicesSection() {
               </motion.div>
             );
           })}
-        </div>
+          </div>
+        )}
 
 
 

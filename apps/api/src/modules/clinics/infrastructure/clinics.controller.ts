@@ -1,11 +1,13 @@
 import {
-  Controller, Get, Post, Put, Patch, Delete,
+  Controller, Get, Post, Put, Patch, Delete, Header,
   Param, Body, Query, UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { SkipThrottle } from '@nestjs/throttler';
 import { ClinicsService } from '../application/clinics.service';
 import { RolesGuard, Roles } from '../../../common/decorators';
 
+@SkipThrottle()
 @Controller('clinics')
 export class ClinicsController {
   constructor(private readonly clinicsService: ClinicsService) {}
@@ -13,26 +15,31 @@ export class ClinicsController {
   // ─── Public ────────────────────────────────────────────────────────────
 
   @Get()
+  @Header('Cache-Control', 'public, max-age=300, stale-while-revalidate=600')
   findAll() {
     return this.clinicsService.findAll();
   }
 
   @Get(':id')
+  @Header('Cache-Control', 'public, max-age=300, stale-while-revalidate=600')
   findOne(@Param('id') id: string) {
     return this.clinicsService.findOne(id);
   }
 
   @Get(':id/available-slots')
+  @Header('Cache-Control', 'public, max-age=300, stale-while-revalidate=600')
   getAvailableSlots(@Param('id') id: string, @Query('date') date: string) {
     return this.clinicsService.getAvailableSlots(id, date);
   }
 
   @Get(':id/working-hours')
+  @Header('Cache-Control', 'public, max-age=300, stale-while-revalidate=600')
   getWorkingHours(@Param('id') id: string) {
     return this.clinicsService.getWorkingHours(id);
   }
 
   @Get(':id/blocked-slots')
+  @Header('Cache-Control', 'public, max-age=300, stale-while-revalidate=600')
   getBlockedSlots(@Param('id') id: string) {
     return this.clinicsService.getBlockedSlots(id);
   }
@@ -41,6 +48,7 @@ export class ClinicsController {
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles('admin', 'editor')
+  @SkipThrottle({ default: false })
   @Post()
   create(@Body() body: {
     nameAr: string; nameEn: string;
@@ -52,6 +60,7 @@ export class ClinicsController {
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles('admin', 'editor')
+  @SkipThrottle({ default: false })
   @Patch(':id')
   update(@Param('id') id: string, @Body() body: any) {
     return this.clinicsService.update(id, body);
@@ -59,6 +68,7 @@ export class ClinicsController {
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles('admin')
+  @SkipThrottle({ default: false })
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.clinicsService.remove(id);
@@ -66,6 +76,7 @@ export class ClinicsController {
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles('admin', 'editor')
+  @SkipThrottle({ default: false })
   @Put(':id/working-hours')
   setWorkingHours(
     @Param('id') clinicId: string,
@@ -81,6 +92,7 @@ export class ClinicsController {
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles('admin', 'editor')
+  @SkipThrottle({ default: false })
   @Post(':id/blocked-slots')
   addBlockedSlot(
     @Param('id') clinicId: string,
@@ -91,6 +103,7 @@ export class ClinicsController {
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles('admin', 'editor')
+  @SkipThrottle({ default: false })
   @Delete(':id/blocked-slots/:slotId')
   removeBlockedSlot(@Param('slotId') slotId: string) {
     return this.clinicsService.removeBlockedSlot(slotId);

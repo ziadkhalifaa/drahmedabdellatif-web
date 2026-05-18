@@ -1,14 +1,17 @@
-import { Controller, Get, Post, Patch, Delete, Param, Body, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Param, Body, Query, UseGuards, Header } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { SkipThrottle } from '@nestjs/throttler';
 import { BlogService } from '../application/blog.service';
 import { RolesGuard, Roles } from '../../../common/decorators';
 import { BlogPostStatus } from '@prisma/client';
 
+@SkipThrottle()
 @Controller('blog')
 export class BlogController {
   constructor(private readonly blogService: BlogService) {}
 
   @Get()
+  @Header('Cache-Control', 'public, max-age=300, stale-while-revalidate=600')
   async findAll(
     @Query('status') status?: BlogPostStatus,
     @Query('page') page = 1,
@@ -18,27 +21,32 @@ export class BlogController {
   }
 
   @Get('published')
+  @Header('Cache-Control', 'public, max-age=300, stale-while-revalidate=600')
   async findPublished() {
     return this.blogService.findPublished();
   }
 
   @Get('categories')
+  @Header('Cache-Control', 'public, max-age=300, stale-while-revalidate=600')
   async getCategories() {
     return this.blogService.getCategories();
   }
 
   @Get('tags')
+  @Header('Cache-Control', 'public, max-age=300, stale-while-revalidate=600')
   async getTags() {
     return this.blogService.getTags();
   }
 
   @Get(':slug')
+  @Header('Cache-Control', 'public, max-age=300, stale-while-revalidate=600')
   async findBySlug(@Param('slug') slug: string) {
     return this.blogService.findBySlug(slug);
   }
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles('admin', 'editor')
+  @SkipThrottle({ default: false })
   @Post()
   async create(@Body() body: {
     titleAr: string; titleEn: string;
@@ -55,6 +63,7 @@ export class BlogController {
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles('admin', 'editor')
+  @SkipThrottle({ default: false })
   @Patch(':id')
   async update(@Param('id') id: string, @Body() body: any) {
     return this.blogService.update(id, body);
@@ -62,6 +71,7 @@ export class BlogController {
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles('admin')
+  @SkipThrottle({ default: false })
   @Delete(':id')
   async remove(@Param('id') id: string) {
     return this.blogService.remove(id);

@@ -1,27 +1,33 @@
-import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards, Header } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { SkipThrottle } from '@nestjs/throttler';
 import { ServicesService } from '../application/services.service';
 import { RolesGuard, Roles } from '../../../common/decorators';
 
+@SkipThrottle()
 @Controller('services')
 export class ServicesController {
   constructor(private readonly servicesService: ServicesService) {}
 
   @Get()
+  @Header('Cache-Control', 'public, max-age=300, stale-while-revalidate=600')
   async findAll() {
     return this.servicesService.findActive();
   }
 
   @Get('all')
+  @Header('Cache-Control', 'public, max-age=300, stale-while-revalidate=600')
   async findAllAdmin() {
     return this.servicesService.findAll();
   }
 
   @Get(':id')
+  @Header('Cache-Control', 'public, max-age=300, stale-while-revalidate=600')
   async findOne(@Param('id') id: string) {
     return this.servicesService.findOne(id);
   }
 
+  @SkipThrottle({ default: false })
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles('admin')
   @Post()
@@ -42,6 +48,7 @@ export class ServicesController {
     return this.servicesService.create(body);
   }
 
+  @SkipThrottle({ default: false })
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles('admin')
   @Patch(':id')
@@ -49,6 +56,7 @@ export class ServicesController {
     return this.servicesService.update(id, body);
   }
 
+  @SkipThrottle({ default: false })
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles('admin')
   @Delete(':id')

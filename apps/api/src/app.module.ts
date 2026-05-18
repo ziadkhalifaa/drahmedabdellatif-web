@@ -24,6 +24,7 @@ import { HeroModule } from './modules/hero/hero.module';
 import { TechniquesModule } from './modules/techniques/techniques.module';
 import { ClinicsModule } from './modules/clinics/clinics.module';
 import { RemindersModule } from './modules/reminders/reminders.module';
+import { HealthModule } from './modules/health/health.module';
 
 @Module({
   imports: [
@@ -61,6 +62,7 @@ import { RemindersModule } from './modules/reminders/reminders.module';
     TechniquesModule,
     ClinicsModule,
     RemindersModule,
+    HealthModule,
   ],
   providers: [
     {

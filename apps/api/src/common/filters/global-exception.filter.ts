@@ -47,6 +47,10 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       );
     }
 
+    if (status === HttpStatus.TOO_MANY_REQUESTS) {
+      response.header('Retry-After', '60');
+    }
+
     response.status(status).json(errorResponse);
   }
 }
