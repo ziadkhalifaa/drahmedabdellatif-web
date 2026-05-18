@@ -19,10 +19,12 @@ let bootstrapPromise: Promise<any> | null = null;
 async function bootstrap() {
   if (!bootstrapPromise) {
     bootstrapPromise = (async () => {
+      console.log('[BOOTSTRAP-DEBUG] Creating NestJS application (NestFactory.create)...');
       const app = await NestFactory.create<NestExpressApplication>(AppModule, {
         logger: WinstonModule.createLogger(winstonConfig),
         bufferLogs: true,
       });
+      console.log('[BOOTSTRAP-DEBUG] NestJS application created successfully.');
 
       // Security & Middleware
       app.use(helmet({
@@ -80,7 +82,9 @@ async function bootstrap() {
         SwaggerModule.setup('api/docs', app, document);
       }
 
+      console.log('[BOOTSTRAP-DEBUG] Initializing NestJS application (app.init)...');
       await app.init();
+      console.log('[BOOTSTRAP-DEBUG] NestJS application initialized successfully.');
 
       if (!process.env.VERCEL) {
         const port = process.env.PORT || 4000;
