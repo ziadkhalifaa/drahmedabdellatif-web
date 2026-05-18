@@ -18,6 +18,10 @@ const config: NextConfig = {
       },
       {
         protocol: 'https',
+        hostname: 'api.drahmedabdellatif.com',
+      },
+      {
+        protocol: 'https',
         hostname: '*.supabase.co',
       },
       {
