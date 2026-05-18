@@ -16,7 +16,7 @@ export class StorageService {
         persistSession: false,
       },
       realtime: {
-        transport: WebSocket,
+        transport: WebSocket as any,
       },
     }
   );

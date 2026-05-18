@@ -8,15 +8,13 @@ import { api, getMediaUrl } from '@/lib/api';
 import { Link } from '@/i18n/routing';
 import { Calendar, ArrowRight, FileText } from 'lucide-react';
 import type { BlogPost } from '@dr-ahmed/shared';
+import useSWR from 'swr';
 
 export function BlogPreviewSection() {
   const t = useTranslations('blog');
   const locale = useLocale();
-  const [posts, setPosts] = useState<BlogPost[]>([]);
-
-  useEffect(() => {
-    api.get<BlogPost[]>('/blog/published').then(setPosts).catch(() => {});
-  }, []);
+  const { data: postsData } = useSWR<BlogPost[]>('/blog/published', api.get);
+  const posts = postsData || [];
 
   return (
     <Section id="blog">

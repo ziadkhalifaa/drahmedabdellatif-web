@@ -1,6 +1,5 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { Section, SectionHeader, Card, Button } from '@/components/ui';
 import { motion } from 'framer-motion';
@@ -10,7 +9,7 @@ import type { Service } from '@dr-ahmed/shared';
 
 import { Stethoscope, Activity, Scan, Heart, Shield, Gem, ChevronRight } from 'lucide-react';
 import { EditableText, EditableImage } from '@/components/editor/editable-components';
-
+import useSWR from 'swr';
 
 const iconMap: Record<string, React.ElementType> = {
   Stethoscope, Kidney: Activity, Scan, Heart, Shield, Gem,
@@ -19,11 +18,8 @@ const iconMap: Record<string, React.ElementType> = {
 export function ServicesSection() {
   const t = useTranslations('services');
   const locale = useLocale();
-  const [services, setServices] = useState<Service[]>([]);
-
-  useEffect(() => {
-    api.get<Service[]>('/services').then(setServices).catch(() => {});
-  }, []);
+  const { data: servicesData } = useSWR<Service[]>('/services', api.get);
+  const services = servicesData || [];
 
   return (
     <Section id="services" className="bg-gradient-to-b from-transparent to-[var(--primary)]/5">

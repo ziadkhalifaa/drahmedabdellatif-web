@@ -11,9 +11,9 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
     // required on Hostinger shared hosting which blocks os thread creation (EAGAIN)
     const pool = new Pool({
       connectionString: process.env.DATABASE_URL,
-      max: 5,           // Small pool for shared hosting
-      idleTimeoutMillis: 10000,
-      connectionTimeoutMillis: 10000,
+      max: 15,           // Increased pool size for handling concurrent connections on Supabase pgbouncer
+      idleTimeoutMillis: 15000,
+      connectionTimeoutMillis: 15000,
     });
 
     const adapter = new PrismaPg(pool);

@@ -11,21 +11,19 @@ import { cn } from '@/lib/utils';
 import { ArrowLeft, ArrowRight, Heart } from 'lucide-react';
 import useEmblaCarousel from 'embla-carousel-react';
 import Autoplay from 'embla-carousel-autoplay';
+import useSWR from 'swr';
 
 export function TestimonialsSection() {
   const t = useTranslations('testimonials');
   const locale = useLocale();
   const isAr = locale === 'ar';
-  const [stories, setStories] = useState<any[]>([]);
+  const { data: storiesData } = useSWR<any[]>('/testimonials/success-stories?limit=10', api.get);
+  const stories = storiesData || [];
 
   const [emblaRef, emblaApi] = useEmblaCarousel(
     { loop: true, align: 'center', direction: isAr ? 'rtl' : 'ltr' },
     [Autoplay({ delay: 5000, stopOnInteraction: true })]
   );
-
-  useEffect(() => {
-    api.get<any[]>('/testimonials/success-stories?limit=10').then(setStories).catch(() => {});
-  }, []);
 
   const scrollPrev = useCallback(() => emblaApi && emblaApi.scrollPrev(), [emblaApi]);
   const scrollNext = useCallback(() => emblaApi && emblaApi.scrollNext(), [emblaApi]);

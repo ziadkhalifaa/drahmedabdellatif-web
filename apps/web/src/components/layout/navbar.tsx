@@ -30,6 +30,7 @@ import { Logo } from '@/components/ui/logo';
 import { motion, AnimatePresence, useScroll, useTransform, useSpring } from 'framer-motion';
 import { api, getMediaUrl } from '@/lib/api';
 import type { Service } from '@dr-ahmed/shared';
+import useSWR from 'swr';
 
 export function Navbar() {
   const t = useTranslations('nav');
@@ -46,7 +47,8 @@ export function Navbar() {
   const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
-  const [services, setServices] = useState<Service[]>([]);
+  const { data: servicesData } = useSWR<Service[]>('/services', api.get);
+  const services = servicesData?.slice(0, 6) || [];
   const [mounted, setMounted] = useState(false);
   const { user, token, isLoading: isAuthLoading, logout } = useAuth();
   const isLoggedIn = !!token;
@@ -57,10 +59,6 @@ export function Navbar() {
     setMounted(true);
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener('scroll', handleScroll);
-    
-    api.get<Service[]>('/services')
-      .then(res => setServices(res.slice(0, 6)))
-      .catch(err => console.error("Failed to fetch services:", err));
 
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
