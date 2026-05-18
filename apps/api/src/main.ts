@@ -81,6 +81,13 @@ async function bootstrap() {
       }
 
       await app.init();
+
+      if (!process.env.VERCEL) {
+        const port = process.env.PORT || 4000;
+        await app.listen(port);
+        Logger.log(`🚀 API Server listening on port ${port}`, 'Bootstrap');
+      }
+
       return app.getHttpAdapter().getInstance();
     })();
   }
