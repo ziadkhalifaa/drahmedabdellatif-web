@@ -205,8 +205,9 @@ export function Navbar() {
                 onClick={() => setLangOpen(!langOpen)} 
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-full hover:bg-white dark:hover:bg-slate-800 text-foreground transition-all duration-300 text-[10px] font-black tracking-wider"
               >
-                <span>{locale === 'ar' ? '🇸🇦 AR' : '🇬🇧 EN'}</span>
-                <ChevronDown size={10} className={cn("transition-transform duration-300 opacity-60 text-primary", langOpen && "rotate-180")} />
+                <Languages size={12} className="text-primary" />
+                <span>{locale === 'ar' ? 'العربية' : 'English'}</span>
+                <ChevronDown size={10} className={cn("transition-transform duration-300 opacity-60", langOpen && "rotate-180")} />
               </button>
 
               <AnimatePresence>
@@ -233,10 +234,7 @@ export function Navbar() {
                         locale === 'ar' ? "text-primary bg-primary/5" : "text-foreground/80 hover:text-foreground"
                       )}
                     >
-                      <span className="flex items-center gap-2">
-                        <span>🇸🇦</span>
-                        <span>العربية</span>
-                      </span>
+                      <span>العربية</span>
                       {locale === 'ar' && <Check size={10} className="text-primary font-black" />}
                     </button>
 
@@ -252,10 +250,7 @@ export function Navbar() {
                         locale === 'en' ? "text-primary bg-primary/5" : "text-foreground/80 hover:text-foreground"
                       )}
                     >
-                      <span className="flex items-center gap-2">
-                        <span>🇬🇧</span>
-                        <span>EN</span>
-                      </span>
+                      <span>English</span>
                       {locale === 'en' && <Check size={10} className="text-primary font-black" />}
                     </button>
                   </motion.div>
