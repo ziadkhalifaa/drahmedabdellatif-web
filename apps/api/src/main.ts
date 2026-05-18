@@ -84,7 +84,9 @@ async function bootstrap() {
 
       if (!process.env.VERCEL) {
         const port = process.env.PORT || 4000;
+        console.log(`[BOOTSTRAP-DEBUG] Calling app.listen(${port})...`);
         await app.listen(port);
+        console.log(`[BOOTSTRAP-DEBUG] app.listen(${port}) successful!`);
         Logger.log(`🚀 API Server listening on port ${port}`, 'Bootstrap');
       }
 
@@ -106,13 +108,15 @@ export default async (req: any, res: any) => {
 
 // For standalone Node.js environments (like Hostinger, PM2, local)
 if (!process.env.VERCEL) {
+  console.log('[BOOTSTRAP-DEBUG] Standalone environment detected, invoking bootstrap()...');
   bootstrap()
     .then(() => {
-      Logger.log('🚀 NestJS Bootstrap completed successfully', 'StandaloneBootstrap');
+      console.log('[BOOTSTRAP-DEBUG] bootstrap() Promise resolved successfully!');
     })
     .catch(err => {
-      Logger.error('💥 Failed to bootstrap NestJS server', err, 'StandaloneBootstrap');
+      console.error('[BOOTSTRAP-DEBUG] bootstrap() Promise REJECTED with error:', err);
       process.exit(1);
     });
 }
+
 
