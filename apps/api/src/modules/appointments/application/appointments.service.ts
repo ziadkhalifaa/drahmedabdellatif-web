@@ -73,7 +73,7 @@ export class AppointmentsService {
             },
             body: JSON.stringify({
               name: `dr-ahmed-${Date.now()}`,
-              privacy: 'private',
+              privacy: 'public',
               properties: {
                 exp: Math.floor(Date.now() / 1000) + 7200,
                 enable_prejoin_ui: true,
