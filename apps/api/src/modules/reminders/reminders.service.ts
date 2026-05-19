@@ -56,6 +56,81 @@ export class RemindersService {
     }
   }
 
+  @Cron('*/5 * * * *') // Run every 5 minutes
+  async handleSessionReminders() {
+    this.logger.log('Running 10-minute session reminders cron job...');
+    const now = new Date();
+
+    // Fetch approved online appointments for today
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+    const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+
+    const appointments = await this.prisma.appointment.findMany({
+      where: {
+        type: 'ONLINE',
+        status: 'approved',
+        whatsappReminderSent: false,
+        date: {
+          gte: startOfToday,
+          lte: endOfToday,
+        },
+      },
+      include: {
+        patient: true,
+      },
+    });
+
+    this.logger.log(`Found ${appointments.length} approved online appointments today to check for session reminders.`);
+
+    for (const apt of appointments) {
+      if (!apt.timeSlot) continue;
+      
+      const [hourStr, minuteStr] = apt.timeSlot.split(':');
+      const hours = parseInt(hourStr || '0', 10);
+      const minutes = parseInt(minuteStr || '0', 10);
+      
+      // Calculate local appointment start time
+      const appointmentStart = new Date(
+        apt.date.getFullYear(),
+        apt.date.getMonth(),
+        apt.date.getDate(),
+        hours,
+        minutes,
+        0, 0
+      );
+
+      const diffMs = appointmentStart.getTime() - now.getTime();
+      const diffMins = diffMs / (60 * 1000);
+
+      // If the session starts in 5 to 15 minutes
+      if (diffMins >= 5 && diffMins <= 15) {
+        const phone = apt.patient?.phone || apt.guestPhone;
+        const name = apt.patient?.name || apt.guestName || 'مريضنا العزيز';
+        
+        if (phone) {
+          try {
+            const frontendUrl = process.env.FRONTEND_URL || 'https://drahmedabdellatif.com';
+            const roomUrl = `${frontendUrl}/ar/dashboard/video/${apt.meetingId || apt.id}`;
+            
+            const message = `تذكير: تبدأ جلستك الاستشارية مع د. أحمد عبد اللطيف بعد 10 دقائق.\nالموعد: اليوم الساعة ${apt.timeSlot}\nرابط الدخول المباشر للغرفة:\n${roomUrl}`;
+            
+            await this.whatsappService.sendMessage(phone, message);
+            
+            // Mark as sent
+            await this.prisma.appointment.update({
+              where: { id: apt.id },
+              data: { whatsappReminderSent: true },
+            });
+            
+            this.logger.log(`Session start reminder sent to ${name} (${phone}) for appointment ${apt.id}`);
+          } catch (error: any) {
+            this.logger.error(`Failed to send session reminder to ${name}: ${error.message}`);
+          }
+        }
+      }
+    }
+  }
+
   // Manual trigger for testing
   async triggerRemindersForDate(dateStr: string) {
     const targetDate = new Date(dateStr);

@@ -8,6 +8,7 @@ import { Card, Button, Input } from '@/components/ui';
 import { toast } from 'sonner';
 import { FileText, Upload, Search, User, FileUp, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useSearchParams } from 'next/navigation';
 
 interface Patient {
   id: string;
@@ -20,6 +21,9 @@ export default function AdminReportsPage() {
   const t = useTranslations('admin.reports');
   const tCommon = useTranslations('common');
   const { token } = useAuth();
+  const searchParams = useSearchParams();
+  const searchParam = searchParams.get('search');
+  const openUploadParam = searchParams.get('openUpload');
   
   const [patients, setPatients] = useState<Patient[]>([]);
   const [loading, setLoading] = useState(true);
@@ -27,6 +31,24 @@ export default function AdminReportsPage() {
   
   // Upload Modal State
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (searchParam) {
+      setSearchTerm(searchParam);
+    }
+  }, [searchParam]);
+
+  useEffect(() => {
+    if (openUploadParam === 'true' && patients.length > 0 && searchParam) {
+      const match = patients.find(p => p.name?.toLowerCase().includes(searchParam.toLowerCase()));
+      if (match) {
+        setSelectedPatient(match);
+        setIsUploadModalOpen(true);
+        setUploadData({ title: '', description: '' });
+        setFile(null);
+      }
+    }
+  }, [patients, searchParam, openUploadParam]);
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [uploadData, setUploadData] = useState({ title: '', description: '' });
   const [file, setFile] = useState<File | null>(null);

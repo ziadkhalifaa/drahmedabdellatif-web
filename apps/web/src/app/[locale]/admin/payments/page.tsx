@@ -45,7 +45,7 @@ function ProofModal({ url, onClose }: { url: string; onClose: () => void }) {
   );
 }
 
-function AppointmentPaymentCard({ apt, onAction }: { apt: any; onAction: () => void }) {
+function AppointmentPaymentCard({ apt, onAction }: { apt: any; onAction: (id: string, newStatus: string) => void }) {
   const locale = useLocale();
   const isRTL = locale === 'ar';
   const { token } = useAuth();
@@ -59,7 +59,7 @@ function AppointmentPaymentCard({ apt, onAction }: { apt: any; onAction: () => v
     try {
       await appointmentsApi.confirmPayment(apt.id, action, adminNote || undefined, token!);
       toast.success(action === 'confirm' ? '✅ تم تأكيد الدفع والحجز' : '❌ تم رفض الدفع');
-      onAction();
+      onAction(apt.id, action === 'confirm' ? 'CONFIRMED' : 'REJECTED');
     } catch {
       toast.error('فشل تنفيذ الإجراء');
     } finally {
@@ -265,7 +265,13 @@ export default function AdminPaymentsPage() {
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">
           {paymentApts.map(apt => (
-            <AppointmentPaymentCard key={apt.id} apt={apt} onAction={load} />
+            <AppointmentPaymentCard 
+              key={apt.id} 
+              apt={apt} 
+              onAction={(id, newStatus) => {
+                setAppointments(prev => prev.map(a => a.id === id ? { ...a, paymentStatus: newStatus } : a));
+              }} 
+            />
           ))}
         </div>
       )}

@@ -5,9 +5,11 @@ import { api } from '@/lib/api';
 import { useAuth } from '@/components/layout/admin-layout';
 import { Card, Button, Input } from '@/components/ui';
 import { toast } from 'sonner';
-import { Users, Search, Mail, Phone, Calendar, FileText, Download, Trash2 } from 'lucide-react';
+import { Users, Search, Mail, Phone, Calendar, FileText, Download, Trash2, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { exportToExcel } from '@/lib/export-utils';
+import { useSearchParams } from 'next/navigation';
+import { useRouter } from '@/i18n/routing';
 
 interface Patient {
   id: string;
@@ -23,10 +25,21 @@ interface Patient {
 
 export default function PatientsManagementPage() {
   const { token } = useAuth();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const searchParam = searchParams.get('search');
+  const appointmentIdParam = searchParams.get('appointmentId');
+
   const [patients, setPatients] = useState<Patient[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (searchParam) {
+      setSearchTerm(searchParam);
+    }
+  }, [searchParam]);
 
   const handleDeleteClick = async (patientId: string, patientName: string) => {
     const confirmDelete = window.confirm(`Are you absolutely sure you want to delete patient "${patientName}"? This will permanently delete ALL of their appointments, prescriptions, medical reports, payments, and account data. This action is irreversible!`);
@@ -174,11 +187,23 @@ export default function PatientsManagementPage() {
                         size="sm"
                         className="text-[var(--primary)] hover:bg-[var(--primary)]/5 rounded-lg h-8 px-3 text-xs font-bold gap-1"
                         onClick={() => {
-                          window.location.href = `/${(window as any).__NEXT_DATA__?.locale || 'ar'}/admin/reports`;
+                          router.push(`/admin/reports?search=${encodeURIComponent(patient.name)}&openUpload=true`);
                         }}
                       >
                         <FileText size={14} /> Reports
                       </Button>
+                      {appointmentIdParam && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-emerald-500 hover:bg-emerald-500/5 rounded-lg h-8 px-3 text-xs font-bold gap-1 animate-pulse border border-emerald-500/20"
+                          onClick={() => {
+                            router.push(`/admin/prescriptions/new/${appointmentIdParam}`);
+                          }}
+                        >
+                          <Plus size={14} /> Write Prescription
+                        </Button>
+                      )}
                       <Button
                         variant="ghost"
                         size="sm"

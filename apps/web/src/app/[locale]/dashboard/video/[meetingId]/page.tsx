@@ -130,7 +130,9 @@ export default function VideoRoomPage() {
                   setEndingSession(true);
                   try {
                     await api.patch(`/appointments/${appointment.id}/status`, { status: 'completed' }, token);
-                    router.push('/dashboard');
+                    const patientName = appointment?.patient?.name || appointment?.guestName || '';
+                    const appointmentId = appointment?.id || '';
+                    router.push(`/admin/patients?search=${encodeURIComponent(patientName)}&appointmentId=${appointmentId}`);
                   } catch (err: any) {
                     console.error(err);
                   } finally {

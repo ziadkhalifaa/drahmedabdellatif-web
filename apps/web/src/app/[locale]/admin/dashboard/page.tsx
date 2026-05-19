@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/components/layout/admin-layout';
 import { Card, Button } from '@/components/ui';
@@ -37,10 +37,13 @@ interface DashboardStats {
 
 export default function AdminDashboardPage() {
   const t = useTranslations('admin');
+  const locale = useLocale();
+  const isRTL = locale === 'ar';
   const { token } = useAuth();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [activeChartTab, setActiveChartTab] = useState<'bookings' | 'revenue'>('bookings');
 
   const fetchStats = useCallback((attempt = 1) => {
     if (!token) return;
@@ -206,64 +209,125 @@ export default function AdminDashboardPage() {
                     <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
                       <TrendingUp size={20} />
                     </div>
-                    {t('appointment_trends')}
+                    {isRTL ? 'إحصائيات وتحليلات الأداء' : 'Performance Analytics'}
                   </h3>
-                  <p className="text-xs font-bold text-[var(--muted)] mt-1 ml-13">{t('monthly_performance')}</p>
+                  <p className="text-xs font-bold text-[var(--muted)] mt-1 ml-13">
+                    {isRTL ? 'العيادات ضد الاستشارات الأونلاين' : 'Clinics vs. Online Consultations'}
+                  </p>
                 </div>
                 <div className="flex gap-2 bg-black/5 dark:bg-white/5 p-1 rounded-xl">
-                   {['Week', 'Month', 'Year'].map((period) => (
-                     <button key={period} className={cn(
-                       "px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
-                       period === 'Month' ? "bg-white dark:bg-white/10 shadow-sm text-primary" : "text-[var(--muted)] hover:text-[var(--foreground)]"
-                     )}>{period}</button>
-                   ))}
+                  <button 
+                    onClick={() => setActiveChartTab('bookings')} 
+                    className={cn(
+                      "px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
+                      activeChartTab === 'bookings' ? "bg-white dark:bg-white/10 shadow-sm text-primary" : "text-[var(--muted)] hover:text-[var(--foreground)]"
+                    )}
+                  >
+                    {isRTL ? 'الحجوزات' : 'Bookings'}
+                  </button>
+                  <button 
+                    onClick={() => setActiveChartTab('revenue')} 
+                    className={cn(
+                      "px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
+                      activeChartTab === 'revenue' ? "bg-white dark:bg-white/10 shadow-sm text-primary" : "text-[var(--muted)] hover:text-[var(--foreground)]"
+                    )}
+                  >
+                    {isRTL ? 'الإيرادات' : 'Revenue'}
+                  </button>
                 </div>
               </div>
+              
               <div className="h-[350px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={stats?.charts?.appointments || []} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
-                    <defs>
-                      <linearGradient id="premiumGradient" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3}/>
-                        <stop offset="95%" stopColor="var(--primary)" stopOpacity={0}/>
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="6 6" vertical={false} strokeOpacity={0.05} />
-                    <XAxis 
-                      dataKey="month" 
-                      fontSize={10} 
-                      axisLine={false} 
-                      tickLine={false} 
-                      tick={{ fill: 'var(--muted)', fontWeight: 800 }} 
-                    />
-                    <YAxis 
-                      fontSize={10} 
-                      axisLine={false} 
-                      tickLine={false} 
-                      tick={{ fill: 'var(--muted)', fontWeight: 800 }}
-                    />
-                    <Tooltip 
-                      contentStyle={{ 
-                        borderRadius: '20px', 
-                        border: '1px solid rgba(255,255,255,0.1)', 
-                        background: 'rgba(0,0,0,0.8)',
-                        backdropFilter: 'blur(10px)',
-                        boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
-                        padding: '12px 16px'
-                      }}
-                      itemStyle={{ color: '#fff', fontSize: '12px', fontWeight: 'bold' }}
-                      labelStyle={{ color: 'rgba(255,255,255,0.5)', fontSize: '10px', marginBottom: '4px', textTransform: 'uppercase', fontWeight: '900' }}
-                    />
-                    <Area 
-                      type="monotone" 
-                      dataKey="count" 
-                      stroke="var(--primary)" 
-                      fillOpacity={1} 
-                      fill="url(#premiumGradient)" 
-                      strokeWidth={4} 
-                      animationDuration={2000}
-                    />
-                  </AreaChart>
+                  {activeChartTab === 'bookings' ? (
+                    <BarChart data={stats?.charts?.appointments || []} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="6 6" vertical={false} strokeOpacity={0.05} />
+                      <XAxis 
+                        dataKey="month" 
+                        fontSize={10} 
+                        axisLine={false} 
+                        tickLine={false} 
+                        tick={{ fill: 'var(--muted)', fontWeight: 800 }} 
+                      />
+                      <YAxis 
+                        fontSize={10} 
+                        axisLine={false} 
+                        tickLine={false} 
+                        tick={{ fill: 'var(--muted)', fontWeight: 800 }}
+                      />
+                      <Tooltip 
+                        contentStyle={{ 
+                          borderRadius: '20px', 
+                          border: '1px solid rgba(255,255,255,0.1)', 
+                          background: 'rgba(0,0,0,0.8)',
+                          backdropFilter: 'blur(10px)',
+                          boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
+                          padding: '12px 16px'
+                        }}
+                        itemStyle={{ color: '#fff', fontSize: '12px', fontWeight: 'bold' }}
+                        labelStyle={{ color: 'rgba(255,255,255,0.5)', fontSize: '10px', marginBottom: '4px', textTransform: 'uppercase', fontWeight: '900' }}
+                      />
+                      <Bar dataKey="clinicsBookings" name={isRTL ? "حجوزات العيادات" : "Clinic Bookings"} fill="#10b981" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="onlineBookings" name={isRTL ? "استشارات أونلاين" : "Online Consultations"} fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  ) : (
+                    <AreaChart data={stats?.charts?.appointments || []} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
+                      <defs>
+                        <linearGradient id="clinicRevenueGrad" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
+                          <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                        </linearGradient>
+                        <linearGradient id="onlineRevenueGrad" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
+                          <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="6 6" vertical={false} strokeOpacity={0.05} />
+                      <XAxis 
+                        dataKey="month" 
+                        fontSize={10} 
+                        axisLine={false} 
+                        tickLine={false} 
+                        tick={{ fill: 'var(--muted)', fontWeight: 800 }} 
+                      />
+                      <YAxis 
+                        fontSize={10} 
+                        axisLine={false} 
+                        tickLine={false} 
+                        tick={{ fill: 'var(--muted)', fontWeight: 800 }}
+                      />
+                      <Tooltip 
+                        contentStyle={{ 
+                          borderRadius: '20px', 
+                          border: '1px solid rgba(255,255,255,0.1)', 
+                          background: 'rgba(0,0,0,0.8)',
+                          backdropFilter: 'blur(10px)',
+                          boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
+                          padding: '12px 16px'
+                         }}
+                        itemStyle={{ color: '#fff', fontSize: '12px', fontWeight: 'bold' }}
+                        labelStyle={{ color: 'rgba(255,255,255,0.5)', fontSize: '10px', marginBottom: '4px', textTransform: 'uppercase', fontWeight: '900' }}
+                      />
+                      <Area 
+                        type="monotone" 
+                        dataKey="clinicsPayments" 
+                        name={isRTL ? "إيرادات العيادات (EGP)" : "Clinic Revenue (EGP)"}
+                        stroke="#10b981" 
+                        fillOpacity={1} 
+                        fill="url(#clinicRevenueGrad)" 
+                        strokeWidth={3} 
+                      />
+                      <Area 
+                        type="monotone" 
+                        dataKey="onlinePayments" 
+                        name={isRTL ? "إيرادات الأونلاين (EGP)" : "Online Revenue (EGP)"}
+                        stroke="#3b82f6" 
+                        fillOpacity={1} 
+                        fill="url(#onlineRevenueGrad)" 
+                        strokeWidth={3} 
+                      />
+                    </AreaChart>
+                  )}
                 </ResponsiveContainer>
               </div>
            </Card>
