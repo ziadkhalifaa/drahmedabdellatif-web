@@ -1,7 +1,7 @@
 import { Controller, Post, Get, Delete, Param, Body, UseGuards, Req, Res, UnauthorizedException, Query } from '@nestjs/common';
 import { Response, Request } from 'express';
 import { AuthGuard } from '@nestjs/passport';
-import { Throttle } from '@nestjs/throttler';
+import { Throttle, SkipThrottle } from '@nestjs/throttler';
 import { RolesGuard, Roles } from '../../../common/decorators';
 import { AuthService } from '../application/auth.service';
 
@@ -46,6 +46,7 @@ export class AuthController {
     return this.authService.resendCode(body.email, body.method);
   }
 
+  @SkipThrottle()
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles('admin', 'doctor')
   @Get('users')
@@ -53,12 +54,14 @@ export class AuthController {
     return this.authService.getUsers(role);
   }
 
+  @SkipThrottle()
   @UseGuards(AuthGuard('jwt'))
   @Get('profile')
   async profile(@Req() req: any) {
     return this.authService.getProfile(req.user.id);
   }
 
+  @SkipThrottle()
   @UseGuards(AuthGuard('jwt'))
   @Post('profile')
   async updateProfile(@Req() req: any, @Body() body: any) {
@@ -76,6 +79,7 @@ export class AuthController {
     return this.authService.resetPassword(body.email, body.code, body.newPassword);
   }
 
+  @SkipThrottle()
   @Post('refresh')
   async refresh(@Req() req: Request, @Body() body: { refreshToken?: string }, @Res({ passthrough: true }) res: Response) {
     const refreshToken = req.cookies?.refreshToken || body.refreshToken;
@@ -93,6 +97,7 @@ export class AuthController {
     return { accessToken: data.accessToken };
   }
 
+  @SkipThrottle()
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles('admin')
   @Delete('users/:id')
