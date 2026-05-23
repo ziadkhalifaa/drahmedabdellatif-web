@@ -7,6 +7,7 @@ export class EmailService {
   private transporter: nodemailer.Transporter;
 
   constructor() {
+    this.logger.log(`[EmailService] SMTP init: Host=${process.env.SMTP_HOST}, Port=${process.env.SMTP_PORT}, User=${process.env.SMTP_USER}, PassLength=${process.env.SMTP_PASS ? process.env.SMTP_PASS.length : 0}`);
     this.transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST || 'smtp.gmail.com',
       port: Number(process.env.SMTP_PORT) || 465,
