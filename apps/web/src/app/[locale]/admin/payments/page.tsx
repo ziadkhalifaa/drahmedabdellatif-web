@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useLocale } from 'next-intl';
 import { useAuth } from '@/components/layout/admin-layout';
 import { appointmentsApi } from '@/lib/api';
-import { cn } from '@/lib/utils';
+import { cn, formatTime12Hour } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   CreditCard, CheckCircle, XCircle, Loader2,
@@ -108,7 +108,7 @@ function AppointmentPaymentCard({ apt, onAction }: { apt: any; onAction: (id: st
         </div>
         <div className="flex items-center gap-2">
           <Clock size={12} className="text-primary" />
-          {apt.timeSlot}
+          {formatTime12Hour(apt.timeSlot, isRTL)}
         </div>
         {apt.clinic && (
           <div className="flex items-center gap-2 col-span-2">

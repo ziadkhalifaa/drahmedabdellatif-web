@@ -7,7 +7,7 @@ import { Input, Textarea, Button } from '@/components/ui';
 import { api, clinicsApi, appointmentsApi, siteSettingsApi } from '@/lib/api';
 import { Calendar, CheckCircle2, AlertCircle, Clock, Phone, Mail, User, FileText, Building2, BabyIcon, CreditCard, UploadCloud } from 'lucide-react';
 import { TIME_SLOTS } from '@dr-ahmed/shared';
-import { cn } from '@/lib/utils';
+import { cn, formatTime12Hour } from '@/lib/utils';
 import { useAuth } from '@/context/auth-context';
 import { useRouter } from '@/i18n/routing';
 import { toast } from 'sonner';
@@ -410,7 +410,7 @@ export function BookingForm() {
             >
               <option value="" className="bg-[#050e1a]">{slotsLoading ? (isAr ? 'جاري التحميل...' : 'Loading...') : (isAr ? 'اختر وقتاً' : 'Select a time')}</option>
               {availableSlots.length > 0 ? availableSlots.map((slot) => (
-                <option key={slot} value={slot} className="bg-[#050e1a]">{slot}</option>
+                <option key={slot} value={slot} className="bg-[#050e1a]">{formatTime12Hour(slot, isAr)}</option>
               )) : (
                 form.date && form.clinicId && !slotsLoading && <option value="" disabled className="bg-[#050e1a]">{isAr ? 'لا توجد مواعيد متاحة' : 'No available slots'}</option>
               )}

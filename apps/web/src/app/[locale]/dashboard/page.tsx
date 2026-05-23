@@ -10,7 +10,8 @@ import {
   Calendar, FileText, User as UserIcon, LogOut, Video,
   Clock, Pill, History, LayoutDashboard, HeartPulse, Activity, Star
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, formatTime12Hour } from '@/lib/utils';
+import { useLocale } from 'next-intl';
 import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
 import { useRouter } from '@/i18n/routing';
@@ -21,6 +22,8 @@ import { useAuth } from '@/context/auth-context';
 
 export default function DashboardPage() {
   const t = useTranslations('dashboard');
+  const locale = useLocale();
+  const isRTL = locale === 'ar';
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, token, logout, isLoading } = useAuth();
@@ -264,7 +267,7 @@ export default function DashboardPage() {
                               </h4>
                               <p className="text-sm font-bold text-[var(--muted)] flex items-center gap-2">
                                 <Clock size={14} className="text-[var(--primary)]" /> 
-                                {activeAppointments[0]?.timeSlot || activeAppointments[0]?.time || '--:--'}
+                                {activeAppointments[0]?.timeSlot ? formatTime12Hour(activeAppointments[0].timeSlot, isRTL) : (activeAppointments[0]?.time ? formatTime12Hour(activeAppointments[0].time, isRTL) : '--:--')}
                                 <span className="mx-2 opacity-30">•</span>
                                 <span className={activeAppointments[0]?.type === 'ONLINE' ? 'text-blue-500' : 'text-emerald-500'}>
                                   {activeAppointments[0]?.type === 'ONLINE' ? 'Online Video' : 'Clinic Visit'}

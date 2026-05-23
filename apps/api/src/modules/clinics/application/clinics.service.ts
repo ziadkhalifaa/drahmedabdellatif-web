@@ -173,10 +173,12 @@ export class ClinicsService {
   }
 
   async getBlockedSlots(clinicId: string) {
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
     return this.prisma.clinicBlockedSlot.findMany({
       where: {
         clinicId,
-        date: { gte: new Date() },
+        date: { gte: startOfToday },
       },
       orderBy: { date: 'asc' },
     });

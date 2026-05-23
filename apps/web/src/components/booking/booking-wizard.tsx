@@ -9,7 +9,7 @@ import {
   Video, ChevronRight, ChevronLeft, CreditCard,
   UploadCloud, CheckCircle, AlertCircle, MapPin
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, formatTime12Hour } from '@/lib/utils';
 import { toast } from 'sonner';
 import { AppointmentType } from '@dr-ahmed/shared';
 import { useAuth } from '@/context/auth-context';
@@ -396,7 +396,7 @@ export default function BookingWizard() {
                                 : 'bg-white/5 border-white/10 text-white/70 hover:bg-white/10 hover:border-white/30'
                             )}
                           >
-                            {slot}
+                            {formatTime12Hour(slot, isRTL)}
                           </button>
                         ))}
                       </div>
@@ -620,7 +620,7 @@ export default function BookingWizard() {
                   </div>
                   <div>
                     <p className="text-xs text-white/50">{isRTL ? 'الموعد' : 'Date & Time'}</p>
-                    <p className="font-bold text-white font-mono" dir="ltr">{date} <span className="mx-1 text-primary">@</span> {timeSlot}</p>
+                    <p className="font-bold text-white font-mono" dir="ltr">{date} <span className="mx-1 text-primary">@</span> {formatTime12Hour(timeSlot, isRTL)}</p>
                   </div>
                 </div>
 

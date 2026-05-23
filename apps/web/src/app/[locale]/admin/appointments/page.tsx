@@ -9,6 +9,7 @@ import type { Appointment } from '@dr-ahmed/shared';
 import { AppointmentStatus, AppointmentType } from '@dr-ahmed/shared';
 import { Check, X, FileDown, Download, Pill, Video } from 'lucide-react';
 import { exportToExcel, exportToPDF } from '@/lib/export-utils';
+import { formatTime12Hour } from '@/lib/utils';
 
 export default function AdminAppointmentsPage() {
   const { token } = useAuth();
@@ -45,7 +46,7 @@ export default function AdminAppointmentsPage() {
         Phone: phone,
         Email: email,
         Date: new Date(a.date).toLocaleDateString(),
-        Time: a.timeSlot,
+        Time: formatTime12Hour(a.timeSlot, false),
         Status: a.status,
         Notes: a.notes || ''
       };
@@ -62,7 +63,7 @@ export default function AdminAppointmentsPage() {
         name,
         phone,
         new Date(a.date).toLocaleDateString(),
-        a.timeSlot,
+        formatTime12Hour(a.timeSlot, false),
         a.status
       ];
     });
@@ -137,7 +138,7 @@ export default function AdminAppointmentsPage() {
                     </td>
                     <td className="p-4 text-[var(--muted)] font-medium">{phone}</td>
                   <td className="p-4 text-[var(--muted)]">{new Date(apt.date).toLocaleDateString()}</td>
-                  <td className="p-4 text-[var(--muted)]">{apt.timeSlot}</td>
+                  <td className="p-4 text-[var(--muted)]">{formatTime12Hour(apt.timeSlot, true)}</td>
                   <td className="p-4">
                     <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase ${
                       apt.status === AppointmentStatus.APPROVED ? 'bg-emerald-100 text-emerald-700' :

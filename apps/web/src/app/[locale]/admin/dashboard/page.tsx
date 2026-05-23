@@ -17,7 +17,7 @@ import {
   AreaChart, Area
 } from 'recharts';
 import { exportToExcel, exportToPDF } from '@/lib/export-utils';
-import { cn } from '@/lib/utils';
+import { cn, formatTime12Hour } from '@/lib/utils';
 
 
 interface DashboardStats {
@@ -368,7 +368,7 @@ export default function AdminDashboardPage() {
                         <td className="px-8 py-6">
                           <div className="flex flex-col">
                             <span className="text-xs font-black text-[var(--foreground)]">{new Date(apt.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
-                            <span className="text-[10px] font-bold text-[var(--muted)] uppercase tracking-wider mt-1">{apt.timeSlot}</span>
+                            <span className="text-[10px] font-bold text-[var(--muted)] uppercase tracking-wider mt-1">{formatTime12Hour(apt.timeSlot, locale === 'ar')}</span>
                           </div>
                         </td>
                         <td className="px-8 py-6 text-right">

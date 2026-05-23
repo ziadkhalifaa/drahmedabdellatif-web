@@ -19,7 +19,8 @@ import {
   Clock3,
   LayoutDashboard
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, formatTime12Hour } from '@/lib/utils';
+import { useLocale } from 'next-intl';
 import { useAuth } from '@/context/auth-context';
 
 import { useState, useEffect } from 'react';
@@ -28,6 +29,8 @@ import { useRouter } from '@/i18n/routing';
 
 export default function PatientAppointmentsPage() {
   const t = useTranslations('dashboard');
+  const locale = useLocale();
+  const isRTL = locale === 'ar';
   const router = useRouter();
   const { token, logout } = useAuth();
   const [appointments, setAppointments] = useState<any[]>([]);
@@ -201,7 +204,7 @@ export default function PatientAppointmentsPage() {
                                   <div className="flex flex-wrap items-center gap-4 text-sm text-[var(--muted)] font-medium">
                                     <span className="flex items-center gap-1.5">
                                       <Clock size={16} /> 
-                                      {appt.timeSlot}
+                                      {formatTime12Hour(appt.timeSlot, isRTL)}
                                     </span>
                                     <span className="flex items-center gap-1.5">
                                       {isOnline ? <Video size={16} /> : <MapPin size={16} />}
