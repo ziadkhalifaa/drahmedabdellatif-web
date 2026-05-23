@@ -1,9 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../common/prisma.service';
+import { EmailService } from '../../common/email.service';
 
 @Injectable()
 export class NewsletterService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly emailService: EmailService,
+  ) {}
 
   async subscribe(email: string, name?: string) {
     return this.prisma.newsletterSubscriber.upsert({
@@ -31,5 +35,25 @@ export class NewsletterService {
 
   async remove(id: string) {
     return this.prisma.newsletterSubscriber.delete({ where: { id } });
+  }
+
+  async sendCampaign(subject: string, content: string) {
+    const subscribers = await this.prisma.newsletterSubscriber.findMany({
+      where: { isActive: true },
+    });
+
+    if (subscribers.length === 0) {
+      return { message: 'No active subscribers found', sentCount: 0 };
+    }
+
+    let sentCount = 0;
+    for (const sub of subscribers) {
+      const res = await this.emailService.sendNewsletter(sub.email, subject, content);
+      if (res.success) {
+        sentCount++;
+      }
+    }
+
+    return { message: `Campaign sent successfully`, sentCount };
   }
 }

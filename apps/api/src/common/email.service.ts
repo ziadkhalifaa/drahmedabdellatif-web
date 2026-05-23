@@ -144,4 +144,55 @@ export class EmailService {
   async sendAppointmentConfirmation(email: string, details: { date: string; time: string; type: string; url?: string }) {
     // Implementation for appointment confirmation emails...
   }
+
+  async sendNewsletter(email: string, subject: string, content: string) {
+    const html = `
+      <!DOCTYPE html>
+      <html dir="rtl" lang="ar">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      </head>
+      <body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc; margin: 0; padding: 40px 0;">
+        <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 24px; overflow: hidden; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);">
+          <!-- Header -->
+          <div style="background: linear-gradient(135deg, #1e40af, #3b82f6); padding: 40px 20px; text-align: center;">
+            <h1 style="color: white; margin: 0; font-size: 24px; font-weight: 800;">أ.د. أحمد عبد اللطيف</h1>
+            <p style="color: rgba(255,255,255,0.8); margin: 10px 0 0; font-size: 14px;">النشرة البريدية والتوعوية</p>
+          </div>
+
+          <!-- Content -->
+          <div style="padding: 40px 30px; line-height: 1.8; color: #334155; font-size: 16px; text-align: right;">
+            ${content}
+          </div>
+
+          <!-- Footer -->
+          <div style="background: #f8fafc; padding: 24px; text-align: center; border-top: 1px solid #e2e8f0; font-size: 12px; color: #94a3b8;">
+            <p style="margin: 0 0 8px 0;">
+              وصلتك هذه الرسالة لأنك مشترك في النشرة البريدية لعيادات أ.د. أحمد عبد اللطيف.
+            </p>
+            <p style="margin: 0;">
+              © ${new Date().getFullYear()} عيادات أ.د. أحمد عبد اللطيف. جميع الحقوق محفوظة.<br>
+              بني سويف - 6 أكتوبر، مصر
+            </p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    try {
+      const from = process.env.SMTP_USER || 'noreply@drahmedabdellatif.com';
+      await this.transporter.sendMail({
+        from: `"أ.د. أحمد عبد اللطيف" <${from}>`,
+        to: email,
+        subject: subject,
+        html,
+      });
+      return { success: true };
+    } catch (error) {
+      this.logger.error(`[Newsletter Email] Failed to send to ${email}`, error);
+      return { success: false };
+    }
+  }
 }

@@ -21,6 +21,13 @@ export class NewsletterController {
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles('admin')
+  @Post('send')
+  async sendCampaign(@Body() body: { subject: string; content: string }) {
+    return this.newsletterService.sendCampaign(body.subject, body.content);
+  }
+
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('admin')
   @Delete(':id')
   async remove(@Param('id') id: string) {
     return this.newsletterService.remove(id);
