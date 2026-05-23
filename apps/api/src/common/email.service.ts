@@ -78,7 +78,8 @@ export class EmailService {
       return { success: true };
     } catch (error) {
       this.logger.error(`[Email OTP] Failed to send to ${email}`, error);
-      throw error;
+      // Don't throw — user is already created in DB, they can request resend
+      return { success: false };
     }
   }
 
