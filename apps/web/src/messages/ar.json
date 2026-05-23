@@ -485,7 +485,20 @@
       "title": "حجوزاتي الطبية",
       "noAppointments": "لا توجد لديك حجوزات حالية.",
       "bookNow": "احجز موعداً الآن",
-      "meetingLink": "انضم للاستشارة أونلاين"
+      "meetingLink": "انضم للاستشارة أونلاين",
+      "manage": "إدارة المواعيد والاستشارات الخاصة بك.",
+      "pending": "قيد الانتظار",
+      "approved": "مقبول",
+      "completed": "مكتمل",
+      "cancelled": "ملغي",
+      "noAppointmentsDesc": "ليس لديك أي مواعيد تطابق هذه الحالة.",
+      "filters": {
+        "all": "الكل",
+        "pending": "قيد الانتظار",
+        "approved": "مقبول",
+        "completed": "مكتمل",
+        "cancelled": "ملغي"
+      }
     },
     "reports": {
       "title": "تقاريري الطبية",

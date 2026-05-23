@@ -48,8 +48,9 @@ export default function AdminClinicsPage() {
       }));
       setWorkingHours(wh);
       setBlockedSlots(bs);
-    } catch (e) {
-      toast.error('فشل تحميل العيادات');
+    } catch (e: any) {
+      console.error('Failed to load clinics details:', e);
+      toast.error(`فشل تحميل العيادات: ${e?.message || e}`);
     } finally {
       setLoading(false);
     }

@@ -485,7 +485,20 @@
       "title": "My Appointments",
       "noAppointments": "You don't have any appointments yet.",
       "bookNow": "Book Now",
-      "meetingLink": "Join Video Consultation"
+      "meetingLink": "Join Video Consultation",
+      "manage": "Manage your appointments and consultations.",
+      "pending": "Pending",
+      "approved": "Approved",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "noAppointmentsDesc": "You do not have any appointments matching this status.",
+      "filters": {
+        "all": "All",
+        "pending": "Pending",
+        "approved": "Approved",
+        "completed": "Completed",
+        "cancelled": "Cancelled"
+      }
     },
     "reports": {
       "title": "Medical Reports",
