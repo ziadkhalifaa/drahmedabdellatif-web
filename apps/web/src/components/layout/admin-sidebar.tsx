@@ -39,7 +39,7 @@ const navSections = [
     items: [
       { href: '/admin/testimonials', icon: MessageSquare, labelKey: 'testimonials' },
       { href: '/admin/messages', icon: Mail, labelKey: 'messages' },
-      { href: '/admin/newsletter', icon: Bell, labelKey: 'newsletter' },
+      { href: '/admin/newsletter', icon: Bell, labelKey: 'newsletterLabel' },
     ]
   },
   {
