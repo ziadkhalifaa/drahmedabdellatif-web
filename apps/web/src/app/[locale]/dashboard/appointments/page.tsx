@@ -29,6 +29,7 @@ import { useRouter } from '@/i18n/routing';
 
 export default function PatientAppointmentsPage() {
   const t = useTranslations('dashboard');
+  const tWizard = useTranslations('wizard');
   const locale = useLocale();
   const isRTL = locale === 'ar';
   const router = useRouter();
@@ -59,19 +60,20 @@ export default function PatientAppointmentsPage() {
   };
 
   const filteredAppointments = appointments.filter(a => 
-    statusFilter === 'ALL' ? true : a.status === statusFilter
+    statusFilter === 'ALL' ? true : a.status?.toUpperCase() === statusFilter
   );
 
   const sidebarItems = [
     { icon: <LayoutDashboard size={20} />, label: t('menu.overview'), href: '/dashboard' },
     { icon: <Calendar size={20} />, label: t('menu.appointments'), href: '/dashboard/appointments', active: true },
     { icon: <FileText size={20} />, label: t('menu.reports'), href: '/dashboard/reports' },
-    { icon: <FileText size={20} />, label: 'Prescriptions', href: '/dashboard/prescriptions' },
+    { icon: <FileText size={20} />, label: t('menu.prescriptions', { fallback: 'Prescriptions' }), href: '/dashboard/prescriptions' },
     { icon: <UserIcon size={20} />, label: t('menu.profile'), href: '/dashboard/profile' },
   ];
 
   const getStatusConfig = (status: string) => {
-    switch(status) {
+    const s = status?.toUpperCase();
+    switch(s) {
       case 'PENDING': return { icon: <Clock3 size={14} />, color: 'text-orange-500 bg-orange-500/10 border-orange-500/20', label: t('appointments.pending', { fallback: 'Pending' }) };
       case 'APPROVED': return { icon: <CheckCircle size={14} />, color: 'text-blue-500 bg-blue-500/10 border-blue-500/20', label: t('appointments.approved', { fallback: 'Approved' }) };
       case 'COMPLETED': return { icon: <CheckCircle size={14} />, color: 'text-green-500 bg-green-500/10 border-green-500/20', label: t('appointments.completed', { fallback: 'Completed' }) };
@@ -172,60 +174,60 @@ export default function PatientAppointmentsPage() {
                           exit={{ opacity: 0, scale: 0.95 }}
                           transition={{ duration: 0.2 }}
                         >
-                          <Card className="p-6 border-[var(--border)] rounded-3xl hover:shadow-lg transition-all group overflow-hidden relative">
-                            {appt.status === 'APPROVED' && (
-                              <div className="absolute top-0 right-0 h-full w-1.5 bg-blue-500" />
-                            )}
-                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                              <div className="flex items-center gap-5">
-                                <div className={cn(
-                                  "h-16 w-16 rounded-2xl flex flex-col items-center justify-center shrink-0",
-                                  isOnline ? "bg-blue-500/10 text-blue-500" : "bg-[var(--primary)]/10 text-[var(--primary)]"
-                                )}>
-                                  <span className="text-xs font-bold uppercase">
-                                    {new Date(appt.date).toLocaleString('default', { month: 'short' })}
-                                  </span>
-                                  <span className="text-2xl font-black leading-none mt-1">
-                                    {new Date(appt.date).getDate()}
-                                  </span>
-                                </div>
-                                
-                                <div className="space-y-2">
-                                  <div className="flex items-center gap-3">
-                                    <h4 className="text-lg font-black">
-                                      {isOnline ? t('wizard.onlineConsultation', { fallback: 'Online Consultation' }) : t('wizard.clinicVisit', { fallback: 'Clinic Visit' })}
-                                    </h4>
-                                    <div className={cn("flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider border", status.color)}>
-                                      {status.icon}
-                                      {status.label}
-                                    </div>
-                                  </div>
-                                  
-                                  <div className="flex flex-wrap items-center gap-4 text-sm text-[var(--muted)] font-medium">
-                                    <span className="flex items-center gap-1.5">
-                                      <Clock size={16} /> 
-                                      {formatTime12Hour(appt.timeSlot, isRTL)}
-                                    </span>
-                                    <span className="flex items-center gap-1.5">
-                                      {isOnline ? <Video size={16} /> : <MapPin size={16} />}
-                                      {isOnline ? 'Google Meet / Jitsi' : t('clinicAddress', { fallback: 'Clinic Address' })}
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
+                           <Card className="p-6 border-[var(--border)] rounded-3xl hover:shadow-lg transition-all group overflow-hidden relative">
+                             {appt.status?.toUpperCase() === 'APPROVED' && (
+                               <div className="absolute top-0 right-0 h-full w-1.5 bg-blue-500" />
+                             )}
+                             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                               <div className="flex items-center gap-5">
+                                 <div className={cn(
+                                   "h-16 w-16 rounded-2xl flex flex-col items-center justify-center shrink-0",
+                                   isOnline ? "bg-blue-500/10 text-blue-500" : "bg-[var(--primary)]/10 text-[var(--primary)]"
+                                 )}>
+                                   <span className="text-xs font-bold uppercase">
+                                     {new Date(appt.date).toLocaleString(locale, { month: 'short' })}
+                                   </span>
+                                   <span className="text-2xl font-black leading-none mt-1">
+                                     {new Date(appt.date).getDate()}
+                                   </span>
+                                 </div>
+                                 
+                                 <div className="space-y-2">
+                                   <div className="flex items-center gap-3">
+                                     <h4 className="text-lg font-black">
+                                       {isOnline ? tWizard('onlineConsultation') : tWizard('clinicVisit')}
+                                     </h4>
+                                     <div className={cn("flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider border", status.color)}>
+                                       {status.icon}
+                                       {status.label}
+                                     </div>
+                                   </div>
+                                   
+                                   <div className="flex flex-wrap items-center gap-4 text-sm text-[var(--muted)] font-medium">
+                                     <span className="flex items-center gap-1.5">
+                                       <Clock size={16} /> 
+                                       {formatTime12Hour(appt.timeSlot, isRTL)}
+                                     </span>
+                                     <span className="flex items-center gap-1.5">
+                                       {isOnline ? <Video size={16} /> : <MapPin size={16} />}
+                                       {isOnline ? 'Google Meet / Jitsi' : (appt.clinic ? (isRTL ? appt.clinic.nameAr : appt.clinic.nameEn) : (isRTL ? 'زيارة العيادة' : 'Clinic Visit'))}
+                                     </span>
+                                   </div>
+                                 </div>
+                               </div>
 
-                              <div className="flex items-center gap-3">
-                                {isOnline && appt.status === 'APPROVED' && (
-                                  <Link href={`/dashboard/video/${appt.meetingId || appt.id}`}>
-                                    <Button className="rounded-xl px-6 py-5 font-bold gap-2 shadow-lg shadow-[var(--primary)]/20 w-full md:w-auto">
-                                      <Video size={18} />
-                                      {t('joinMeeting')}
-                                    </Button>
-                                  </Link>
-                                )}
-                              </div>
-                            </div>
-                          </Card>
+                               <div className="flex items-center gap-3">
+                                 {isOnline && appt.status?.toUpperCase() === 'APPROVED' && (
+                                   <Link href={`/dashboard/video/${appt.meetingId || appt.id}`}>
+                                     <Button className="rounded-xl px-6 py-5 font-bold gap-2 shadow-lg shadow-[var(--primary)]/20 w-full md:w-auto">
+                                       <Video size={18} />
+                                       {t('joinMeeting')}
+                                     </Button>
+                                   </Link>
+                                 )}
+                               </div>
+                             </div>
+                           </Card>
                         </motion.div>
                       );
                     })}

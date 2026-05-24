@@ -288,13 +288,15 @@ export default function DashboardPage() {
                               ) : (
                                 <div className="px-5 py-3 bg-orange-500/10 text-orange-500 border border-orange-500/20 rounded-2xl text-sm font-black flex items-center gap-2">
                                   <div className="h-2 w-2 bg-orange-500 rounded-full animate-pulse" />
-                                  {t('appointments.pending') || 'بانتظار تأكيد الدفع'}
+                                  {t('appointments.pending')}
                                 </div>
                               )
                             )}
                             {activeAppointments[0]?.type === 'IN_CLINIC' && (
                               <div className="px-5 py-3 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 rounded-2xl text-sm font-black">
-                                {activeAppointments[0]?.status === 'approved' ? 'موعد عيادة مؤكد' : 'عيادة - بانتظار التأكيد'}
+                                {activeAppointments[0]?.status === 'approved' 
+                                   ? t('appointments.approved', { fallback: 'Confirmed Clinic Visit' }) 
+                                   : t('appointments.pending', { fallback: 'Clinic Visit - Pending Confirmation' })}
                               </div>
                             )}
                           </div>
