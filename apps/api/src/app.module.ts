@@ -36,11 +36,6 @@ import { HealthModule } from './modules/health/health.module';
         ttl: 60000,
         limit: 300,      // 300 requests/min per IP (was 30 - too low for dashboard)
       },
-      {
-        name: 'auth',
-        ttl: 300000,
-        limit: 10,       // 10 login attempts per 5 min (was 5, slightly relaxed)
-      },
     ]),
 
     PrismaModule,
