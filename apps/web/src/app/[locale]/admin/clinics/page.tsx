@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useLocale } from 'next-intl';
 import { useAuth } from '@/components/layout/admin-layout';
-import { clinicsApi } from '@/lib/api';
+import { clinicsApi, siteSettingsApi } from '@/lib/api';
 import { cn, formatTime12Hour } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -55,6 +55,8 @@ export default function AdminClinicsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [slotsLoading, setSlotsLoading] = useState(false);
+  const [maxBookingWeeks, setMaxBookingWeeks] = useState(2);
+  const [savingSettings, setSavingSettings] = useState(false);
   
   // UI Control States
   const [showHoursConfig, setShowHoursConfig] = useState(false);
@@ -83,6 +85,17 @@ export default function AdminClinicsPage() {
       
       const wh: Record<string, any[]> = {};
       const bs: Record<string, any[]> = {};
+
+      // Load maxBookingWeeks setting
+      try {
+        const settingsList = await siteSettingsApi.getAllPublic();
+        const maxWeeksSetting = settingsList.find((s: any) => s.key === 'maxBookingWeeks');
+        if (maxWeeksSetting) {
+          setMaxBookingWeeks(Number(maxWeeksSetting.value) || 2);
+        }
+      } catch (err) {
+        console.error('Failed to load max booking weeks settings:', err);
+      }
       
       await Promise.all(data.map(async (c: any) => {
         const [hours, blocked] = await Promise.all([
@@ -107,6 +120,21 @@ export default function AdminClinicsPage() {
       setLoading(false);
     }
   }, [token, isRTL]);
+
+  const handleSaveBookingWindow = async (weeks: number) => {
+    if (!token) return;
+    setSavingSettings(true);
+    try {
+      await siteSettingsApi.updateMultiple([{ key: 'maxBookingWeeks', value: String(weeks) }], token);
+      setMaxBookingWeeks(weeks);
+      toast.success(isRTL ? 'تم حفظ حد الحجز بنجاح ✅' : 'Booking limit saved successfully ✅');
+    } catch (err) {
+      console.error('Failed to save booking window settings:', err);
+      toast.error(isRTL ? 'فشل حفظ حد الحجز' : 'Failed to save booking limit');
+    } finally {
+      setSavingSettings(false);
+    }
+  };
 
   useEffect(() => { loadClinics(); }, [loadClinics]);
 
@@ -475,6 +503,46 @@ export default function AdminClinicsPage() {
             {/* COLUMN 2: Weekly Hours and Settings */}
             <div className="space-y-6">
               
+              {/* Booking Window Setting Card */}
+              <div className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-md p-6 space-y-4 shadow-xl">
+                <div className="flex items-center gap-3 border-b border-white/10 pb-4">
+                  <Calendar className="text-primary-light" size={20} />
+                  <div>
+                    <h4 className="font-black text-white">{isRTL ? 'نطاق الحجز المتاح' : 'Available Booking Range'}</h4>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">
+                      {isRTL 
+                        ? 'تحديد أقصى مدة مستقبلية يسمح للمرضى بالحجز خلالها بالأسابيع' 
+                        : 'Define the maximum future range (in weeks) patients can book within'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <label className="text-xs font-bold text-muted-foreground">{isRTL ? 'الحد الأقصى للحجز:' : 'Maximum Booking Window:'}</label>
+                  <div className="flex gap-2">
+                    <select
+                      value={maxBookingWeeks}
+                      onChange={e => handleSaveBookingWindow(Number(e.target.value))}
+                      disabled={savingSettings}
+                      className="flex-1 bg-[#0d1527] border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50"
+                    >
+                      {Array.from({ length: 8 }, (_, i) => i + 1).map(w => (
+                        <option key={w} value={w} className="bg-[#0b1329]">
+                          {isRTL 
+                            ? `${w} ${w === 1 ? 'أسبوع' : w === 2 ? 'أسبوعين' : w >= 3 && w <= 8 ? 'أسابيع' : 'أسبوع'}` 
+                            : `${w} ${w === 1 ? 'Week' : 'Weeks'}`}
+                        </option>
+                      ))}
+                    </select>
+                    {savingSettings && (
+                      <div className="flex items-center justify-center px-2">
+                        <Loader2 className="animate-spin text-primary" size={20} />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
               {/* Working Hours Card */}
               <div className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-md overflow-hidden shadow-xl">
                 

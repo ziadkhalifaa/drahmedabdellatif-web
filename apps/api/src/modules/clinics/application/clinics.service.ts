@@ -27,8 +27,9 @@ export class ClinicsService {
   }
 
   async getAvailableSlots(clinicId: string, dateStr: string): Promise<string[]> {
-    const targetDate = new Date(dateStr);
-    const dayOfWeek = targetDate.getDay();
+    // Fix timezone: parse date as UTC to get correct day of week regardless of server timezone
+    const [year, month, day] = dateStr.split('-').map(Number);
+    const dayOfWeek = new Date(Date.UTC(year, month - 1, day)).getUTCDay();
 
     // 1. جلب ساعات العمل لهذا اليوم
     const workingHours = await this.prisma.clinicWorkingHours.findUnique({
@@ -43,9 +44,9 @@ export class ClinicsService {
       workingHours.slotDuration,
     );
 
-    // 3. مواعيد محجوزة مسبقاً
-    const startOfDay = new Date(dateStr + 'T00:00:00');
-    const endOfDay = new Date(dateStr + 'T23:59:59');
+    // 3. مواعيد محجوزة مسبقاً - use UTC boundaries to avoid timezone shift
+    const startOfDay = new Date(`${dateStr}T00:00:00.000Z`);
+    const endOfDay = new Date(`${dateStr}T23:59:59.999Z`);
 
     const bookedAppointments = await this.prisma.appointment.findMany({
       where: {
@@ -151,10 +152,12 @@ export class ClinicsService {
     clinicId: string,
     data: { date: string; timeSlot?: string; reason?: string },
   ) {
+    // Store as UTC midnight to avoid timezone drift
+    const [year, month, day] = data.date.split('-').map(Number);
     return this.prisma.clinicBlockedSlot.create({
       data: {
         clinicId,
-        date: new Date(data.date),
+        date: new Date(Date.UTC(year, month - 1, day)),
         timeSlot: data.timeSlot || null,
         reason: data.reason,
       },
@@ -173,8 +176,9 @@ export class ClinicsService {
   }
 
   async getBlockedSlots(clinicId: string) {
-    const startOfToday = new Date();
-    startOfToday.setHours(0, 0, 0, 0);
+    // Use UTC midnight to ensure consistent comparison
+    const now = new Date();
+    const startOfToday = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
     return this.prisma.clinicBlockedSlot.findMany({
       where: {
         clinicId,

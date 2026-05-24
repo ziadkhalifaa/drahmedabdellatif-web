@@ -33,6 +33,7 @@ export default function BookingWizard() {
   const [loading, setLoading] = useState(false);
   const [clinics, setClinics] = useState<any[]>([]);
   const [paymentSettings, setPaymentSettings] = useState<any>({});
+  const [maxBookingWeeks, setMaxBookingWeeks] = useState(2);
   
   // Form State
   const [type, setType] = useState<AppointmentType | null>(null);
@@ -52,6 +53,7 @@ export default function BookingWizard() {
   const [availableSlots, setAvailableSlots] = useState<string[]>([]);
   const [slotsLoading, setSlotsLoading] = useState(false);
   const [profileLoading, setProfileLoading] = useState(false);
+  const [slotsError, setSlotsError] = useState(false);
   
   useEffect(() => {
     // Load clinics and settings
@@ -66,6 +68,10 @@ export default function BookingWizard() {
         return acc;
       }, {});
       setPaymentSettings(settings);
+      // Read doctor-configured max booking window (in weeks)
+      if (settings.maxBookingWeeks) {
+        setMaxBookingWeeks(Number(settings.maxBookingWeeks) || 2);
+      }
     }).catch(console.error);
   }, []);
 
@@ -86,22 +92,49 @@ export default function BookingWizard() {
       .catch(console.error)
       .finally(() => setProfileLoading(false));
   }, [token, user]);
-  
+
+  // Fetch available slots — used both on mount and for polling
+  const fetchSlots = (targetClinicId: string, targetDate: string, showLoading = false) => {
+    if (!targetClinicId || !targetDate) return;
+    if (showLoading) setSlotsLoading(true);
+    setSlotsError(false);
+    clinicsApi.getAvailableSlots(targetClinicId, targetDate)
+      .then(slots => {
+        setAvailableSlots(slots);
+        // Clear selected time if it was removed (blocked after selection)
+        setTimeSlot(prev => slots.includes(prev) ? prev : '');
+      })
+      .catch(() => {
+        setSlotsError(true);
+        if (showLoading) toast.error(isRTL ? 'خطأ في تحميل المواعيد' : 'Error loading slots');
+      })
+      .finally(() => setSlotsLoading(false));
+  };
+
   useEffect(() => {
     if (!date || !type) return;
-    setSlotsLoading(true);
-    
-    // For IN_CLINIC: use the selected clinic ID
-    // For ONLINE: use the virtual 'clinic-online' ID
     const targetClinicId = type === AppointmentType.IN_CLINIC ? clinicId : 'clinic-online';
-    
-    if (!targetClinicId) { setSlotsLoading(false); return; }
-    
-    clinicsApi.getAvailableSlots(targetClinicId, date)
-      .then(setAvailableSlots)
-      .catch(() => toast.error(isRTL ? 'خطأ في تحميل المواعيد' : 'Error loading slots'))
-      .finally(() => setSlotsLoading(false));
-  }, [date, clinicId, type, isRTL]);
+    if (type === AppointmentType.IN_CLINIC && !clinicId) return;
+
+    // Initial load with spinner
+    setSlotsLoading(true);
+    fetchSlots(targetClinicId, date, true);
+
+    // Poll every 30 seconds for real-time updates (no spinner for background refresh)
+    const interval = setInterval(() => {
+      fetchSlots(targetClinicId, date, false);
+    }, 30000);
+
+    return () => clearInterval(interval);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [date, clinicId, type]);
+
+  // Compute max bookable date from maxBookingWeeks
+  const maxDate = (() => {
+    const d = new Date();
+    d.setDate(d.getDate() + maxBookingWeeks * 7);
+    return d.toISOString().split('T')[0];
+  })();
 
   const handleNext = () => {
     if (currentStep === 1) {
@@ -353,9 +386,10 @@ export default function BookingWizard() {
                   <input
                     type="date"
                     min={new Date().toISOString().split('T')[0]}
+                    max={maxDate}
                     value={date}
                     onChange={e => { setDate(e.target.value); setTimeSlot(''); }}
-                    className="w-full bg-black/40 border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors"
+                    className="w-full bg-black/40 border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors [color-scheme:dark]"
                   />
                   {type === AppointmentType.IN_CLINIC && !date && (
                     <div className="bg-primary/10 border border-primary/20 rounded-xl p-4 mt-4 text-sm text-primary-light">

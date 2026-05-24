@@ -39,6 +39,8 @@ export function BookingForm() {
   const [slotsLoading, setSlotsLoading] = useState(false);
   const [profileLoading, setProfileLoading] = useState(false);
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error' | 'conflict'>('idle');
+  const [maxBookingWeeks, setMaxBookingWeeks] = useState(2);
+  const [slotsError, setSlotsError] = useState(false);
 
   useEffect(() => {
     clinicsApi.getAll().then(setClinics).catch(console.error);
@@ -48,6 +50,9 @@ export function BookingForm() {
         return acc;
       }, {});
       setPaymentSettings(settings);
+      if (settings.maxBookingWeeks) {
+        setMaxBookingWeeks(Number(settings.maxBookingWeeks) || 2);
+      }
     }).catch(console.error);
   }, []);
 
@@ -69,17 +74,49 @@ export function BookingForm() {
       .finally(() => setProfileLoading(false));
   }, [token, user]);
 
+  // Fetch available slots — used both on mount and for polling
+  const fetchSlots = (clinicId: string, date: string, showLoading = false) => {
+    if (!clinicId || !date) return;
+    if (showLoading) setSlotsLoading(true);
+    setSlotsError(false);
+    clinicsApi.getAvailableSlots(clinicId, date)
+      .then(slots => {
+        setAvailableSlots(slots);
+        // Clear selected time if it was removed (blocked after selection)
+        setForm(prev => slots.includes(prev.timeSlot) ? prev : { ...prev, timeSlot: '' });
+      })
+      .catch(() => {
+        setSlotsError(true);
+        if (showLoading) toast.error(isAr ? 'خطأ في تحميل المواعيد' : 'Error loading slots');
+      })
+      .finally(() => setSlotsLoading(false));
+  };
+
   useEffect(() => {
     if (!form.date || !form.clinicId) {
       setAvailableSlots([]);
       return;
     }
+
+    // Initial load with spinner
     setSlotsLoading(true);
-    clinicsApi.getAvailableSlots(form.clinicId, form.date)
-      .then(setAvailableSlots)
-      .catch(console.error)
-      .finally(() => setSlotsLoading(false));
+    fetchSlots(form.clinicId, form.date, true);
+
+    // Poll every 30 seconds for real-time updates (no spinner for background refresh)
+    const interval = setInterval(() => {
+      fetchSlots(form.clinicId, form.date, false);
+    }, 30000);
+
+    return () => clearInterval(interval);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.date, form.clinicId]);
+
+  // Compute max bookable date from maxBookingWeeks
+  const maxDate = (() => {
+    const d = new Date();
+    d.setDate(d.getDate() + maxBookingWeeks * 7);
+    return d.toISOString().split('T')[0];
+  })();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -389,6 +426,7 @@ export function BookingForm() {
               onChange={(e) => setForm({ ...form, date: e.target.value })}
               required
               min={new Date().toISOString().split('T')[0]}
+              max={maxDate}
               className={cn("rounded-xl border-white/10 bg-white/5 text-white focus:border-[var(--primary)] transition-colors [color-scheme:dark] h-12", isAr ? "pr-11" : "pl-11")}
             />
           )}
@@ -408,7 +446,13 @@ export function BookingForm() {
                 (!form.date || !form.clinicId || slotsLoading) && "opacity-50 cursor-not-allowed"
               )}
             >
-              <option value="" className="bg-[#050e1a]">{slotsLoading ? (isAr ? 'جاري التحميل...' : 'Loading...') : (isAr ? 'اختر وقتاً' : 'Select a time')}</option>
+              <option value="" className="bg-[#050e1a]">
+                {slotsLoading 
+                  ? (isAr ? 'جاري التحميل...' : 'Loading...') 
+                  : slotsError 
+                    ? (isAr ? 'خطأ في تحميل المواعيد' : 'Error loading slots') 
+                    : (isAr ? 'اختر وقتاً' : 'Select a time')}
+              </option>
               {availableSlots.length > 0 ? availableSlots.map((slot) => (
                 <option key={slot} value={slot} className="bg-[#050e1a]">{formatTime12Hour(slot, isAr)}</option>
               )) : (

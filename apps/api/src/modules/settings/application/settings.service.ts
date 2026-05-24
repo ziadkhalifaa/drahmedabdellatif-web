@@ -21,4 +21,16 @@ export class SettingsService {
       create: { key, value },
     });
   }
+
+  async setMultiple(settings: { key: string; value: any }[]) {
+    return Promise.all(
+      settings.map((s) =>
+        this.prisma.siteSettings.upsert({
+          where: { key: s.key },
+          update: { value: s.value },
+          create: { key: s.key, value: s.value },
+        }),
+      ),
+    );
+  }
 }
