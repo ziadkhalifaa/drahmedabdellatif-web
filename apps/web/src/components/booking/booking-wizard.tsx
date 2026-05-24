@@ -345,7 +345,7 @@ export default function BookingWizard() {
                 <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="space-y-3 pt-4">
                   <h3 className="text-white/80 font-bold px-2">{isRTL ? 'اختر العيادة:' : 'Select Clinic:'}</h3>
                   <div className="grid grid-cols-1 gap-3">
-                    {clinics.map(clinic => (
+                    {clinics.filter(clinic => clinic.id !== 'clinic-online').map(clinic => (
                       <button
                         key={clinic.id}
                         onClick={() => setClinicId(clinic.id)}
