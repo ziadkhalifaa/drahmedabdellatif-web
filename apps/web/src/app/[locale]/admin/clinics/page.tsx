@@ -77,6 +77,8 @@ export default function AdminClinicsPage() {
   const [blockDayOptionType, setBlockDayOptionType] = useState<'vacation' | 'closed' | 'custom'>('vacation');
   const [selectedBlockedItem, setSelectedBlockedItem] = useState<any | null>(null);
   const [isBlockingWholeDay, setIsBlockingWholeDay] = useState(false);
+  const [blockingInProgress, setBlockingInProgress] = useState(false);
+  const [unblockingInProgress, setUnblockingInProgress] = useState(false);
 
   const loadClinics = useCallback(async () => {
     try {
@@ -180,7 +182,8 @@ export default function AdminClinicsPage() {
   };
 
   const addBlockedSlot = async (slotTime: string | null, reason: string) => {
-    if (!clinic || !token || !selectedDate) return;
+    if (!clinic || !token || !selectedDate || blockingInProgress) return;
+    setBlockingInProgress(true);
     try {
       const payload = {
         date: selectedDate,
@@ -202,11 +205,14 @@ export default function AdminClinicsPage() {
       fetchAvailableSlots();
     } catch {
       toast.error(isRTL ? 'فشل الحجب' : 'Failed to block slot');
+    } finally {
+      setBlockingInProgress(false);
     }
   };
 
   const removeBlockedSlot = async (slotId: string) => {
-    if (!clinic || !token) return;
+    if (!clinic || !token || unblockingInProgress) return;
+    setUnblockingInProgress(true);
     try {
       await clinicsApi.removeBlockedSlot(clinic.id, slotId, token);
       
@@ -220,6 +226,8 @@ export default function AdminClinicsPage() {
       fetchAvailableSlots();
     } catch {
       toast.error(isRTL ? 'فشل إلغاء الحجب' : 'Failed to unblock slot');
+    } finally {
+      setUnblockingInProgress(false);
     }
   };
 
@@ -823,13 +831,17 @@ export default function AdminClinicsPage() {
               <div className="flex items-center gap-3 pt-2">
                 <button
                   onClick={() => addBlockedSlot(blockingSlot, blockReasonText)}
-                  className="flex-1 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-2xl text-xs font-black shadow-lg shadow-orange-500/20 transition-all"
+                  disabled={blockingInProgress}
+                  className="flex-1 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-2xl text-xs font-black shadow-lg shadow-orange-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isRTL ? 'حفظ وحجب الموعد الآن' : 'Confirm & Block Slot'}
+                  {blockingInProgress
+                    ? (isRTL ? 'جاري الحفظ...' : 'Saving...')
+                    : (isRTL ? 'حفظ وحجب الموعد الآن' : 'Confirm & Block Slot')}
                 </button>
                 <button
                   onClick={() => setBlockingSlot(null)}
-                  className="px-5 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl text-xs font-black text-white transition-all"
+                  disabled={blockingInProgress}
+                  className="px-5 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl text-xs font-black text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isRTL ? 'إلغاء' : 'Cancel'}
                 </button>
@@ -892,14 +904,18 @@ export default function AdminClinicsPage() {
               <div className="flex items-center gap-3 pt-2">
                 <button
                   onClick={() => removeBlockedSlot(selectedBlockedItem.id)}
-                  className="flex-1 py-3 bg-red-500 hover:bg-red-600 text-white rounded-2xl text-xs font-black shadow-lg shadow-red-500/20 transition-all flex items-center justify-center gap-2"
+                  disabled={unblockingInProgress}
+                  className="flex-1 py-3 bg-red-500 hover:bg-red-600 text-white rounded-2xl text-xs font-black shadow-lg shadow-red-500/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Unlock size={14} />
-                  {isRTL ? 'إلغاء الحجب وجعله متاحاً للمرضى' : 'Unblock & Make Slot Available'}
+                  {unblockingInProgress
+                    ? (isRTL ? 'جاري إلغاء الحجب...' : 'Unblocking...')
+                    : (isRTL ? 'إلغاء الحجب وجعله متاحاً للمرضى' : 'Unblock & Make Slot Available')}
                 </button>
                 <button
                   onClick={() => setSelectedBlockedItem(null)}
-                  className="px-5 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl text-xs font-black text-white transition-all"
+                  disabled={unblockingInProgress}
+                  className="px-5 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl text-xs font-black text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isRTL ? 'إغلاق' : 'Close'}
                 </button>

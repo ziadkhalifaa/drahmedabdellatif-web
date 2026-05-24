@@ -13,19 +13,19 @@ export class SettingsController {
   constructor(private readonly settingsService: SettingsService) {}
 
   @Get('public')
-  @Header('Cache-Control', 'public, max-age=300, stale-while-revalidate=600')
+  @Header('Cache-Control', 'no-store, no-cache, must-revalidate')
   async getPublic() {
     return this.settingsService.getAll();
   }
 
   @Get(':key')
-  @Header('Cache-Control', 'public, max-age=300, stale-while-revalidate=600')
+  @Header('Cache-Control', 'no-store, no-cache, must-revalidate')
   async get(@Param('key') key: string) {
     return this.settingsService.get(key);
   }
 
   @Get()
-  @Header('Cache-Control', 'public, max-age=300, stale-while-revalidate=600')
+  @Header('Cache-Control', 'no-store, no-cache, must-revalidate')
   async getAll() {
     return this.settingsService.getAll();
   }

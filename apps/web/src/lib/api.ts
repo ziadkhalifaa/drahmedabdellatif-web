@@ -274,7 +274,7 @@ export const appointmentsApi = {
 };
 
 export const siteSettingsApi = {
-  getAllPublic: () => api.get<any[]>('/settings/public'),
+  getAllPublic: () => api.get<any[]>(`/settings/public?_t=${Date.now()}`),
   updateMultiple: (settings: { key: string; value: string }[], token: string) =>
     api.put<any>('/settings', { settings }, token),
 };

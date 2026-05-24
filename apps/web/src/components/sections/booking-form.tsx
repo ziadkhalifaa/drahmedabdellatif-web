@@ -102,10 +102,10 @@ export function BookingForm() {
     setSlotsLoading(true);
     fetchSlots(form.clinicId, form.date, true);
 
-    // Poll every 30 seconds for real-time updates (no spinner for background refresh)
+    // Poll every 10 seconds for real-time updates (no spinner for background refresh)
     const interval = setInterval(() => {
       fetchSlots(form.clinicId, form.date, false);
-    }, 30000);
+    }, 10000);
 
     return () => clearInterval(interval);
   // eslint-disable-next-line react-hooks/exhaustive-deps
