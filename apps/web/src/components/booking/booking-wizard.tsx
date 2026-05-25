@@ -591,25 +591,42 @@ export default function BookingWizard() {
                   <button
                     onClick={() => setPaymentMethod('VODAFONE_CASH')}
                     className={cn(
-                      'p-4 rounded-xl border-2 flex flex-col items-center gap-2 font-bold transition-all',
+                      'p-4 rounded-xl border-2 flex flex-col items-center gap-3 font-bold transition-all',
                       paymentMethod === 'VODAFONE_CASH'
                         ? 'bg-red-600/20 border-red-500 text-white shadow-lg shadow-red-500/10'
                         : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10 hover:border-white/20'
                     )}
                   >
-                    <span className="text-2xl">📱</span>
+                    <div className="w-12 h-12 flex items-center justify-center rounded-full bg-white/5 p-1">
+                      <svg className="w-10 h-10" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="50" r="48" fill="#E60000" />
+                        <path d="M50 22C34.54 22 22 34.54 22 50C22 62.63 30.36 73.31 41.87 76.79L36.75 83.6H49.03L53.1 77.41C54.26 77.52 55.43 77.58 56.6 77.58C72.06 77.58 84.6 65.04 84.6 49.58C84.6 34.12 72.06 22 56.6 22C55.43 22 54.26 22.06 53.1 22.17V22H50ZM56.6 37.28C63.4 37.28 68.9 42.78 68.9 49.58C68.9 56.38 63.4 61.88 56.6 61.88C49.8 61.88 44.3 56.38 44.3 49.58C44.3 42.78 49.8 37.28 56.6 37.28Z" fill="white" />
+                      </svg>
+                    </div>
                     <span className="text-sm">{isRTL ? 'فودافون كاش' : 'Vodafone Cash'}</span>
                   </button>
                   <button
                     onClick={() => setPaymentMethod('INSTAPAY')}
                     className={cn(
-                      'p-4 rounded-xl border-2 flex flex-col items-center gap-2 font-bold transition-all',
+                      'p-4 rounded-xl border-2 flex flex-col items-center gap-3 font-bold transition-all',
                       paymentMethod === 'INSTAPAY'
                         ? 'bg-purple-600/20 border-purple-500 text-white shadow-lg shadow-purple-500/10'
                         : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10 hover:border-white/20'
                     )}
                   >
-                    <span className="text-2xl">💜</span>
+                    <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-white/5 p-1">
+                      <svg className="w-10 h-10" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="100" height="100" rx="24" fill="url(#instapay-btn-grad)" />
+                        <path d="M52 18 L28 54 H47 L36 82 L72 46 H53 Z" fill="white" />
+                        <defs>
+                          <linearGradient id="instapay-btn-grad" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+                            <stop stopColor="#c8102e" />
+                            <stop offset="0.5" stopColor="#7C3AED" />
+                            <stop offset="1" stopColor="#00ADEF" />
+                          </linearGradient>
+                        </defs>
+                      </svg>
+                    </div>
                     <span className="text-sm">{isRTL ? 'انستا باي' : 'InstaPay'}</span>
                   </button>
                 </div>
