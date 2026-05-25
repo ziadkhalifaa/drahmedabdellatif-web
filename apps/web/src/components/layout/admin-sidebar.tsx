@@ -3,7 +3,7 @@
 import { useTranslations, useLocale } from 'next-intl';
 import { useAuth } from './admin-layout';
 import { 
-  LogOut, LayoutDashboard, Calendar, FileText, 
+  LogOut, LayoutDashboard, Calendar, CalendarDays, FileText, 
   Package, MessageSquare, Star, X, Image, 
   Settings, ChevronRight, PieChart, Users, Edit3,
   Clock, Bell, ShieldCheck, Mail, Users2, Layout,
@@ -19,6 +19,7 @@ const navSections = [
     items: [
       { href: '/admin', icon: LayoutDashboard, labelKey: 'dashboard' },
       { href: '/admin/appointments', icon: Calendar, labelKey: 'appointments' },
+      { href: '/admin/calendar', icon: CalendarDays, labelKey: 'calendar_view' },
       { href: '/admin/clinics', icon: Building2, labelKey: 'clinics' },
       { href: '/admin/payments', icon: CreditCard, labelKey: 'payments' },
       { href: '/admin/editor', icon: Edit3, labelKey: 'live_editor' },
@@ -123,6 +124,8 @@ export function AdminSidebar({ open, onClose }: { open: boolean; onClose: () => 
                       ? (isRTL ? 'العيادات' : 'Clinics')
                       : item.labelKey === 'payments'
                       ? (isRTL ? 'المدفوعات' : 'Payments')
+                      : item.labelKey === 'calendar_view'
+                      ? (isRTL ? 'التقويم' : 'Calendar')
                       : t(item.labelKey)}</span>
                   </div>
                   {isActive(item.href) && (
